@@ -103,8 +103,9 @@ Different learners make different errors, and combining them reduces the varianc
 1. **Base learners:**
    - tuned LightGBM;
    - tuned XGBoost;
-   - histogram gradient boosting (scikit-learn);
-   - Extra Trees, for the datasets with fewer than 150,000 training structures (memory limit).
+   - histogram gradient boosting (scikit-learn).
+
+   We also tried **Extra Trees** as a fourth base learner. We removed it: the fully grown trees took **447 MB of RAM** (95 % of the ensemble), the stacker gave it only a small weight (0.17), and it barely changed the accuracy (see section 6). The deployed models are 3–4 MB.
 2. **Out-of-fold predictions.** The training set is split into 3 folds grouped by formula. Each base learner is trained on 2 folds and predicts the third. Every training structure thus gets a probability from each learner that was produced *without having seen it*.
 3. **Meta-learner.** A logistic regression is trained on the **logits** of these out-of-fold probabilities:
 
@@ -145,21 +146,44 @@ The test set holds 20,000 structures per task (stratified), or the whole held-ou
 
 ## 6. Results – ablation on the held-out test set
 
-*The numbers come from `data/predictions/high_accuracy/{task}_summary.json` and `{task}_ablation.csv`, and are filled in as the trainings finish.*
+*The numbers come from `data/predictions/high_accuracy/{task}_summary.json` and `{task}_ablation.csv`.*
 
-| Task | 1. Composition only | 2. + structure | 3. + tuning | 4. + stacking | 5. + threshold | Balanced acc. | ROC-AUC |
-|---|---|---|---|---|---|---|---|
-| Metallicity | 90.3 % | 91.4 % | *running* | *running* | *running* | *running* | *running* |
-| Magnetism | *queued* | | | | | | |
-| PV band gap | *queued* | | | | | | |
-| Stability | *queued* | | | | | | |
+**Test accuracy after each step:**
+
+| Task (test structures) | 1. Composition only | 2. + structure | 3. + tuning | 4. + stacking | 5. + threshold (= final) |
+|---|---|---|---|---|---|
+| Metallicity (20,000) | 90.3 % | 91.4 % | 91.3 % | 91.5 % | **91.5 %** |
+| Magnetism (17,535) | 93.4 % | 94.5 % | 94.3 % | 94.6 % | **94.6 %** |
+| Stability (20,000) | 85.4 % | 89.8 % | 88.7 % | 90.3 % | **90.3 %** |
+| PV band gap (20,000) | 93.5 % | 93.8 % | 93.3 % | 93.6 % | **93.5 %** |
+
+**Final models (all metrics):**
+
+| Task | Accuracy | Balanced accuracy | F1 | ROC-AUC | Threshold | Gain vs. composition only |
+|---|---|---|---|---|---|---|
+| Metallicity | **91.5 %** | 91.1 % | 0.901 | 0.969 | 0.50 | +1.2 points |
+| Magnetism | **94.6 %** | 91.6 % | 0.874 | 0.983 | 0.51 | +1.2 points |
+| Stability | **90.3 %** | 87.0 % | 0.818 | 0.961 | 0.50 | **+4.9 points** |
+| PV band gap | **93.5 %** | 58.9 % | 0.292 | 0.906 | 0.56 | 0 points |
+
+### What the ablation teaches us
+
+1. **The crystal structure is the main ingredient.**
+   - Stability gains +4.3 points from the structure descriptors alone.
+   - Its five most important descriptors are all structural: atoms in the primitive cell, symmetry-distinct sites, shortest bond relative to covalent radii, mean coordination number and spread of bond lengths.
+   - Metallicity and magnetism gain about +1.1 points each.
+2. **Tuning did not help accuracy.** The Optuna-tuned LightGBM is slightly *below* the default one on every task (−0.1 to −1.0 points). It was tuned on log-loss over a sub-sample of at most 60,000 structures, and that optimum did not carry over to the full training set. We report this as it is rather than hiding the step.
+3. **Stacking helps a little.** It adds +0.1 to +0.5 points over the best single model.
+4. **The accuracy-optimal threshold** ends up at about 0.50 for the three balanced tasks, so it changes nothing. For the band gap it moves to 0.56 and costs 0.1 points on the test set: the threshold is chosen on training data only, and that is the honest outcome.
+5. **The photovoltaic band gap stays hard.**
+   - Only 7.3 % of structures are positive. "Always no" already scores 92.7 %.
+   - Our 93.5 % is therefore only slightly better than that baseline, as the balanced accuracy of 58.9 % shows.
+   - The ROC-AUC of 0.906 shows the model *ranks* materials well. It is useful for screening, where the top-ranked candidates are inspected first, but it is not a reliable yes/no classifier.
+6. **Extra Trees was removed.** With it as a fourth base learner, metallicity scored 91.7 % instead of 91.5 % and magnetism 94.5 % instead of 94.6 %, for 450 MB of memory. Not worth it.
 
 Step 1 is a LightGBM with default settings (the model family that won Track A), using composition descriptors only and trained on all structures. The comparison between steps 1 and 5 is fair: same test set, same split, same labels.
 
 Track A's accuracies (section 2) were measured per *formula*, while Track B measures per *structure* on a different test set. The fair before/after comparison is therefore **step 1 against step 5 within Track B**.
-
-Already visible on metallicity: adding the **structure descriptors** raises accuracy from 90.3 % to **91.4 %** (+1.1 points) and the ROC-AUC from 0.963 to 0.969, on exactly the same test structures.
-
 ## 7. Why we do not reach 98 %
 
 98 % accuracy on all four tasks is not reachable with an honest evaluation. The reasons:
@@ -168,6 +192,8 @@ Already visible on metallicity: adding the **structure descriptors** raises accu
 2. **Stability is a property of the whole phase diagram,** not of one structure. Whether a compound is on the convex hull depends on the energies of all competing phases. No descriptor of a single structure contains that information. This is why stability stays the hardest task.
 3. **Metallicity and band gap depend on the electronic structure.** Borderline cases (small gaps, semimetals) are hard to separate from geometry alone.
 4. **Our test is deliberately strict.** With a random split, polymorphs of the same formula would sit on both sides and the accuracy would look several points higher. We refuse that shortcut, because it measures memorisation, not prediction.
+
+5. **A structure-aware model needs a relaxed structure.** Our structure descriptors come from DFT-relaxed geometries, which already contain some information about the energy. This is fine for known materials and database screening. For a brand-new composition, however, a structure must first be predicted or relaxed (prototype decoration, a machine-learned potential, or DFT). This is why the application keeps the composition-only SSL models as a fallback.
 
 The next real gain would come from **graph neural networks** that learn directly from atomic positions (CGCNN, MEGNet, ALIGNN). They need a GPU and much longer training, and are left as future work.
 
@@ -179,6 +205,11 @@ The next real gain would come from **graph neural networks** that learn directly
    - If no structure is known (a hypothetical composition) or the database cannot be reached, the app **falls back** to the Track A composition-only SSL models.
 3. **Explanations.** SHAP contributions now include structure descriptors, marked ◆ (for example "mean coordination number" or "volume per atom").
 4. **Offline demo.** `app/models/structure_cache.json` stores the structures of 50 demo materials, so the presentation works without internet.
+5. **Model vs. DFT.** When the structure comes from Alexandria, its DFT hull distance is shown next to the stability prediction, so the model can be compared with the database in front of the audience. The model is not always right. Two examples are Cu and Fe₂O₃, which it predicts unstable:
+   - Alexandria's lowest-energy Cu is an unusual 7-atom rhombohedral cell, and plain fcc Cu sits 0.076 eV/atom above the hull in that PBE database;
+   - Alexandria's lowest-energy Fe₂O₃ is a 40-atom cubic cell.
+
+   Neither ground state is among the 5 Alexandria files (out of about 45) that we downloaded. Training on the complete Alexandria database (about 4.5 million entries) is the obvious next step for stability.
 
 While building this we fixed a bug. The lookup selected the entry with the lowest hull distance using `value or 9`, which treats a distance of exactly **0.0** (the true ground state) as missing. For Cu and Fe the app was therefore showing a metastable structure. The fix compares against `None` explicitly.
 

@@ -23,3 +23,4 @@ shot 09_lab_bandgap "/lab?tab=bandgap" 2000
 shot 10_lab_unsupervised "/lab?tab=unsupervised" 1900
 shot 11_compare "/compare?f=LiFePO4,LiMnPO4,LiCoO2" 1100
 shot 12_lab_datasets "/lab?tab=datasets" 1100
+shot 13_lab_accuracy "/lab?tab=accuracy" 1900

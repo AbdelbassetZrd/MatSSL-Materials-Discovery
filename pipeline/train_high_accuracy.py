@@ -116,7 +116,11 @@ def tune(kind: str, X, y, groups, n_trials: int, n_jobs: int) -> tuple[dict, flo
 
     study = optuna.create_study(direction="minimize",
                                 sampler=optuna.samplers.TPESampler(seed=0))
-    study.optimize(objective, n_trials=n_trials)
+    def progress(st, tr):
+        if (tr.number + 1) % 5 == 0 or tr.number + 1 == n_trials:
+            log(f"    {kind} trial {tr.number + 1}/{n_trials}  best logloss {st.best_value:.4f}")
+
+    study.optimize(objective, n_trials=n_trials, callbacks=[progress])
     return study.best_params, study.best_value
 
 
@@ -132,6 +136,10 @@ def main() -> None:
     ap.add_argument("--trials", type=int, default=30)
     ap.add_argument("--tune-sample", type=int, default=60000)
     ap.add_argument("--n-jobs", type=int, default=-1)
+    ap.add_argument("--extra-trees", action="store_true",
+                    help="add Extra Trees to the stack (large model: ~450 MB in memory)")
+    ap.add_argument("--reuse-tuning", action="store_true",
+                    help="reuse the Optuna parameters of an earlier run (skip tuning)")
     args = ap.parse_args()
     task, nj = args.task, args.n_jobs
     OUT.mkdir(parents=True, exist_ok=True)
@@ -174,9 +182,17 @@ def main() -> None:
     # ------------------------------------------------------------------ 3: tuning
     rng = np.random.default_rng(1)
     sub = tr if len(tr) <= args.tune_sample else rng.choice(tr, args.tune_sample, replace=False)
-    log(f"Optuna on {len(sub):,} training structures ({args.trials} trials per family)")
-    p_lgb, cv_lgb = tune("lgbm", X[sub], y[sub], groups[sub], args.trials, nj)
-    p_xgb, cv_xgb = tune("xgb", X[sub], y[sub], groups[sub], max(10, args.trials * 2 // 3), nj)
+    prev = OUT / f"{task}_summary.json"
+    if args.reuse_tuning and prev.exists():
+        P = json.loads(prev.read_text())
+        p_lgb, p_xgb = P["tuned_params"]["LightGBM"], P["tuned_params"]["XGBoost"]
+        cv_lgb, cv_xgb = P["tuning_cv_logloss"]["LightGBM"], P["tuning_cv_logloss"]["XGBoost"]
+        log("reusing the Optuna parameters of the previous run")
+    else:
+        log(f"Optuna on {len(sub):,} training structures ({args.trials} trials per family)")
+        p_lgb, cv_lgb = tune("lgbm", X[sub], y[sub], groups[sub], args.trials, nj)
+        p_xgb, cv_xgb = tune("xgb", X[sub], y[sub], groups[sub],
+                             max(10, args.trials * 2 // 3), nj)
     log(f"  tuned LightGBM logloss={cv_lgb:.4f} {p_lgb}")
     log(f"  tuned XGBoost  logloss={cv_xgb:.4f} {p_xgb}")
     m3 = lgbm(p_lgb, nj).fit(X[tr], ytr)
@@ -189,7 +205,7 @@ def main() -> None:
              ("HistGB", HistGradientBoostingClassifier(max_iter=500, learning_rate=0.08,
                                                        max_leaf_nodes=63, l2_regularization=1.0,
                                                        random_state=42))]
-        if len(tr) <= 150_000:
+        if args.extra_trees and len(tr) <= 150_000:
             b.append(("ExtraTrees", ExtraTreesClassifier(n_estimators=300, min_samples_leaf=2,
                                                          max_features=0.3, n_jobs=nj,
                                                          random_state=42)))

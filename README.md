@@ -82,6 +82,29 @@ See `report/main.pdf` (sections 6-9) and the Research Lab page of the app. In sh
 
 The deployed models are listed in `app/models/registry.json`.
 
+## High-accuracy track (all labels + crystal structure)
+
+Separate from the 1,000-label SSL study. It uses one row per crystal structure, 28
+crystal-structure descriptors (spglib + numpy), tuned LightGBM/XGBoost, a stacked ensemble and
+an accuracy-optimal threshold. The test split is grouped by formula.
+Full explanation: [`docs/high_accuracy_methods.md`](docs/high_accuracy_methods.md).
+
+| Task | Composition only | Final accuracy | Balanced acc. | ROC-AUC |
+|---|---|---|---|---|
+| Metallicity | 90.3 % | **91.5 %** | 91.1 % | 0.969 |
+| Magnetism | 93.4 % | **94.6 %** | 91.6 % | 0.983 |
+| Stability | 85.4 % | **90.3 %** | 87.0 % | 0.961 |
+| PV band gap | 93.5 % | **93.5 %** | 58.9 % | 0.906 |
+
+```bash
+uv run python pipeline/build_structure_dataset.py
+uv run python pipeline/train_high_accuracy.py --task stability   # metallicity, magnetism, band_gap
+uv run python pipeline/build_structure_cache.py                  # offline structures for the demo
+```
+
+The web app uses these models when the lowest-energy structure of the formula is known
+(Alexandria), and the SSL composition models otherwise.
+
 ## MatSSL Studio (web application)
 
 | Page | What it shows |

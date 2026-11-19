@@ -9,7 +9,7 @@ import { AXIS, GRID, NEG, POS, TASK, fmt } from "../lib/theme.js";
 
 const ICONS = { metallicity: Zap, magnetism: Magnet, stability: Scale, band_gap: Sun };
 
-export function PropertyCard({ p }) {
+export function PropertyCard({ p, reference }) {
   const Icon = ICONS[p.task] || Zap;
   const t = TASK[p.task];
   return (
@@ -37,6 +37,10 @@ export function PropertyCard({ p }) {
           <b className="text-ink">{fmt(p.test_metrics?.Accuracy)} · {fmt(p.test_metrics?.["ROC-AUC"])}</b></div>
         {p.ssl_probability != null && (
           <div className="flex justify-between"><span>SSL model (1,000 labels)</span><span className="font-mono">{(100 * p.ssl_probability).toFixed(0)}%</span></div>
+        )}
+        {reference != null && (
+          <div className="flex justify-between gap-2"><span>DFT reference (Alexandria)</span>
+            <b className={reference <= 0.05 ? "text-good" : "text-amber-700"}>{reference <= 0.05 ? "stable" : "unstable"} · {reference.toFixed(3)} eV/atom</b></div>
         )}
       </div>
     </div>

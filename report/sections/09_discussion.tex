@@ -53,9 +53,9 @@ two restrictions while keeping the evaluation honest:
   relative to covalent radii), and coordination-number statistics. Energies, magnetic moments
   and band gaps are never used as inputs.
   \item \textbf{All training labels}, Optuna-tuned LightGBM and XGBoost, and a
-  \textbf{stacked ensemble} (LightGBM, XGBoost, histogram gradient boosting and, for the datasets
-  below 150,000 training structures, Extra Trees; logistic-regression meta-learner on
-  out-of-fold probabilities).
+  \textbf{stacked ensemble} (LightGBM, XGBoost and histogram gradient boosting;
+  logistic-regression meta-learner on out-of-fold probabilities). Extra Trees was tried as a
+  fourth member but removed: it needed 447\,MB of memory for a negligible accuracy gain.
   \item An \textbf{accuracy-optimal decision threshold}, chosen on out-of-fold predictions of
   the training set only.
 \end{enumerate}
@@ -76,9 +76,19 @@ already seen and would inflate the accuracy.
 The final models reach \HAMetalAcc\% accuracy for metallicity (composition only:
 \HAMetalBaseAcc\%), \HAMagAcc\% for magnetism (\HAMagBaseAcc\%), \HAStabAcc\% for stability
 (\HAStabBaseAcc\%) and \HAGapAcc\% for the photovoltaic band gap (\HAGapBaseAcc\%).
+The crystal structure is the main ingredient. For stability it adds 4.3 points on its own,
+and the five most important descriptors of the stability model are all structural: atoms in
+the primitive cell, symmetry-distinct sites, shortest bond relative to covalent radii, mean
+coordination number and spread of bond lengths. Optuna tuning did not improve accuracy: the
+parameters were tuned on log-loss over a 40,000--60,000-structure sub-sample and did not
+transfer to the full training set. Stacking adds 0.1--0.5 points, and the accuracy-optimal
+threshold stays close to 0.5 for the balanced tasks.
 For the band gap only 7.3\% of the structures are positive: a model that always answers
 ``outside the window'' would already reach 92.7\% accuracy. Its balanced accuracy
-(\HAGapBal\%) is therefore the fairer number. Accuracies close to 98--99\% are not reachable
+(\HAGapBal\%) is therefore the fairer number, and its ROC-AUC (\HAGapAUC) makes it a ranking
+tool for screening rather than a yes/no classifier. Finally, these models need a relaxed
+crystal structure, which is available for known materials but must be predicted first for a
+new composition. Accuracies close to 98--99\% are not reachable
 with honest evaluation for these properties: stability, in particular, depends on competing
 phases that no descriptor of a single structure encodes, and the DFT labels themselves carry
 numerical noise near the decision boundaries (for example, a hull distance of 0.049 versus

@@ -84,7 +84,7 @@ export default function Results() {
       <StructureBanner r={r} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-        {r.predictions.map((p) => <PropertyCard key={p.task} p={p} />)}
+        {r.predictions.map((p) => <PropertyCard key={p.task} p={p} reference={p.task === "stability" ? r.structure?.e_above_hull : null} />)}
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

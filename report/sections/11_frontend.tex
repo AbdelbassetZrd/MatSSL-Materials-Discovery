@@ -6,7 +6,9 @@ with React (frontend) and FastAPI (backend). The backend exposes the deployed mo
 API (\texttt{/materials/predict}, \texttt{/analyze}, \texttt{/similar}, \texttt{/structure},
 \texttt{/experiments}, \texttt{/models-info}). The frontend lets users build a chemical
 composition, inspect its crystal structure, and receive stability, magnetism, metallicity and
-photovoltaic band-gap predictions, each with an explanation and a reliability check. Beyond
+photovoltaic band-gap predictions, each with an explanation and a reliability check. When the lowest-energy crystal structure of the composition is known (Alexandria),
+the structure-aware high-accuracy models are used; otherwise the semi-supervised composition
+models. Beyond
 prediction, a \textbf{Research Lab} presents every experiment of this report interactively, a
 \textbf{Compare} page ranks candidate materials side by side, and a guided \textbf{demo tour}
 supports the oral presentation. The whole application ships as a single Docker image in which
@@ -51,4 +53,5 @@ The application has five sections:
 \shot{screenshots/06_results.png}{Results Interface (LiFePO$_4$)}
 \shot{screenshots/07_lab_ssl.png}{Research Lab: semi-supervised experiments}
 \shot{screenshots/08_lab_models.png}{Research Lab: selected models, confusion matrices and ROC curves}
+\shot{screenshots/13_lab_accuracy.png}{Research Lab: high-accuracy track (composition + crystal structure, stacked ensemble)}
 \shot{screenshots/11_compare.png}{Compare Interface (battery cathodes)}

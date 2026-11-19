@@ -36,7 +36,9 @@ export default function HighAccuracy({ data }) {
               </div>
               <div className="flex items-end gap-3">
                 <div className="font-display text-4xl font-bold text-brand">{pct(f.Accuracy)}</div>
-                <div className="pb-1 text-xs text-good font-semibold">+{(100 * gain).toFixed(1)} pts vs composition only</div>
+                <div className={`pb-1 text-xs font-semibold ${gain > 0.0005 ? "text-good" : "text-ink-mute"}`}>
+                  {Math.abs(gain) < 0.0005 ? "±0.0" : `${gain > 0 ? "+" : "−"}${Math.abs(100 * gain).toFixed(1)}`} pts vs composition only
+                </div>
               </div>
               <div className="grid grid-cols-3 gap-2 text-center">
                 {[["Balanced", f.Balanced_Accuracy], ["F1", f["F1-Score"]], ["ROC-AUC", f["ROC-AUC"]]].map(([l, v]) => (
