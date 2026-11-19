@@ -1,0 +1,46 @@
+\clearpage
+\section{Frontend Interface}
+
+To demonstrate practical applicability, a web application was developed with React (frontend)
+and FastAPI (backend). The backend exposes the deployed models through a REST API
+(\texttt{/materials/predict}, \texttt{/materials/analyze}, \texttt{/materials/structure},
+\texttt{/materials/models-info}), while the frontend allows users to build a chemical
+composition, inspect its crystal structure and receive stability, magnetism, metallicity and
+photovoltaic band-gap predictions. The application is packaged in a single Docker image in which
+FastAPI also serves the compiled React interface.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/01_start.png}
+  \caption{Starting Interface}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/02_editor.png}
+  \caption{Composition editor Interface (periodic table)}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/03_input.png}
+  \caption{Inputing formula Interface}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/04_viewer.png}
+  \caption{3D crystal View Interface}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/05_analyze.png}
+  \caption{Analyze Material Interface}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{screenshots/06_results.png}
+  \caption{Results Interface}
+\end{figure}

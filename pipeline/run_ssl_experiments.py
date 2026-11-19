@@ -177,7 +177,7 @@ def main() -> None:  # noqa: C901, PLR0915
     ap.add_argument("--pool", choices=["gnome", "indist"], default="indist")
     ap.add_argument("--budget", type=int, default=1000, help="labeled samples (scarcity)")
     ap.add_argument("--seeds", type=int, default=3)
-    ap.add_argument("--sizes", default="1000,5000,10000,25000,50000,100000")
+    ap.add_argument("--sizes", default="1000,5000,25000,100000")
     ap.add_argument("--trials", type=int, default=25)
     ap.add_argument("--max-test", type=int, default=20000,
                     help="cap on the evaluated test rows (stratified) for speed")
@@ -316,7 +316,9 @@ def main() -> None:  # noqa: C901, PLR0915
 
     # ------------------------------------------------------------------ 5-8. SSL
     def ssl_configs(n_unl: int):
-        small = n_unl + args.budget <= 11000
+        small = n_unl + args.budget <= 11000      # dense RBF graph still fits in memory
+        large = n_unl > 10000                     # lighter settings for 25k-100k pools
+        st_iter, ct_rounds = (3, 5) if large else (5, 8)
         C = [("LP knn k=10", "raw", lambda d, s: core.run_label_propagation(
                 d, "knn", n_neighbors=10, seed=s)),
              ("LS knn k=10 alpha=0.2", "raw", lambda d, s: core.run_label_propagation(
@@ -331,19 +333,24 @@ def main() -> None:  # noqa: C901, PLR0915
             C += [("LS knn k=10 alpha=0.2 [AE space]", "ae",
                    lambda d, s: core.run_label_propagation(d, "knn", n_neighbors=10,
                                                            spreading=True, alpha=0.2, seed=s))]
-        for tau in ((0.75, 0.9) if small else (0.9,)):
-            C += [(f"ST RF tau={tau}", "raw", lambda d, s, t=tau: core.run_self_training(
-                d, "RF", threshold=t, max_iter=5, seed=s))]
+        # Self-training: friend's reference (RF, tau=0.75) on small pools + tuned learner
+        if not large:
+            C += [("ST RF tau=0.75", "raw", lambda d, s: core.run_self_training(
+                d, "RF", threshold=0.75, max_iter=st_iter, seed=s))]
+        for tau in ((0.75, 0.9) if not large else (0.9,)):
             C += [(f"ST {star} tau={tau}", "raw", lambda d, s, t=tau: core.run_self_training(
-                d, best_kind, threshold=t, max_iter=5, seed=s, params=best_params))]
-        if ae is not None:
+                d, best_kind, threshold=t, max_iter=st_iter, seed=s, params=best_params))]
+        if ae is not None and not large:
             C += [(f"ST {star} tau=0.9 [raw+AE]", "raw+ae",
                    lambda d, s: core.run_self_training(d, best_kind, threshold=0.9,
-                                                       max_iter=5, seed=s, params=best_params))]
-        C += [("CT RF tau=0.85", "raw", lambda d, s: core.run_co_training(
-                d, view1, view2, "RF", threshold=0.85, n_rounds=8, seed=s)),
-              (f"CT {star} tau=0.85", "raw", lambda d, s: core.run_co_training(
-                d, view1, view2, best_kind, threshold=0.85, n_rounds=8, seed=s,
+                                                       max_iter=st_iter, seed=s,
+                                                       params=best_params))]
+        # Co-training (two views)
+        if not large:
+            C += [("CT RF tau=0.85", "raw", lambda d, s: core.run_co_training(
+                d, view1, view2, "RF", threshold=0.85, n_rounds=ct_rounds, seed=s))]
+        C += [(f"CT {star} tau=0.85", "raw", lambda d, s: core.run_co_training(
+                d, view1, view2, best_kind, threshold=0.85, n_rounds=ct_rounds, seed=s,
                 params=best_params)),
               (f"CtL {star} k=100 purity=0.8", "raw", lambda d, s: core.run_cluster_then_label(
                 d, best_kind, n_clusters=100, purity=0.8, seed=s, params=best_params))]

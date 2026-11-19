@@ -30,6 +30,15 @@ export default function App() {
 
   useEffect(() => {
     api.modelsInfo().then((r) => setModels(r.models)).catch(() => setModels([]));
+    // deep links, e.g. ?step=results&formula=Fe2O3 (used for demos and report screenshots)
+    const q = new URLSearchParams(window.location.search);
+    const f = q.get("formula");
+    if (f) updateText(f);
+    const s = q.get("step");
+    if (s === "analyze" && f) runAnalysis(f);
+    else if (s === "results" && f) runPrediction(f);
+    else if (s) setStep(s);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // two-way sync: editor <-> formula text
@@ -51,11 +60,11 @@ export default function App() {
 
   const formula = toFormula(counts);
 
-  async function runAnalysis() {
+  async function runAnalysis(f = formula) {
     setBusy(true);
     setError(null);
     try {
-      setAnalysis(await api.analyze(formula));
+      setAnalysis(await api.analyze(f));
       setStep("analyze");
     } catch (e) {
       setError(e.message);
@@ -64,11 +73,11 @@ export default function App() {
     }
   }
 
-  async function runPrediction() {
+  async function runPrediction(f = formula) {
     setBusy(true);
     setError(null);
     try {
-      const [a, r] = await Promise.all([api.analyze(formula), api.predict(formula)]);
+      const [a, r] = await Promise.all([api.analyze(f), api.predict(f)]);
       setAnalysis(a);
       setResults(r);
       setStep("results");
@@ -101,10 +110,10 @@ export default function App() {
           <span className="label">Current composition</span>
           <code className="formula">{formula || "—"}</code>
           <div className="spacer" />
-          <button className="secondary" disabled={!formula || busy} onClick={runAnalysis}>
+          <button className="secondary" disabled={!formula || busy} onClick={() => runAnalysis()}>
             Analyze material
           </button>
-          <button className="primary" disabled={!formula || busy} onClick={runPrediction}>
+          <button className="primary" disabled={!formula || busy} onClick={() => runPrediction()}>
             {busy ? "Running models…" : "Predict properties"}
           </button>
         </div>
@@ -118,8 +127,8 @@ export default function App() {
           <FormulaInput text={formulaText} error={formulaError} counts={counts} onChange={updateText} />
         )}
         {step === "viewer" && <CrystalViewer formula={formula} counts={counts} />}
-        {step === "analyze" && <AnalysisPanel analysis={analysis} onRun={runAnalysis} busy={busy} />}
-        {step === "results" && <ResultsPanel results={results} models={models} onRun={runPrediction} busy={busy} />}
+        {step === "analyze" && <AnalysisPanel analysis={analysis} onRun={() => runAnalysis()} busy={busy} />}
+        {step === "results" && <ResultsPanel results={results} models={models} onRun={() => runPrediction()} busy={busy} />}
       </main>
       <footer>
         ESI-SBA · Machine Learning mini-project · Laref Ibrahim · Nemouchi Faycal Abdelhadi · Zerradi

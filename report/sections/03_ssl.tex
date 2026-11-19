@@ -1,0 +1,53 @@
+\clearpage
+\section{Semi-Supervised Learning as a Solution}
+
+Semi-Supervised Learning (SSL) lies between supervised and unsupervised learning. Its main goal
+is to leverage a small labeled dataset along with a large pool of unlabeled data to improve
+model generalization, especially when acquiring labels is expensive or time-consuming. This
+makes SSL particularly relevant for materials discovery, where every label costs a DFT
+calculation or an experiment (Section~1).
+
+In this project, we explore five SSL algorithms. The wrapper methods are built on
+\textbf{tree-ensemble classifiers}: Random Forest as the reference learner (as in classical
+QSAR/QSPR studies) and a LightGBM gradient-boosting learner tuned with Optuna:
+
+\begin{itemize}
+  \item \textbf{Self-Learning (Pseudo-Labeling):} a tree-ensemble model is trained on labeled
+  data, then used to predict labels for unlabeled data. High-confidence predictions are added
+  iteratively to the training set to refine the model.
+  \item \textbf{Co-Training (Multi-View Learning):} two models are trained on different
+  feature subsets (views) of the same data: elemental-property statistics and
+  stoichiometry/valence-electron descriptors. Each model labels unlabeled data for the other,
+  exploiting complementary information.
+  \item \textbf{Label Propagation:} models the dataset as a graph where nodes are materials and
+  edges represent compositional similarity. Labels propagate from labeled to unlabeled nodes,
+  respecting the data manifold.
+  \item \textbf{Label Spreading:} similar to label propagation, but includes a normalization
+  step to ensure a smooth label distribution across the graph and to reduce sensitivity to
+  noisy edges.
+  \item \textbf{Cluster-then-Label:} an unsupervised K-Means clustering of labeled and
+  unlabeled materials; unlabeled members of label-pure clusters receive the cluster's label
+  (the \emph{cluster assumption} of SSL).
+\end{itemize}
+
+\begin{table}[H]
+\centering\small
+\renewcommand{\arraystretch}{1.25}
+\begin{tabularx}{\textwidth}{>{\bfseries}l X X X X X}
+\toprule
+Feature & Self-Learning & Co-Training & Label Propagation & Label Spreading & Cluster-then-Label\\
+\midrule
+Approach & Iterative pseudo-labeling & Multi-view learning & Graph-based, hard labels &
+Graph-based, soft labels & Clustering + label transfer\\
+Strengths & Simple, easy to implement, scalable & Exploits complementary features, reduces bias
+& Captures manifold structure, smooth predictions & Smooths labels, robust to noise & Very fast,
+uses global structure of the pool\\
+Limitations & Sensitive to initial model errors & Requires distinct views, can be complex &
+Computationally intensive, sensitive to graph quality & Same as label propagation, can
+over-smooth & Fails when clusters mix classes\\
+\bottomrule
+\end{tabularx}
+\end{table}
+
+By comparing these SSL methods on our materials datasets, we aim to identify which technique
+best balances prediction accuracy and robustness when labeled data is limited.

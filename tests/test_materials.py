@@ -40,8 +40,9 @@ def test_invalid_formula(client):
 
 
 def test_predict_formula(client):
-    loaded = [m for m in client.get("/materials/models-info").json()["models"]
-              if m["status"] == "Loaded"]
+    loaded = [
+        m for m in client.get("/materials/models-info").json()["models"] if m["status"] == "Loaded"
+    ]
     if not loaded:
         pytest.skip("no trained models available in app/models")
     r = client.post("/materials/predict", json={"formula": "Fe2O3"})

@@ -1,10 +1,13 @@
 import logging
 from contextlib import asynccontextmanager
+from pathlib import Path
 
 import sentry_sdk
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.trustedhost import TrustedHostMiddleware
+from fastapi.responses import RedirectResponse
+from fastapi.staticfiles import StaticFiles
 from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
@@ -51,7 +54,7 @@ async def lifespan(app: FastAPI):
     except Exception as e:
         logger.error(f"Database initialization failed: {e}")
         # We don't raise here to allow the app to start even if DB fails (optional)
-    
+
     # Load the deployed models once at startup
     from app.services.model import get_registry
 
@@ -86,8 +89,7 @@ if settings.cors_origins:
 
 # Add security middleware
 app.add_middleware(
-    TrustedHostMiddleware, 
-    allowed_hosts=["*"] if settings.debug else settings.allowed_hosts
+    TrustedHostMiddleware, allowed_hosts=["*"] if settings.debug else settings.allowed_hosts
 )
 
 
@@ -116,6 +118,16 @@ app.include_router(health.router, prefix="/health", tags=["System Health"])
 app.include_router(materials.router, prefix="/materials", tags=["Materials Prediction"])
 
 
+# 3. Serve the React frontend (built into frontend/dist) at /ui/
+FRONTEND_DIST = Path(__file__).resolve().parents[1] / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    app.mount("/ui", StaticFiles(directory=FRONTEND_DIST, html=True), name="ui")
+
+    @app.get("/app", include_in_schema=False)
+    async def open_ui():
+        return RedirectResponse("/ui/")
+
+
 @app.get("/")
 async def root():
     """Root endpoint providing API info."""
@@ -124,5 +136,6 @@ async def root():
         "description": "Materials property prediction (metallicity, magnetism, stability, photovoltaic band gap)",
         "version": settings.app_version,
         "environment": settings.environment,
-        "docs_url": "/docs"
+        "docs_url": "/docs",
+        "ui_url": "/ui/",
     }

@@ -37,14 +37,30 @@ for _cls in (Preprocessor, MaskedAutoencoder):
         setattr(_main, _cls.__name__, _cls)
 
 TASKS = {
-    "metallicity": {"title": "Metallicity", "positive": "Metal", "negative": "Non-metal",
-                    "source": "Materials Project"},
-    "magnetism": {"title": "Magnetism", "positive": "Magnetic", "negative": "Non-magnetic",
-                  "source": "JARVIS-DFT"},
-    "stability": {"title": "Thermodynamic stability", "positive": "Stable / near hull",
-                  "negative": "Unstable", "source": "Alexandria"},
-    "band_gap": {"title": "Photovoltaic band gap", "positive": "In PV window (1.1-1.7 eV)",
-                 "negative": "Outside PV window", "source": "Materials Project"},
+    "metallicity": {
+        "title": "Metallicity",
+        "positive": "Metal",
+        "negative": "Non-metal",
+        "source": "Materials Project",
+    },
+    "magnetism": {
+        "title": "Magnetism",
+        "positive": "Magnetic",
+        "negative": "Non-magnetic",
+        "source": "JARVIS-DFT",
+    },
+    "stability": {
+        "title": "Thermodynamic stability",
+        "positive": "Stable / near hull",
+        "negative": "Unstable",
+        "source": "Alexandria",
+    },
+    "band_gap": {
+        "title": "Photovoltaic band gap",
+        "positive": "In PV window (1.1-1.7 eV)",
+        "negative": "Outside PV window",
+        "source": "Materials Project",
+    },
 }
 
 
@@ -111,13 +127,18 @@ def models_info() -> list[ModelInfo]:
     out = []
     for task, meta in TASKS.items():
         pkg = reg.models.get(task)
-        out.append(ModelInfo(
-            task=task, title=meta["title"], source=meta["source"],
-            status="Loaded" if pkg else "Not loaded",
-            method=(pkg or {}).get("method") or (pkg or {}).get("registry", {}).get("method"),
-            config=(pkg or {}).get("config"),
-            test_metrics=(pkg or {}).get("test_metrics") or
-            (pkg or {}).get("registry", {}).get("test_metrics")))
+        out.append(
+            ModelInfo(
+                task=task,
+                title=meta["title"],
+                source=meta["source"],
+                status="Loaded" if pkg else "Not loaded",
+                method=(pkg or {}).get("method") or (pkg or {}).get("registry", {}).get("method"),
+                config=(pkg or {}).get("config"),
+                test_metrics=(pkg or {}).get("test_metrics")
+                or (pkg or {}).get("registry", {}).get("test_metrics"),
+            )
+        )
     return out
 
 
@@ -153,15 +174,27 @@ def predict(formula: str) -> dict:
         X = _task_matrix(task, raw)
         p = float(np.clip(pkg["model"].predict_proba(X)[0, 1], 0, 1))
         y = int(p >= 0.5)
-        preds.append(TaskPrediction(
-            task=task, title=meta["title"], prediction=y,
-            prediction_label=meta["positive"] if y else meta["negative"], probability=p,
-            confidence=abs(p - 0.5) * 2,
-            method=pkg.get("method") or ("Genetic-algorithm descriptors + "
-                                         "gradient boosting" if task == "band_gap" else None)
-        ).model_dump())
-    return {"formula": formula, "predictions": preds,
-            "applicability_domain": applicability_domain(raw)}
+        preds.append(
+            TaskPrediction(
+                task=task,
+                title=meta["title"],
+                prediction=y,
+                prediction_label=meta["positive"] if y else meta["negative"],
+                probability=p,
+                confidence=abs(p - 0.5) * 2,
+                method=pkg.get("method")
+                or (
+                    "Genetic-algorithm descriptors + gradient boosting"
+                    if task == "band_gap"
+                    else None
+                ),
+            ).model_dump()
+        )
+    return {
+        "formula": formula,
+        "predictions": preds,
+        "applicability_domain": applicability_domain(raw),
+    }
 
 
 def applicability_domain(raw: pd.DataFrame) -> dict | None:
@@ -172,10 +205,13 @@ def applicability_domain(raw: pd.DataFrame) -> dict | None:
     X = _task_matrix("band_gap", raw)
     d = float(pkg["nn"].kneighbors(X, n_neighbors=5)[0].mean())
     pc = pkg["pca"].transform(X)[0]
-    return {"distance": d, "threshold": float(pkg["ad_threshold"]),
-            "inside": bool(d <= pkg["ad_threshold"]),
-            "cluster": int(pkg["kmeans"].predict(pkg["pca"].transform(X))[0]),
-            "pca": [float(pc[0]), float(pc[1])]}
+    return {
+        "distance": d,
+        "threshold": float(pkg["ad_threshold"]),
+        "inside": bool(d <= pkg["ad_threshold"]),
+        "cluster": int(pkg["kmeans"].predict(pkg["pca"].transform(X))[0]),
+        "pca": [float(pc[0]), float(pc[1])],
+    }
 
 
 def analyze(formula: str) -> dict:
@@ -187,10 +223,17 @@ def analyze(formula: str) -> dict:
         raise ValueError(f"Could not parse formula '{formula}'")
     comp = Composition(formula)
     raw = _features(formula)
-    key = ["MagpieData mean Electronegativity", "MagpieData range Electronegativity",
-           "MagpieData mean CovalentRadius", "MagpieData mean NValence",
-           "MagpieData mean GSbandgap", "MagpieData mean GSmagmom",
-           "MagpieData mean MeltingT", "MagpieData mean AtomicWeight", "0-norm"]
+    key = [
+        "MagpieData mean Electronegativity",
+        "MagpieData range Electronegativity",
+        "MagpieData mean CovalentRadius",
+        "MagpieData mean NValence",
+        "MagpieData mean GSbandgap",
+        "MagpieData mean GSmagmom",
+        "MagpieData mean MeltingT",
+        "MagpieData mean AtomicWeight",
+        "0-norm",
+    ]
     try:
         guesses = comp.oxi_state_guesses(max_sites=-50)
     except Exception:
@@ -201,9 +244,14 @@ def analyze(formula: str) -> dict:
         for _, r in rules.iterrows():
             ante = [a.strip() for a in str(r["antecedents"]).split(",")]
             if all(a in elements for a in ante):
-                matched.append({"task": task, "rule": f"{{{r['antecedents']}}} -> "
-                                f"{r['consequents']}", "confidence": float(r["confidence"]),
-                                "lift": float(r["lift"])})
+                matched.append(
+                    {
+                        "task": task,
+                        "rule": f"{{{r['antecedents']}}} -> {r['consequents']}",
+                        "confidence": float(r["confidence"]),
+                        "lift": float(r["lift"]),
+                    }
+                )
     matched = sorted(matched, key=lambda m: -m["lift"])[:8]
     return {
         "formula": formula,
@@ -212,12 +260,12 @@ def analyze(formula: str) -> dict:
         "n_elements": len(elements),
         "n_atoms_formula_unit": float(comp.num_atoms),
         "weight": float(comp.weight),
-        "descriptors": {k: (None if pd.isna(raw[k].iloc[0]) else float(raw[k].iloc[0]))
-                        for k in key if k in raw},
+        "descriptors": {
+            k: (None if pd.isna(raw[k].iloc[0]) else float(raw[k].iloc[0])) for k in key if k in raw
+        },
         "chemical_rules": {
             "charge_balanced": bool(guesses),
-            "oxidation_states": {k: float(v) for k, v in guesses[0].items()} if guesses
-            else None,
+            "oxidation_states": {k: float(v) for k, v in guesses[0].items()} if guesses else None,
             "n_elements_ok": len(elements) <= 6,
         },
         "association_rules_matched": matched,

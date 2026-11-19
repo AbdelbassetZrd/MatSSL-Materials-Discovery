@@ -1,0 +1,285 @@
+\clearpage
+\section{Algorithmic Methods}
+
+In this project, we use five Semi-Supervised Learning (SSL) techniques. While all methods
+leverage labeled and unlabeled data, their approach differs. Tree-ensemble classifiers (a
+Random Forest reference and an Optuna-tuned LightGBM, written LightGBM$^*$) are used as the
+\textbf{base model} for Self-Learning, Co-Training and Cluster-then-Label, while Label
+Propagation and Label Spreading are graph-based methods operating directly on the
+compositional-similarity graph. Every method is compared with a \textbf{supervised baseline}
+trained on the same labeled samples only. The experimental protocol is identical for all
+methods:
+
+\begin{itemize}
+  \item a stratified 80/20 train/test split; the test set (up to 20,000 evaluated
+  compositions) is never used for training or tuning;
+  \item a scarce \textbf{labeled budget of 1,000 compositions} drawn from the training set;
+  \item unlabeled pools of \textbf{1,000, 5,000, 25,000 and 100,000} compositions, either from
+  GNoME or from the training set with labels hidden;
+  \item \textbf{3 random seeds} for every configuration, results reported as mean $\pm$ std;
+  \item model selection with the \textbf{Composite Score = (F1 + ROC-AUC)/2}, which balances
+  threshold-dependent (F1) and ranking (ROC-AUC) quality on imbalanced classes.
+\end{itemize}
+
+% ---------------------------------------------------------------------------- 5.1
+\subsection{Self-Learning (Pseudo-Labeling)}
+
+\subsubsection{Introduction}
+Self-learning is an iterative SSL method where a tree-ensemble model trained on labeled data
+predicts labels for unlabeled samples. High-confidence predictions are added to the labeled
+set in successive iterations to refine performance.
+
+\subsubsection{Theory}
+Let $X_L$ and $y_L$ be the labeled data, and $X_U$ the unlabeled data. A model $f$ is trained
+on $(X_L, y_L)$ and predicts $\hat{y}_U$ for $X_U$. Samples with prediction confidence above
+threshold $\tau$ are added to the labeled set:
+\[
+X_L \leftarrow X_L \cup \{x \in X_U : \max f(x) \ge \tau\}, \qquad
+y_L \leftarrow y_L \cup \{\hat{y}_U \text{ for selected } x\}
+\]
+This repeats until no new sample passes the threshold or the maximum number of iterations is
+reached. We test $\tau \in \{0.75, 0.9\}$ with Random Forest and LightGBM$^*$ base learners.
+
+\subsubsection{Workflow}
+\begin{enumerate}
+  \item Train the base model on labeled data.
+  \item Predict labels for unlabeled samples.
+  \item Add high-confidence predictions to the labeled set.
+  \item Retrain the base model with the updated labeled set.
+  \item Repeat until the stopping criteria.
+\end{enumerate}
+
+\begin{pycode}{Self-Learning with a tuned LightGBM base learner}
+from sklearn.semi_supervised import SelfTrainingClassifier
+from lightgbm import LGBMClassifier
+import numpy as np
+
+base = LGBMClassifier(**optuna_best_params, class_weight="balanced")   # tuned base model
+self_training = SelfTrainingClassifier(base, threshold=0.9, max_iter=5)
+
+# Combine labeled and unlabeled data (-1 = unlabeled)
+X_combined = np.vstack([X_labeled, X_unlabeled])
+y_combined = np.concatenate([y_labeled, -np.ones(len(X_unlabeled), dtype=int)])
+
+self_training.fit(X_combined, y_combined)
+y_pred_proba = self_training.predict_proba(X_test)[:, 1]
+y_pred = (y_pred_proba >= 0.5).astype(int)
+\end{pycode}
+
+% ---------------------------------------------------------------------------- 5.2
+\subsection{Co-Training (Multi-View Learning)}
+
+\subsubsection{Introduction}
+Co-training trains two models on different feature subsets (views). Each model predicts labels
+for unlabeled samples to improve the other iteratively.
+
+\subsubsection{Theory}
+Let $(X^1, X^2)$ be two feature views and $f^1, f^2$ two classifiers trained on
+$(X^1_L, y_L)$ and $(X^2_L, y_L)$. In our materials setting, \textbf{view~1} contains the
+elemental-property statistics (electronegativity, radius, melting point, Mendeleev number,
+\dots) and \textbf{view~2} the stoichiometry, valence-orbital and valence-electron descriptors.
+Each classifier labels the unlabeled samples it is most confident about (probability above
+$\tau=0.85$, keeping the labeled class ratio), and these pseudo-labels are added to the shared
+labeled set. The final prediction averages the probabilities of both views:
+$p(x) = \tfrac{1}{2}\big(f^1(x^1) + f^2(x^2)\big)$.
+
+\subsubsection{Workflow}
+\begin{enumerate}
+  \item Split features into two views.
+  \item Train a model on each view with labeled data.
+  \item Predict labels for unlabeled data in each view.
+  \item Add high-confidence predictions to the labeled set used by the other view.
+  \item Retrain and repeat (5--8 rounds).
+\end{enumerate}
+
+\begin{pycode}{Co-Training Example (pipeline/ssl\_core.py)}
+for round in range(n_rounds):
+    c1 = clone(base).fit(XL[:, view1], yL)      # elemental-property view
+    c2 = clone(base).fit(XL[:, view2], yL)      # stoichiometry / valence view
+    for clf, view in ((c1, view1), (c2, view2)):
+        p = clf.predict_proba(X_unl[pool][:, view])[:, 1]
+        for cls, prob in ((1, p), (0, 1 - p)):
+            quota = round(per_round * (pos_ratio if cls == 1 else 1 - pos_ratio))
+            cand = np.where(prob >= threshold)[0]                 # confident samples
+            cand = cand[np.argsort(-prob[cand])][:quota]
+            add_idx.extend(pool[cand]); add_lab.extend([cls] * len(cand))
+    XL = np.vstack([XL, X_unl[add_idx]]); yL = np.concatenate([yL, add_lab])
+    pool = np.setdiff1d(pool, add_idx)
+proba = (c1.predict_proba(X[:, view1]) + c2.predict_proba(X[:, view2])) / 2
+\end{pycode}
+
+% ---------------------------------------------------------------------------- 5.3
+\subsection{Label Propagation}
+
+\subsubsection{Introduction}
+Label Propagation is a graph-based SSL method. Nodes represent materials, and edges encode
+compositional similarity. Labels from labeled nodes propagate iteratively to unlabeled nodes.
+
+\subsubsection{Theory}
+Construct a similarity graph $G = (V, E)$ with adjacency matrix $W$ (RBF kernel
+$W_{ij}=\exp(-\gamma\|x_i-x_j\|^2)$ for pools up to 10,000 nodes, sparse $k$-nearest-neighbour
+graph with $k=10$ for larger pools). Let $Y$ be the label matrix with labeled nodes initialized
+to their class. Labels are propagated iteratively:
+\[
+Y^{(t+1)} = \alpha W Y^{(t)} + (1-\alpha) Y^{(0)}
+\]
+where $\alpha \in (0,1)$ controls the influence of neighbours (Label Propagation clamps the
+labeled nodes, i.e.\ hard labels). Because graph methods tend to drift towards the majority
+class on imbalanced data, we apply \textbf{class mass normalization} (Zhu et al., 2003): the
+class scores are rescaled so that the class proportions predicted on the unlabeled nodes match
+the class prior estimated from the labeled nodes.
+
+\subsubsection{Workflow}
+\begin{enumerate}
+  \item Build the similarity graph from the standardized descriptors.
+  \item Initialize the label matrix $Y^{(0)}$ (labeled nodes only).
+  \item Propagate labels iteratively until convergence.
+  \item Apply class mass normalization and assign labels to unlabeled and test nodes.
+\end{enumerate}
+
+\begin{pycode}{Label Propagation - Core Step}
+from sklearn.semi_supervised import LabelPropagation
+
+X_combined = np.vstack([X_labeled, X_unlabeled])
+y_combined = np.concatenate([y_labeled, np.full(len(X_unlabeled), -1)])
+
+lp = LabelPropagation(kernel="knn", n_neighbors=10, max_iter=1000, n_jobs=-1)
+lp.fit(X_combined, y_combined)
+
+# class mass normalization: predicted class proportions = labeled class prior
+model = ClassMassNormalized(lp, n_labeled=len(y_labeled), prior_pos=y_labeled.mean(),
+                            X_u=X_unlabeled)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+\end{pycode}
+
+% ---------------------------------------------------------------------------- 5.4
+\subsection{Label Spreading}
+
+\subsubsection{Introduction}
+Label Spreading extends Label Propagation by normalizing the adjacency matrix, smoothing label
+assignments, and reducing sensitivity to noisy edges. Labeled nodes are allowed to change
+(soft labels).
+
+\subsubsection{Theory}
+Normalized adjacency matrix:
+\[
+S = D^{-1/2} W D^{-1/2}, \qquad Y^{(t+1)} = \alpha S Y^{(t)} + (1-\alpha) Y^{(0)}
+\]
+where $D$ is the degree matrix. We test $\alpha \in \{0.2, 0.8\}$ and also build the graph in
+the 32-dimensional \textbf{self-supervised embedding} (Section~5.6.3) instead of the raw
+descriptor space.
+
+\subsubsection{Workflow}
+\begin{enumerate}
+  \item Build the similarity graph and normalize the adjacency matrix.
+  \item Initialize the label matrix $Y^{(0)}$ with the labeled nodes.
+  \item Iteratively propagate and smooth labels.
+  \item Assign labels after convergence (with class mass normalization).
+\end{enumerate}
+
+\begin{pycode}{Label Spreading - Core Step}
+from sklearn.semi_supervised import LabelSpreading
+
+ls = LabelSpreading(kernel="knn", n_neighbors=10, alpha=0.2, max_iter=1000, n_jobs=-1)
+ls.fit(X_combined, y_combined)
+model = ClassMassNormalized(ls, len(y_labeled), y_labeled.mean(), X_u=X_unlabeled)
+y_pred_proba = model.predict_proba(X_test)[:, 1]
+\end{pycode}
+
+% ---------------------------------------------------------------------------- 5.5
+\subsection{Traditional Materials Informatics for Photovoltaic Band Gap}
+
+For photovoltaic band-gap classification, we implemented a classical materials-informatics
+pipeline with genetic-algorithm optimization. The task is to recognize compositions whose PBE
+band gap lies in the photovoltaic window $1.1 \le E_g \le 1.7$\,eV (\GapN{} Materials Project
+compositions, \GapPos{}\% positives).
+
+\subsubsection{Feature Generation and Optimization}
+The 142 Magpie/stoichiometry descriptors were generated for every composition. Seven
+classifiers (Random Forest, Extra Trees, XGBoost, LightGBM, Logistic Regression, $k$-NN and an
+RBF Support Vector Machine) were compared, and a DEAP-based genetic algorithm optimized the
+descriptor subset by maximizing the cross-validated ROC-AUC.
+
+\subsubsection{Applicability Domain Assessment}
+Following OECD guidelines, we implemented an applicability-domain framework using PCA
+projection, K-Means clustering, and distance-based thresholds to flag predictions with low
+confidence. The same check is exposed by the web application for every user query.
+
+\subsubsection{Theoretical Foundations}
+
+\textbf{Genetic Algorithms in Feature Selection:} genetic algorithms (GAs) are
+population-based optimization techniques inspired by natural selection~\cite{deap}. For feature
+selection, each individual is a binary vector indicating descriptor inclusion/exclusion. The
+algorithm evolves through tournament selection, two-point crossover and bit-flip mutation:
+\[
+\text{Fitness} = \text{ROC-AUC} - \lambda \cdot \frac{\#\text{selected features}}{\#\text{total features}}
+\]
+where $\lambda = 0.05$ controls the penalty for feature count. The GA explores the feature
+space combinatorially, making it particularly suitable for high-dimensional descriptor
+selection in materials informatics.
+
+\textbf{Applicability Domain Theory:} the applicability domain (AD) defines the chemical space
+where a model provides reliable predictions~\cite{oecd}. Multiple approaches were employed:
+\begin{itemize}
+  \item \textbf{Distance-Based AD:} the mean Euclidean distance $D_i$ of composition $i$ to its
+  five nearest training compositions (in the GA-selected, standardized descriptor space) is
+  compared with the 95th percentile of the same distance over the training set:
+  \[
+  D_i = \frac{1}{5}\sum_{j \in \mathrm{kNN}(i)} \lVert x_i - x_j \rVert_2, \qquad
+  i \in \text{AD} \iff D_i \le P_{95}\big(D_{\text{train}}\big)
+  \]
+  \item \textbf{PCA-Based AD:} test compositions projecting outside the region occupied by the
+  training compositions in PCA space are flagged as outliers.
+  \item \textbf{Cluster-Based AD:} test compositions assigned to sparsely populated training
+  clusters (K-Means, $k = 6$) are considered at the border of the AD.
+\end{itemize}
+
+\textbf{Performance Metrics:} model performance was evaluated using the receiver operating
+characteristic area under the curve (ROC-AUC), which measures the trade-off between true
+positive rate (sensitivity) and false positive rate (1-specificity):
+\[
+\text{ROC-AUC} = \int_0^1 \text{TPR}\big(\text{FPR}^{-1}(x)\big)\,dx
+\]
+ROC-AUC values range from 0.5 (random performance) to 1.0 (perfect discrimination), with values
+above 0.8 generally considered good and above 0.9 excellent. Because the positive class is
+rare (\GapPos{}\%), we also report the precision--recall AUC (PR-AUC, random level =
+\GapPos{}\%) and the F1-score.
+
+% ---------------------------------------------------------------------------- 5.6
+\subsection{Unsupervised and Self-Supervised Components}
+
+\subsubsection{Cluster-then-Label}
+K-Means ($k=100$, unsupervised) is run on the union of labeled and unlabeled compositions. For
+every cluster containing at least three labeled compositions whose labels are at least 80\%
+pure, the unlabeled members receive the majority label. The base learner is then trained on
+labeled plus pseudo-labeled compositions, pseudo-labels being weighted by 0.5.
+
+\subsubsection{Association-Rule Mining (Apriori)}
+Each composition is treated as a \emph{transaction} whose items are its chemical elements,
+extended with the property item (\texttt{STABLE}, \texttt{MAGNETIC}, \texttt{METAL},
+\texttt{PV\_GAP}) used only as a rule consequent. The Apriori algorithm extracts frequent
+itemsets and rules $A \Rightarrow B$ scored by
+\[
+\text{supp}(A\Rightarrow B) = P(A \cup B),\quad
+\text{conf}(A\Rightarrow B) = \frac{P(A \cup B)}{P(A)},\quad
+\text{lift}(A\Rightarrow B) = \frac{\text{conf}(A\Rightarrow B)}{P(B)}
+\]
+A lift above 1 means that the elements of $A$ make property $B$ more likely than average. The
+same mining on GNoME alone (no property item) reveals which elements co-occur in new materials.
+
+\subsubsection{Self-Supervised Pre-training (Masked Autoencoder)}
+The pretext task requires no labels: 25\% of the 142 descriptors of each GNoME composition are
+masked (set to the mean) and an MLP autoencoder
+($142 \rightarrow 128 \rightarrow 32 \rightarrow 128 \rightarrow 142$, tanh) learns to
+reconstruct the complete, clean vector from the 554,054 unlabeled compositions. The
+32-dimensional bottleneck is a learned \emph{materials embedding}; downstream classifiers are
+trained on it (alone or concatenated with the raw descriptors), and Label Spreading is also run
+on a graph built in this embedding space.
+
+\begin{pycode}{Masked-feature autoencoder (pipeline/self\_supervised.py)}
+net = MLPRegressor(hidden_layer_sizes=(128, 32, 128), activation="tanh", batch_size=512)
+for epoch in range(20):
+    mask = rng.random(Z_train.shape) < 0.25          # mask 25 % of the descriptors
+    net.partial_fit(np.where(mask, 0.0, Z_train), Z_train)   # reconstruct clean vector
+embedding = encode(X)                                   # 32-d bottleneck layer
+\end{pycode}

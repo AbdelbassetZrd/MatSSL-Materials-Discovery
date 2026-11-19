@@ -1,0 +1,61 @@
+\clearpage
+\section{Introduction and Problem Statement}
+
+\subsection{The Challenge: Stability and Functionality}
+
+Materials discovery is a high-stakes filtration process: hundreds of thousands of candidate
+compositions are screened to identify the few that can actually be synthesized and that have
+the property an application needs. Early success in this pipeline hinges on overcoming two
+critical challenges:
+
+\begin{itemize}
+  \item \textbf{Predicting Stability:} a material must be thermodynamically stable (on or near
+  the convex hull of formation energies) to be made in the laboratory. Compositions resembling
+  known stable compounds are statistically more likely to succeed, offering an early signal of
+  viability.
+  \item \textbf{Predicting Functionality:} electronic and magnetic behaviour (metal or
+  insulator, magnetic or not, band gap inside the photovoltaic window) decides whether a
+  material is useful for batteries, magnets, electronics or solar cells. Detecting these
+  properties early avoids costly quantum-mechanical simulations and failed syntheses, saving
+  both time and resources.
+\end{itemize}
+
+The essential question is clear: \emph{``Is this composition stable enough to be made, and does
+it have the property we are looking for?''}
+
+\subsection{The Data Dilemma}
+
+Applying AI to this challenge is difficult due to an imbalance in available data:
+
+\begin{enumerate}
+  \item \textbf{Labeled Data is Scarce:} a reliable property label requires a density
+  functional theory (DFT) calculation, costing hours to days of computing per material, or an
+  even more expensive laboratory measurement. Consequently, high-quality labeled datasets
+  remain limited compared with the space of possible compositions.
+  \item \textbf{Unlabeled Data is Abundant:} high-throughput and generative searches such as
+  Google DeepMind's GNoME propose hundreds of thousands of new compositions, most of which lack
+  the property we want to predict.
+\end{enumerate}
+
+This raises a crucial question:
+
+\begin{center}
+\textbf{How can we harness the vast sea of unlabeled compositions to improve property
+predictions, even when high-quality labeled data is scarce?}
+\end{center}
+
+Our solution is \textbf{Semi-Supervised Learning (SSL)}, which bridges the gap between scarce
+labels and abundant unlabeled data. By leveraging unlabeled compositions intelligently, SSL aims
+to enhance model performance and deliver more accurate and reliable property predictions.
+
+\subsection{Complementary Approaches: SSL and Traditional Materials Informatics}
+
+In addition to Semi-Supervised Learning, we implemented a traditional materials-informatics
+pipeline for \textbf{photovoltaic band-gap classification}. This classical approach emphasizes
+interpretability, descriptor optimization via genetic algorithms, and an OECD-style
+applicability-domain assessment. We complete the study with \textbf{unsupervised learning}
+(association-rule mining and clustering) and \textbf{self-supervised pre-training} on the
+unlabeled pool. Together, these approaches provide complementary strategies: SSL leverages
+unlabeled data for general property endpoints, unsupervised learning reveals the hidden
+chemical structure of the data, and the traditional pipeline offers explainable, optimized
+models for a well-characterized endpoint.

@@ -1,0 +1,124 @@
+\documentclass[11pt,a4paper]{article}
+
+% ------------------------------------------------------------------ packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{lmodern}
+\usepackage[a4paper,margin=2.2cm,headheight=14pt]{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs,tabularx,array,multirow}
+\usepackage{xcolor}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption,subcaption}
+\usepackage{enumitem}
+\usepackage{listings}
+\usepackage[most]{tcolorbox}
+\usepackage{wrapfig}
+\usepackage{float}
+\usepackage[hidelinks]{hyperref}
+
+\graphicspath{{figures/}}
+
+% ------------------------------------------------------------------ page style
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{Project Report}
+\fancyhead[R]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+\titleformat{\section}{\normalfont\LARGE\bfseries}{\thesection.}{0.4em}{}
+\titleformat{\subsection}{\normalfont\Large\bfseries}{\thesubsection.}{0.4em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\section}{0pt}{0pt}{1.2em}
+\setlength{\parskip}{0.6em}
+\setlength{\parindent}{0pt}
+
+% ------------------------------------------------------------------ code listings
+\definecolor{codebg}{HTML}{0B0F14}
+\definecolor{codekw}{HTML}{4FC3F7}
+\definecolor{codecm}{HTML}{6A9955}
+\definecolor{codestr}{HTML}{E5A15A}
+\lstdefinestyle{dark}{
+  language=Python,
+  backgroundcolor=\color{codebg},
+  basicstyle=\ttfamily\scriptsize\color{white},
+  keywordstyle=\color{codekw},
+  commentstyle=\color{codecm},
+  stringstyle=\color{codestr},
+  showstringspaces=false,
+  columns=fullflexible,
+  breaklines=true,
+  upquote=true,
+}
+\newtcblisting{pycode}[1]{
+  enhanced, colback=codebg, colframe=codebg, coltitle=white,
+  title={\bfseries #1}, fonttitle=\small, arc=0pt, boxrule=0pt,
+  left=6pt, right=6pt, top=4pt, bottom=4pt,
+  listing only, listing options={style=dark},
+}
+\newtcolorbox{console}{
+  enhanced, colback=black!85, colframe=black, arc=1pt, boxrule=0pt,
+  fontupper=\ttfamily\scriptsize\color{green!70!white}, left=6pt, right=6pt,
+}
+
+\input{generated/macros}
+
+\begin{document}
+
+% ================================================================== title page
+\begin{titlepage}
+  \centering
+  \begin{minipage}{0.48\textwidth}
+    \includegraphics[height=2.7cm]{logos/crystal.png}
+  \end{minipage}\hfill
+  \begin{minipage}{0.48\textwidth}\raggedleft
+    \includegraphics[height=2.7cm]{logos/esi.png}
+  \end{minipage}
+
+  \vspace{1.4cm}
+  \rule{\textwidth}{0.4pt}\\[0.6cm]
+  {\fontsize{36}{40}\selectfont\bfseries Project Report}\\[0.5cm]
+  \rule{\textwidth}{0.4pt}
+
+  \vspace{1.6cm}
+  {\Large\bfseries Theme: Materials Discovery and Property Prediction\\(MI--SSL)}
+
+  \vspace{1.8cm}
+  \begin{minipage}{0.78\textwidth}\centering\large
+    This project addresses the critical problem of labeled data scarcity in materials
+    science by using Semi-Supervised Learning (SSL) techniques to predict the stability,
+    magnetism, metallicity and band gap of inorganic materials.
+  \end{minipage}
+
+  \vspace{2cm}
+  {\large\bfseries Group Members:}\\[0.4cm]
+  \large Laref Ibrahim\\[0.15cm]
+  Nemouchi Faycal Abdelhadi\\[0.15cm]
+  Zerradi Abdelbasset\\[0.15cm]
+  Medelci Djezzar Aymen
+
+  \vfill
+  {\small\bfseries \today}
+\end{titlepage}
+
+\tableofcontents
+\clearpage
+\listoffigures
+\clearpage
+
+\input{sections/01_introduction}
+\input{sections/02_materials_informatics}
+\input{sections/03_ssl}
+\input{sections/04_preprocessing}
+\input{sections/05_methods}
+\input{sections/06_results_metallicity}
+\input{sections/07_results_magnetism}
+\input{sections/08_results_stability}
+\input{sections/09_discussion}
+\input{sections/10_technologies}
+\input{sections/11_frontend}
+\input{sections/12_conclusion}
+
+\end{document}

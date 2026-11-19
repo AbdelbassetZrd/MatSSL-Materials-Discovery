@@ -37,5 +37,3 @@ def test_metrics_endpoint(client: TestClient):
     response = client.get("/metrics")
     assert response.status_code == 200
     assert "text/plain" in response.headers["content-type"]
-
-

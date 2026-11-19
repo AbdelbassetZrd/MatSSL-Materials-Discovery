@@ -34,7 +34,8 @@ def fetch(url: str, dest: Path) -> None:
     dest.parent.mkdir(parents=True, exist_ok=True)
     tmp = dest.with_suffix(dest.suffix + ".part")
     print(f"  [get ] {url}")
-    req = urllib.request.Request(url, headers={"User-Agent": "materials-ssl-student-project"})
+    req = urllib.request.Request(  # noqa: S310 (fixed https URLs)
+        url, headers={"User-Agent": "materials-ssl-student-project"})
     for attempt in range(1, 8):
         try:
             with urllib.request.urlopen(req, timeout=120) as r, open(tmp, "wb") as f:  # noqa: S310

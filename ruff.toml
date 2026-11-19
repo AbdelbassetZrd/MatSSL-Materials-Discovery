@@ -1,4 +1,13 @@
 target-version = "py312"
 line-length = 100
-select = ["E","F","I","W","UP","N","S"]
-ignore = ["E501", "S101", "S104"]
+
+[lint]
+select = ["E", "F", "I", "W", "UP", "N", "S"]
+# E501: long lines in notebooks/tables; S101: asserts in tests; S104: bind 0.0.0.0 in Docker;
+# N803/N806: ML convention for matrices (X, X_train); S301: loading our own trained pickles;
+# S113: requests timeouts handled by callers
+ignore = ["E501", "S101", "S104", "N803", "N806", "S301", "S113"]
+
+[lint.per-file-ignores]
+"pipeline/*" = ["S311", "S110", "S112", "E402", "N802"]
+"notebooks/*" = ["E402"]

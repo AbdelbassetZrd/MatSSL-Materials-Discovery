@@ -1,0 +1,43 @@
+\clearpage
+\section{Technologies Used}
+
+\newcommand{\techitem}[3]{%
+  \subsection{#1}
+  \begin{minipage}[c]{0.70\textwidth}#2\end{minipage}\hfill
+  \begin{minipage}[c]{0.24\textwidth}\centering\includegraphics[width=0.85\linewidth]{logos/#3}\end{minipage}
+  \vspace{1.2em}}
+
+\techitem{Docker}{Docker is a containerization platform that allows packaging an application
+and its dependencies into a lightweight, portable container. A multi-stage Dockerfile builds
+the React frontend and the Python API into a single image, which standardizes the development
+environment and simplifies the deployment of the API and web application.}{docker.png}
+
+\techitem{React}{React is an open-source JavaScript library developed by Meta, used to create
+interactive user interfaces. It was used (with Vite) to develop the \textbf{Frontend} of our
+application, providing a smooth and responsive user experience for composition input,
+3D crystal visualization (3Dmol.js) and prediction display.}{react.png}
+
+\techitem{FastAPI}{FastAPI is a modern and high-performance web framework for building APIs
+with Python. It was chosen as the \textbf{Backend} to serve our Machine Learning models due to
+its speed, native asynchronous support, and automatic documentation generation.}{fastapi.png}
+
+\techitem{Jupyter Notebook}{Jupyter Notebook is an open-source web application for creating
+and sharing documents containing code, equations, and visualizations. It served as the main
+tool for data enhancement, Exploratory Data Analysis (EDA), preprocessing, and the
+presentation of the SSL experiments.}{jupyter.png}
+
+\techitem{GitHub}{GitHub is a Git-based source code management platform. It was used for
+project hosting, team collaboration, continuous integration (GitHub Actions: linting and
+tests) and version control of the source code.}{github.png}
+
+\techitem{pymatgen \& matminer}{pymatgen and matminer are the reference open-source Python
+libraries of materials informatics. They were essential for parsing chemical formulas,
+handling compositions and crystal structures, downloading the Matbench datasets and defining
+the Magpie descriptors needed for the models.}{pymatgen.png}
+
+\subsection{scikit-learn, LightGBM and Optuna}
+scikit-learn provides the semi-supervised algorithms (Self-Training, Label Propagation, Label
+Spreading), the classical models and the evaluation metrics; LightGBM and XGBoost provide fast
+gradient-boosting learners, and Optuna performs the Bayesian (TPE) hyper-parameter search used
+to tune the base learners. DEAP implements the genetic algorithm and mlxtend the Apriori
+association-rule mining.
