@@ -69,6 +69,28 @@ async def analyze(body: FormulaInput):
         raise HTTPException(status_code=422, detail=str(exc)) from exc
 
 
+@router.get("/similar")
+async def similar(
+    formula: str = Query(..., min_length=1, max_length=100), k: int = Query(8, ge=1, le=25)
+):
+    """Nearest known (labeled) compositions in the self-supervised embedding space."""
+    try:
+        return service.similar(formula.strip(), k)
+    except ValueError as exc:
+        raise HTTPException(status_code=422, detail=str(exc)) from exc
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
+@router.get("/experiments")
+async def experiments():
+    """All experiment results (datasets, SSL comparison, GA, unsupervised) for the dashboard."""
+    try:
+        return service.experiments()
+    except FileNotFoundError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+
 @router.get("/structure")
 async def structure(formula: str = Query(..., min_length=1, max_length=100)):
     """Lowest-energy crystal structure for the formula from the Alexandria OPTIMADE API

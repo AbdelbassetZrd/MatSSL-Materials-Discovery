@@ -81,7 +81,51 @@ class TaskPrediction(BaseModel):
     prediction_label: str
     probability: float
     confidence: float
+    threshold: float = 0.5
     method: str | None = None
+    config: str | None = None
+    test_metrics: dict | None = None
+    explanation: dict | None = None
+
+
+PRETTY = {
+    "Electronegativity": "electronegativity",
+    "CovalentRadius": "covalent radius",
+    "NValence": "valence electrons",
+    "NsValence": "s valence electrons",
+    "NpValence": "p valence electrons",
+    "NdValence": "d valence electrons",
+    "NfValence": "f valence electrons",
+    "NUnfilled": "unfilled orbitals",
+    "NsUnfilled": "unfilled s orbitals",
+    "NpUnfilled": "unfilled p orbitals",
+    "NdUnfilled": "unfilled d orbitals",
+    "NfUnfilled": "unfilled f orbitals",
+    "GSmagmom": "elemental magnetic moment",
+    "GSbandgap": "elemental band gap",
+    "GSvolume_pa": "elemental volume per atom",
+    "MeltingT": "melting temperature",
+    "MendeleevNumber": "Mendeleev number",
+    "AtomicWeight": "atomic weight",
+    "SpaceGroupNumber": "elemental space group",
+    "Number": "atomic number",
+    "Column": "periodic-table column",
+    "Row": "periodic-table row",
+}
+
+
+def pretty(name: str) -> str:
+    """Human-readable descriptor name, e.g. 'MagpieData mean NdValence' -> 'mean d valence…'."""
+    if name.startswith("MagpieData "):
+        _, stat, prop = name.split(" ", 2)
+        return f"{stat.replace('_', ' ')} {PRETTY.get(prop, prop)}"
+    if name == "0-norm":
+        return "number of elements"
+    if name.endswith("-norm"):
+        return f"stoichiometry {name}"
+    if name.startswith("AE "):
+        return f"self-supervised embedding {name[3:]}"
+    return name
 
 
 class _Registry:
@@ -162,6 +206,124 @@ def _task_matrix(task: str, raw: pd.DataFrame) -> np.ndarray:
     return Z if space == "ae" else np.hstack([X, Z])
 
 
+def _feature_names(task: str) -> list[str]:
+    reg = get_registry()
+    pkg, prep = reg.models[task], reg.scalers[task]
+    if task == "band_gap":
+        return list(pkg["selected_features"])
+    ae_names = [f"AE {i + 1}" for i in range(32)]
+    space = pkg.get("feature_space", "raw")
+    return {"raw": list(prep.cols), "ae": ae_names, "raw+ae": list(prep.cols) + ae_names}[space]
+
+
+def _tree_contrib(est, X: np.ndarray) -> np.ndarray | None:
+    """Exact SHAP contributions (log-odds) of a LightGBM / XGBoost model, else None."""
+    name = type(est).__name__
+    try:
+        if name == "LGBMClassifier":
+            return np.asarray(est.predict(X, pred_contrib=True))[0, :-1]
+        if name == "XGBClassifier":
+            import xgboost
+
+            return est.get_booster().predict(xgboost.DMatrix(X), pred_contribs=True)[0, :-1]
+    except Exception as exc:  # pragma: no cover - explanation is best effort
+        logger.warning("contribution failed: %s", exc)
+    return None
+
+
+def explain(task: str, raw: pd.DataFrame, X: np.ndarray, top: int = 6) -> dict | None:
+    """Why this prediction: SHAP contributions for tree-boosting based models, otherwise the
+    position of the composition's key descriptors in the positive/negative training classes."""
+    reg = get_registry()
+    model = reg.models[task]["model"]
+    names = _feature_names(task)
+    contrib = None
+    kind = type(model).__name__
+    if kind == "SelfTrainingClassifier":
+        contrib = _tree_contrib(model.estimator_, X)
+    elif kind == "ClusterThenLabel":
+        contrib = _tree_contrib(model.model_, X)
+    elif kind == "CoTrainingClassifier":
+        c1, c2 = (
+            _tree_contrib(model.c1_, X[:, model.view1]),
+            _tree_contrib(model.c2_, X[:, model.view2]),
+        )
+        if c1 is not None and c2 is not None:
+            contrib = np.zeros(X.shape[1])
+            contrib[model.view1] += 0.5 * c1
+            contrib[model.view2] += 0.5 * c2
+    elif kind in ("LGBMClassifier", "XGBClassifier"):
+        contrib = _tree_contrib(model, X)
+    if contrib is not None and len(contrib) == len(names):
+        order = np.argsort(-np.abs(contrib))[:top]
+        items = []
+        for i in order:
+            n = names[i]
+            val = float(raw[n].iloc[0]) if n in raw else None
+            items.append({"feature": pretty(n), "value": val, "contribution": float(contrib[i])})
+        return {"type": "shap", "items": items}
+    idx = neighbor_index()
+    if idx is None or task not in idx["percentiles"]:
+        return None
+    items = []
+    for n, q in idx["percentiles"][task].items():
+        v = float(raw[n].iloc[0])
+        p_neg = float(np.searchsorted(q[0], v) / len(q[0]) * 100)
+        p_pos = float(np.searchsorted(q[1], v) / len(q[1]) * 100)
+        items.append(
+            {"feature": pretty(n), "value": v, "pct_positive": p_pos, "pct_negative": p_neg}
+        )
+    items.sort(key=lambda d: -abs(d["pct_positive"] - d["pct_negative"]))
+    return {"type": "percentile", "items": items[:top]}
+
+
+@lru_cache(maxsize=1)
+def neighbor_index() -> dict | None:
+    f = MODELS_DIR / "neighbor_index.joblib"
+    if not f.exists():
+        return None
+    from sklearn.neighbors import NearestNeighbors
+
+    idx = joblib.load(f)
+    idx["nn"] = NearestNeighbors(n_neighbors=10).fit(idx["embedding"].astype(np.float32))
+    return idx
+
+
+def similar(formula: str, k: int = 8) -> dict:
+    """Nearest labeled compositions in the self-supervised embedding space."""
+    reg, idx = get_registry(), neighbor_index()
+    if idx is None or reg.ae is None:
+        raise RuntimeError("neighbor index not available")
+    raw = _features(formula)
+    dist, ind = idx["nn"].kneighbors(reg.ae.encode(raw), n_neighbors=k)
+    out = []
+    for d, i in zip(dist[0], ind[0], strict=True):
+        row = {"formula": str(idx["formula"][i]), "distance": float(d)}
+        for key, values in idx["labels"].items():
+            v = values[i]
+            row[key] = None if v is None or (isinstance(v, float) and np.isnan(v)) else v
+        out.append(row)
+    from pymatgen.core import Composition
+
+    reduced = Composition(formula).reduced_formula
+    return {
+        "formula": reduced,
+        "known": any(r["formula"] == reduced for r in out),
+        "neighbors": out,
+    }
+
+
+def experiments() -> dict:
+    """Dashboard data exported by pipeline/export_dashboard.py."""
+    for f in (
+        ROOT / "frontend" / "public" / "data" / "dashboard.json",
+        ROOT / "frontend" / "dist" / "data" / "dashboard.json",
+    ):
+        if f.exists():
+            return json.loads(f.read_text(encoding="utf-8"))
+    raise FileNotFoundError("dashboard.json not found - run pipeline/export_dashboard.py")
+
+
 def predict(formula: str) -> dict:
     """Predict every available property for one formula."""
     reg = get_registry()
@@ -175,6 +337,7 @@ def predict(formula: str) -> dict:
         p = float(np.clip(pkg["model"].predict_proba(X)[0, 1], 0, 1))
         t = float(pkg.get("threshold", 0.5))  # calibrated for rare classes
         y = int(p >= t)
+        entry = pkg.get("registry", {})
         preds.append(
             TaskPrediction(
                 task=task,
@@ -183,12 +346,11 @@ def predict(formula: str) -> dict:
                 prediction_label=meta["positive"] if y else meta["negative"],
                 probability=p,
                 confidence=(p - t) / (1 - t) if y else (t - p) / t,
-                method=pkg.get("method")
-                or (
-                    "Genetic-algorithm descriptors + gradient boosting"
-                    if task == "band_gap"
-                    else None
-                ),
+                threshold=t,
+                method=pkg.get("method") or entry.get("method"),
+                config=entry.get("config") or pkg.get("config"),
+                test_metrics=entry.get("test_metrics") or pkg.get("test_metrics"),
+                explanation=explain(task, raw, X),
             ).model_dump()
         )
     return {

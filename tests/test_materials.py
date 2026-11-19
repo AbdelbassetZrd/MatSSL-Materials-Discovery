@@ -52,3 +52,35 @@ def test_predict_formula(client):
     for p in preds:
         assert 0.0 <= p["probability"] <= 1.0
         assert p["prediction"] in (0, 1)
+
+
+def test_similar_known_composition(client):
+    r = client.get("/materials/similar", params={"formula": "LiFePO4", "k": 5})
+    if r.status_code == 503:
+        pytest.skip("neighbor index not built")
+    assert r.status_code == 200
+    body = r.json()
+    assert len(body["neighbors"]) == 5
+    assert body["neighbors"][0]["formula"] == "LiFePO4"
+    assert body["known"] is True
+
+
+def test_experiments_dashboard(client):
+    r = client.get("/materials/experiments")
+    if r.status_code == 404:
+        pytest.skip("dashboard.json not exported")
+    assert r.status_code == 200
+    body = r.json()
+    assert {"datasets", "ssl", "kpis"} <= set(body)
+
+
+def test_prediction_has_explanation_and_threshold(client):
+    loaded = [
+        m for m in client.get("/materials/models-info").json()["models"] if m["status"] == "Loaded"
+    ]
+    if not loaded:
+        pytest.skip("no trained models available in app/models")
+    preds = client.post("/materials/predict", json={"formula": "Fe2O3"}).json()["predictions"]
+    for p in preds:
+        assert 0 < p["threshold"] < 1
+        assert p["explanation"] is None or p["explanation"]["type"] in ("shap", "percentile")

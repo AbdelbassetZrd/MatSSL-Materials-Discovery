@@ -63,7 +63,7 @@ def main() -> None:
                                 "method": "GA-selected descriptors + "
                                           f"{B['model_comparison'][0]['Model']}",
                                 "config": f"{B['ga']['final_n_features']} GA descriptors",
-                                "test_metrics": B["test_ga_descriptors"]}
+                                "test_metrics": B.get("test_ga_descriptors_tuned_threshold", B["test_ga_descriptors"])}
     (MODELS / "registry.json").write_text(json.dumps(registry, indent=2, default=float))
     for f in MODELS.glob("*.pkl"):
         print(f"  {f.name:<45} {f.stat().st_size / 1e6:8.1f} MB")

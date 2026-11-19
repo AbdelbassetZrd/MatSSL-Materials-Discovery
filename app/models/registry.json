@@ -1,0 +1,74 @@
+{
+  "metallicity": {
+    "model_file": "metallicity_model.pkl",
+    "scaler_file": "metallicity_scaler.pkl",
+    "method": "Self-Training",
+    "config": "ST LightGBM* tau=0.9",
+    "selection_pool": "indist",
+    "test_metrics": {
+      "Composite_Score": 0.9135987665921244,
+      "F1-Score": 0.8766404199475065,
+      "ROC-AUC": 0.9505571132367423,
+      "Accuracy": 0.8877122748111319,
+      "Precision": 0.9200416914830256,
+      "Recall": 0.8371494377455629
+    },
+    "candidates": {
+      "indist": 0.9135987665921244,
+      "gnome": 0.9125705425282948
+    }
+  },
+  "magnetism": {
+    "model_file": "magnetism_model.pkl",
+    "scaler_file": "magnetism_scaler.pkl",
+    "method": "Self-Training",
+    "config": "ST LightGBM* tau=0.9",
+    "selection_pool": "indist",
+    "test_metrics": {
+      "Composite_Score": 0.8946970376531898,
+      "F1-Score": 0.8185697217955282,
+      "ROC-AUC": 0.9708243535108514,
+      "Accuracy": 0.9174817574910729,
+      "Precision": 0.7475062344139651,
+      "Recall": 0.9045643153526971
+    },
+    "candidates": {
+      "indist": 0.8946970376531898
+    }
+  },
+  "stability": {
+    "model_file": "stability_model.pkl",
+    "scaler_file": "stability_scaler.pkl",
+    "method": "Co-Training",
+    "config": "CT LightGBM* tau=0.85",
+    "selection_pool": "gnome",
+    "test_metrics": {
+      "Composite_Score": 0.7438603142202804,
+      "F1-Score": 0.644770718808712,
+      "ROC-AUC": 0.8429499096318489,
+      "Accuracy": 0.74475,
+      "Precision": 0.5463443396226415,
+      "Recall": 0.78645391274826
+    },
+    "candidates": {
+      "gnome": 0.7438603142202804
+    }
+  },
+  "band_gap": {
+    "model_file": "band_gap_model.pkl",
+    "scaler_file": "band_gap_scaler.pkl",
+    "method": "GA-selected descriptors + RF",
+    "config": "52 GA descriptors",
+    "test_metrics": {
+      "Model": "RF-ga tuned threshold",
+      "Accuracy": 0.9140280176549607,
+      "Precision": 0.39308398023994356,
+      "Recall": 0.5350624399615754,
+      "F1-Score": 0.4532139951179821,
+      "ROC-AUC": 0.9033072284683249,
+      "PR-AUC": 0.4552428169322492,
+      "Composite_Score": 0.6782606117931536,
+      "threshold": 0.22
+    }
+  }
+}

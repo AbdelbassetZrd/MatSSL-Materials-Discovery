@@ -10,9 +10,23 @@ async function call(path, options = {}) {
   return body;
 }
 
+const post = (path, body) => call(path, { method: "POST", body: JSON.stringify(body) });
+const q = (f) => encodeURIComponent(f);
+
 export const api = {
   modelsInfo: () => call("/materials/models-info"),
-  predict: (formula) => call("/materials/predict", { method: "POST", body: JSON.stringify({ formula }) }),
-  analyze: (formula) => call("/materials/analyze", { method: "POST", body: JSON.stringify({ formula }) }),
-  structure: (formula) => call(`/materials/structure?formula=${encodeURIComponent(formula)}`),
+  predict: (formula) => post("/materials/predict", { formula }),
+  analyze: (formula) => post("/materials/analyze", { formula }),
+  similar: (formula, k = 8) => call(`/materials/similar?formula=${q(formula)}&k=${k}`),
+  structure: (formula) => call(`/materials/structure?formula=${q(formula)}`),
+  // Research Lab data: API first, then the static copy bundled with the app (offline demo)
+  experiments: async () => {
+    try {
+      return await call("/materials/experiments");
+    } catch {
+      const r = await fetch(`${import.meta.env.BASE_URL}data/dashboard.json`);
+      if (!r.ok) throw new Error("dashboard data not available");
+      return r.json();
+    }
+  },
 };
