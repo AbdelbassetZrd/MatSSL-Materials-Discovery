@@ -305,6 +305,89 @@ def main() -> None:
         mac("AERtwo", f"{a['final']['val_r2_all']:.3f}")
         mac("AERtwoMasked", f"{a['final']['val_r2_masked_features']:.3f}")
 
+    # high-accuracy track (pipeline/train_high_accuracy.py)
+    H = PRED / "high_accuracy"
+    ha_keys = [("metallicity", "Metal", "Metallicity"), ("magnetism", "Mag", "Magnetism"),
+               ("stability", "Stab", "Stability"), ("band_gap", "Gap", "PV band gap")]
+    ha = {t: json.loads((H / f"{t}_summary.json").read_text())
+          for t, _, _ in ha_keys if (H / f"{t}_summary.json").exists()}
+    rows, final_rows = [], []
+    for task, key, name in ha_keys:
+        S = ha.get(task)
+        if S is None:
+            for m in ("Acc", "Bal", "AUC", "Fone", "BaseAcc", "Gain", "NStruct", "NTest", "Thr"):
+                mac(f"HA{key}{m}", "?")
+            continue
+        f, b = S["final"], S["ablation"][0]
+        mac(f"HA{key}Acc", f"{100 * f['Accuracy']:.1f}")
+        mac(f"HA{key}Bal", f"{100 * f['Balanced_Accuracy']:.1f}")
+        mac(f"HA{key}AUC", f"{f['ROC-AUC']:.3f}")
+        mac(f"HA{key}Fone", f"{f['F1-Score']:.3f}")
+        mac(f"HA{key}BaseAcc", f"{100 * b['Accuracy']:.1f}")
+        mac(f"HA{key}Gain", f"{100 * (f['Accuracy'] - b['Accuracy']):+.1f}")
+        mac(f"HA{key}NStruct", f"{S['dataset']['n_structures']:,}")
+        mac(f"HA{key}NTest", f"{S['dataset']['n_test']:,}")
+        mac(f"HA{key}Thr", f"{S['threshold']:.2f}")
+        for i, r in enumerate(S["ablation"]):
+            step = esc(r["Model"].split(". ", 1)[1].split(" (")[0])
+            rows.append(f"{name if i == 0 else ''} & {step} & {100 * r['Accuracy']:.1f}\\% & "
+                        f"{100 * r['Balanced_Accuracy']:.1f}\\% & {r['F1-Score']:.3f} & "
+                        f"{r['ROC-AUC']:.3f} \\\\")
+        rows.append("\\midrule")
+        final_rows.append(f"{name} & {S['dataset']['n_structures']:,} & {100 * b['Accuracy']:.1f}\\%"
+                          f" & \\textbf{{{100 * f['Accuracy']:.1f}\\%}} & "
+                          f"{100 * f['Balanced_Accuracy']:.1f}\\% & {f['F1-Score']:.3f} & "
+                          f"{f['ROC-AUC']:.3f} \\\\")
+    if ha:
+        if rows and rows[-1] == "\\midrule":
+            rows.pop()
+        (GEN / "hiacc_ablation.tex").write_text(
+            "\\begin{table}[H]\n\\centering\\small\n\\begin{tabular}{llcccc}\n\\toprule\n"
+            "Task & Step & Accuracy & Balanced acc. & F1 & ROC-AUC\\\\\n\\midrule\n"
+            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\caption{Ablation of the "
+            "high-accuracy track on held-out test structures (split grouped by formula).}"
+            "\\label{tab:hiacc-ablation}\n\\end{table}\n", encoding="utf-8")
+        (GEN / "hiacc_final.tex").write_text(
+            "\\begin{table}[H]\n\\centering\\small\n\\resizebox{\\textwidth}{!}{%\n"
+            "\\begin{tabular}{lcccccc}\n\\toprule\nTask & Structures & Composition only & "
+            "Final accuracy & Balanced acc. & F1 & ROC-AUC\\\\\n\\midrule\n"
+            + "\n".join(final_rows) + "\n\\bottomrule\n\\end{tabular}}\n\\caption{Final "
+            "structure-aware models (all labels, stacked ensemble, accuracy-optimal threshold)."
+            "}\\label{tab:hiacc-final}\n\\end{table}\n", encoding="utf-8")
+        import matplotlib
+
+        matplotlib.use("Agg")
+        import matplotlib.pyplot as plt
+
+        steps = ["Composition only", "+ structure", "+ tuning", "+ stacking",
+                 "+ accuracy threshold"]
+        colors = ["#4f46e5", "#eb6834", "#0891b2", "#eda100", "#e87ba4"]
+        names = [n for t, _, n in ha_keys if t in ha]
+        fig, ax = plt.subplots(figsize=(10, 4.2))
+        w = 0.16
+        allv = []
+        for i, s in enumerate(steps):
+            vals = [ha[t]["ablation"][i]["Accuracy"] for t, _, _ in ha_keys if t in ha]
+            allv += vals
+            xs = [j + (i - 2) * w for j in range(len(vals))]
+            ax.bar(xs, vals, w * 0.92, label=s, color=colors[i])
+        for j, (t, _, _) in enumerate([k for k in ha_keys if k[0] in ha]):
+            v = ha[t]["final"]["Accuracy"]
+            ax.text(j + 2 * w, v + 0.004, f"{100 * v:.1f}%", ha="center", fontsize=9,
+                    weight="bold")
+        ax.set_xticks(range(len(names)), names)
+        ax.set_ylim(max(0, min(allv) - 0.04), 1.0)
+        ax.yaxis.set_major_formatter(lambda v, _: f"{100 * v:.0f}%")
+        ax.set_ylabel("Test accuracy")
+        ax.legend(ncol=5, fontsize=8, loc="upper center", bbox_to_anchor=(0.5, -0.08))
+        ax.grid(axis="y", alpha=0.3)
+        ax.set_title("High-accuracy track: what each ingredient adds (held-out test structures)")
+        fig.tight_layout()
+        dst = FIG / "results" / "high_accuracy"
+        dst.mkdir(parents=True, exist_ok=True)
+        fig.savefig(dst / "ablation_all.png", dpi=150)
+        plt.close(fig)
+
     (GEN / "macros.tex").write_text("\n".join(macros) + "\n", encoding="utf-8")
     (GEN / "values.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
     print(f"wrote {len(macros)} macros and tables to {GEN}")

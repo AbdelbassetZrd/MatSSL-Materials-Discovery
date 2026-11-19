@@ -78,6 +78,13 @@ export default function Home() {
                   <div><div className="label">ROC-AUC</div><div className="font-display text-2xl font-bold text-brand">{fmt(d?.test_metrics?.["ROC-AUC"])}</div></div>
                   <div><div className="label">F1</div><div className="font-display text-2xl font-bold text-cyan">{fmt(d?.test_metrics?.["F1-Score"])}</div></div>
                 </div>
+                {data?.high_accuracy?.[t] && (
+                  <div className="mt-3 border-t border-line pt-3 text-xs text-ink-soft">
+                    With crystal structure (all labels, stacked ensemble):{" "}
+                    <b className="text-ink">accuracy {(100 * data.high_accuracy[t].final.Accuracy).toFixed(1)}%</b>
+                    {" "}· AUC {fmt(data.high_accuracy[t].final["ROC-AUC"])}
+                  </div>
+                )}
               </div>
             );
           })}

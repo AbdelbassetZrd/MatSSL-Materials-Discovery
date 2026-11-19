@@ -12,6 +12,7 @@ Execute afterwards with:
 
 from __future__ import annotations
 
+import sys
 from pathlib import Path
 
 import nbformat as nbf
@@ -416,11 +417,67 @@ def unsupervised():
     save(nb, NB / "unsupervised" / "unsupervised_and_self_supervised.ipynb")
 
 
+def high_accuracy():
+    nb = nbf.v4.new_notebook()
+    nb.cells = [
+        md("# High-accuracy track: all labels + crystal structure + ensemble\n\n"
+           "The SSL study uses 1,000 labels and the chemical formula only. This notebook shows "
+           "the best achievable accuracy when every structure of each database is used, with "
+           "28 crystal-structure descriptors (symmetry, density, packing, bond lengths, "
+           "coordination), tuned LightGBM/XGBoost, a stacked ensemble and an accuracy-optimal "
+           "threshold. The test split is grouped by formula (no composition on both sides).\n\n"
+           "Full runs: `pipeline/build_structure_dataset.py` then "
+           "`pipeline/train_high_accuracy.py --task <task>`."),
+        code(SETUP + 'H = ROOT / "data/predictions/high_accuracy"\n'
+             "from IPython.display import Image, display\n"
+             "tasks = [t for t in ('metallicity', 'magnetism', 'stability', 'band_gap') "
+             "if (H / f'{t}_summary.json').exists()]\n"
+             "S = {t: json.loads((H / f'{t}_summary.json').read_text()) for t in tasks}\n"
+             "pd.DataFrame({t: S[t]['dataset'] for t in tasks})"),
+        code("# 1. Structure descriptors of one material (NaCl, conventional and primitive cell)\n"
+             "from pymatgen.core import Lattice, Structure\n"
+             "from structure_features import arrays_from_pymatgen_dict, default_tables, "
+             "features_from_arrays\n"
+             "T = default_tables()\n"
+             "conv = Structure.from_spacegroup('Fm-3m', Lattice.cubic(5.64), ['Na', 'Cl'], "
+             "[[0, 0, 0], [0.5, 0.5, 0.5]])\n"
+             "pd.DataFrame({name: features_from_arrays(*arrays_from_pymatgen_dict(st.as_dict(), "
+             "T['sym2z']), T) for name, st in [('conventional', conv), "
+             "('primitive', conv.get_primitive_structure())]}).round(3)"),
+        code("# 2. Ablation: what each ingredient adds (held-out test structures)\n"
+             "rows = []\nfor t in tasks:\n    for r in S[t]['ablation']:\n"
+             "        rows.append({'task': t, 'step': r['Model'], 'accuracy': r['Accuracy'], "
+             "'balanced_accuracy': r['Balanced_Accuracy'], 'F1': r['F1-Score'], "
+             "'ROC-AUC': r['ROC-AUC']})\npd.DataFrame(rows).round(4)"),
+        code("for t in tasks:\n    display(Image(str(H / f'{t}_ablation.png')))"),
+        code("# 3. Final models: confusion matrix, threshold and most important descriptors\n"
+             "for t in tasks:\n    f = S[t]['final']\n"
+             "    print(f\"{t:<12} accuracy={f['Accuracy']:.4f}  balanced={f['Balanced_Accuracy']:.4f}"
+             "  F1={f['F1-Score']:.4f}  AUC={f['ROC-AUC']:.4f}  threshold={S[t]['threshold']:.2f}\")\n"
+             "    print('   confusion [[TN, FP], [FN, TP]] =', S[t]['confusion'])\n"
+             "    print('   top descriptors:', ', '.join(list(S[t]['top_features'])[:6]))"),
+        code("# 4. Use the deployed structure-aware models (offline structure cache)\n"
+             "import os; os.environ['MATSSL_OFFLINE'] = '1'\n"
+             "sys.path.insert(0, str(ROOT))\nfrom app.services import model as service\n"
+             "for f in ['LiFePO4', 'Fe2O3', 'Nd2Fe14B', 'CsPbI3', 'Cu', 'NaCl']:\n"
+             "    r = service.predict(f)\n"
+             "    print(f\"{f:<9}\", r['structure_status'], {p['task']: (p['prediction_label'], "
+             "round(p['probability'], 3), p['model_track']) for p in r['predictions']})"),
+    ]
+    save(nb, NB / "high_accuracy" / "high_accuracy.ipynb")
+
+
 if __name__ == "__main__":
-    for task, t in TASKS.items():
-        enhancing(task, t)
-        eda(task, t)
-        training(task, t)
-    band_gap()
-    unsupervised()
+    only = set(sys.argv[1:])  # e.g. "high_accuracy" - avoids overwriting executed notebooks
+    if not only or only & {"tasks"}:
+        for task, t in TASKS.items():
+            enhancing(task, t)
+            eda(task, t)
+            training(task, t)
+    if not only or "band_gap" in only:
+        band_gap()
+    if not only or "unsupervised" in only:
+        unsupervised()
+    if not only or "high_accuracy" in only:
+        high_accuracy()
     print("notebooks written to", NB)

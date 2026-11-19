@@ -164,9 +164,24 @@ def deployed_block(gn_ae=None):
             X = Z if space == "ae" else np.hstack([X, Z])
         p = pkg["model"].predict_proba(X)[:, 1]
         yk = y[keep]
-        cm = confusion_matrix(yk, (p >= 0.5).astype(int)).tolist()
+        cm = confusion_matrix(yk, (p >= pkg.get("threshold", 0.5)).astype(int)).tolist()
         out[task] = {**entry, "roc": roc_points(yk, p), "confusion": cm, "n_test": int(len(yk))}
         print(f"  deployed {task}: test AUC check, n={len(yk):,}")
+    return out
+
+
+def high_accuracy_block():
+    """Structure-aware full-data models (pipeline/train_high_accuracy.py)."""
+    H = PRED / "high_accuracy"
+    out = {}
+    for task in (*TASKS, "band_gap"):
+        f = H / f"{task}_summary.json"
+        if f.exists():
+            S = json.loads(f.read_text())
+            keys = ("Model", "Accuracy", "Balanced_Accuracy", "Precision", "Recall",
+                    "F1-Score", "ROC-AUC", "Threshold")
+            S["ablation"] = [{k: r[k] for k in keys} for r in S["ablation"]]
+            out[task] = S
     return out
 
 
@@ -236,6 +251,7 @@ def main() -> None:
         out["ssl"][task] = {pool: ssl_block(task, pool) for pool in ("indist", "gnome")}
     print("deployed models ...")
     out["deployed"] = deployed_block()
+    out["high_accuracy"] = high_accuracy_block()
     print("band gap ...")
     out["band_gap"] = band_gap_block()
     print("unsupervised ...")

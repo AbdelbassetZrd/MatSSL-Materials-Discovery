@@ -28,12 +28,63 @@ distribution and underlying assumptions:
   the smallest pools.
   \item \textbf{Composition-only descriptors.} Stability (\StabSelComp{} composite even after
   deployment) depends on the crystal structure and on competing phases, which a composition
-  cannot encode. Structure-aware graph neural networks (CGCNN, MEGNet, ALIGNN) would be needed
-  for a large gain.
+  cannot encode. Structure descriptors help (see below); structure-aware graph neural networks
+  (CGCNN, MEGNet, ALIGNN) would be the next step.
   \item \textbf{DFT labels.} All labels come from PBE calculations. PBE underestimates band
   gaps by 30--50\% on average, so the 1.1--1.7\,eV photovoltaic window is a window on
   \emph{PBE} gaps, and real absorbers may fall slightly outside it.
 \end{itemize}
+
+\subsection*{Toward Higher Accuracy: Structure-Aware Full-Data Models}
+
+The SSL study deliberately uses 1,000 labels and the chemical formula only. To give the web
+application the most accurate models possible, we added a second track that removes these
+two restrictions while keeping the evaluation honest:
+\begin{enumerate}
+  \item \textbf{One row per crystal structure.} Instead of one row per formula, every
+  structure keeps its own label: \HAMetalNStruct{} Materials Project structures for
+  metallicity and band gap, \HAMagNStruct{} JARVIS structures for magnetism and
+  \HAStabNStruct{} Alexandria structures for stability. Labels are no longer averaged over
+  polymorphs.
+  \item \textbf{28 crystal-structure descriptors} computed with spglib and numpy: space group,
+  point-group order, crystal system, number of symmetry-distinct sites, atoms and formula units
+  per primitive cell, volume per atom, density, packing fraction, volume relative to the
+  elemental volumes, lattice ratios and angles, shortest and mean interatomic distances (also
+  relative to covalent radii), and coordination-number statistics. Energies, magnetic moments
+  and band gaps are never used as inputs.
+  \item \textbf{All training labels}, Optuna-tuned LightGBM and XGBoost, and a
+  \textbf{stacked ensemble} (LightGBM, XGBoost, histogram gradient boosting and, for the datasets
+  below 150,000 training structures, Extra Trees; logistic-regression meta-learner on
+  out-of-fold probabilities).
+  \item An \textbf{accuracy-optimal decision threshold}, chosen on out-of-fold predictions of
+  the training set only.
+\end{enumerate}
+The train/test split is grouped by reduced formula, so two polymorphs of the same composition
+are never on both sides. A random split would let the model recognise a composition it has
+already seen and would inflate the accuracy.
+
+\maybeinput{hiacc_final}
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/high_accuracy/ablation_all.png}
+  \caption{Test accuracy after each step of the high-accuracy track.}\label{fig:hiacc}
+\end{figure}
+
+\maybeinput{hiacc_ablation}
+
+The final models reach \HAMetalAcc\% accuracy for metallicity (composition only:
+\HAMetalBaseAcc\%), \HAMagAcc\% for magnetism (\HAMagBaseAcc\%), \HAStabAcc\% for stability
+(\HAStabBaseAcc\%) and \HAGapAcc\% for the photovoltaic band gap (\HAGapBaseAcc\%).
+For the band gap only 7.3\% of the structures are positive: a model that always answers
+``outside the window'' would already reach 92.7\% accuracy. Its balanced accuracy
+(\HAGapBal\%) is therefore the fairer number. Accuracies close to 98--99\% are not reachable
+with honest evaluation for these properties: stability, in particular, depends on competing
+phases that no descriptor of a single structure encodes, and the DFT labels themselves carry
+numerical noise near the decision boundaries (for example, a hull distance of 0.049 versus
+0.051\,eV/atom). The web application uses these structure-aware models whenever the
+lowest-energy structure of the composition is known in Alexandria, and falls back to the
+semi-supervised composition models otherwise.
 
 The self-supervised masked autoencoder learns a good representation (R$^2$ = \AERtwo{} on all
 descriptors, \AERtwoMasked{} on the hidden ones). As extra features it is tied with the raw

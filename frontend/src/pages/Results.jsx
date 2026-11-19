@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
-import { ArrowLeft, Download, Scale } from "lucide-react";
+import { ArrowLeft, Boxes, Download, Scale } from "lucide-react";
 import { api } from "../api.js";
 import { useComposition } from "../lib/composition.jsx";
 import { ErrorBox, Loading, Segmented } from "../components/ui.jsx";
@@ -16,6 +16,22 @@ function download(name, text, type) {
   a.download = name;
   a.click();
   URL.revokeObjectURL(url);
+}
+
+function StructureBanner({ r }) {
+  if (r.structure) {
+    const s = r.structure;
+    return (
+      <div className="flex items-start gap-2 rounded-xl bg-cyan/10 px-4 py-3 text-sm text-ink">
+        <Boxes size={18} className="mt-0.5 shrink-0 text-cyan" />
+        <span><b>Structure-aware models used.</b> Lowest-energy known structure: {s.source} <span className="font-mono">{s.id}</span>, space group {s.spacegroup}, {s.n_atoms_primitive} atoms in the primitive cell, density {s.density.toFixed(2)} g/cm³{s.e_above_hull != null && <> · DFT reference: {s.e_above_hull.toFixed(3)} eV/atom above the convex hull</>}.</span>
+      </div>
+    );
+  }
+  const why = { unknown: "No known crystal structure for this composition", offline: "Structure database unreachable", unused: "No structure-aware model installed" }[r.structure_status];
+  return why ? (
+    <div className="rounded-xl bg-surface px-4 py-3 text-sm text-ink-soft"><b className="text-ink">{why}:</b> the predictions use the composition-only semi-supervised models.</div>
+  ) : null;
 }
 
 export default function Results() {
@@ -65,6 +81,7 @@ export default function Results() {
       </div>
 
       <ADBadge ad={r.applicability_domain} />
+      <StructureBanner r={r} />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
         {r.predictions.map((p) => <PropertyCard key={p.task} p={p} />)}

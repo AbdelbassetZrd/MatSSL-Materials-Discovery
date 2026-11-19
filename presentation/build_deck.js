@@ -345,6 +345,47 @@ bullets(s, ["Criterion: highest mean Composite = (F1 + ROC-AUC)/2 over 3 seeds a
   "Ties are broken in favour of the simpler model"], 0.6, 4.6, 12.1, 2.0, 15);
 s.addNotes("Requirement 6: the best model and the criteria used to choose it.");
 
+// ================================================================== 17b. high accuracy
+const HA = {};
+for (const t of ["metallicity", "magnetism", "stability", "band_gap"]) {
+  const f = path.join(ROOT, "data", "predictions", "high_accuracy", `${t}_summary.json`);
+  if (fs.existsSync(f)) HA[t] = JSON.parse(fs.readFileSync(f, "utf8"));
+}
+if (Object.keys(HA).length) {
+  s = newSlide("CONTENT", "Toward higher accuracy: add the crystal structure", "Results");
+  const haTasks = ["metallicity", "magnetism", "stability", "band_gap"].filter((t) => HA[t]);
+  const haNames = { metallicity: "Metallicity", magnetism: "Magnetism", stability: "Stability", band_gap: "PV band gap" };
+  const stepNames = ["Composition only", "+ structure", "+ tuning", "+ stacking", "+ accuracy threshold"];
+  const series = stepNames.map((n, i) => ({ name: n, labels: haTasks.map((t) => haNames[t]),
+    values: haTasks.map((t) => +(100 * HA[t].ablation[i].Accuracy).toFixed(1)) }));
+  const allAcc = series.flatMap((x) => x.values);
+  s.addChart(pres.charts.BAR, series, {
+    x: 0.6, y: 1.35, w: 7.9, h: 5.0, barDir: "col", barGrouping: "clustered",
+    chartColors: [HEX.accent5, HEX.accent2, HEX.accent3, HEX.accent4, HEX.accent1],
+    valAxisMinVal: Math.max(0, Math.floor((Math.min(...allAcc) - 4) / 5) * 5), valAxisMaxVal: 100,
+    showValue: false, catAxisLabelFontSize: 12, valAxisLabelFontSize: 10, catAxisLabelColor: HEX.dk1,
+    valAxisLabelColor: HEX.accent5, valGridLine: { color: "E2E8F0", size: 0.5 }, catGridLine: { style: "none" },
+    showLegend: true, legendPos: "b", legendFontSize: 10, catAxisLabelFontFace: "+mn-lt",
+    valAxisLabelFontFace: "+mn-lt", legendFontFace: "+mn-lt", valAxisTitle: "Test accuracy (%)",
+    showValAxisTitle: true, valAxisTitleFontSize: 10, valAxisTitleColor: HEX.accent5,
+    showTitle: true, title: "Test accuracy after each step (held-out structures, split by formula)",
+    titleFontSize: 12, titleColor: HEX.dk2, titleFontFace: "+mn-lt", objectName: "accuracy ablation chart",
+  });
+  haTasks.forEach((t, i) => {
+    const f = HA[t].final, b = HA[t].ablation[0];
+    const y0 = 1.4 + i * 1.25;
+    s.addText(`${(100 * f.Accuracy).toFixed(1)} %`, { x: 8.9, y: y0, w: 3.9, h: 0.6, fontSize: 32, bold: true,
+      color: i % 2 ? C.accent2 : C.accent1, fontFace: THEME.headFontFace, margin: 0, isTextBox: true,
+      objectName: "acc value " + t });
+    s.addText(`${haNames[t]} accuracy (composition only ${(100 * b.Accuracy).toFixed(1)} %)`, { x: 8.9, y: y0 + 0.6,
+      w: 3.9, h: 0.5, fontSize: 12, color: C.text1, margin: 0, valign: "top", isTextBox: true,
+      objectName: "acc label " + t });
+  });
+  s.addText("All labels · 28 symmetry and geometry descriptors · tuned LightGBM + XGBoost · stacked ensemble · threshold chosen on training data",
+    { x: 0.6, y: 6.45, w: 12.1, h: 0.45, fontSize: 13, color: C.text1, isTextBox: true, margin: 0 });
+  s.addNotes("The SSL study keeps 1,000 labels and the formula only. This second track shows the best achievable accuracy: every structure of each database, crystal-structure descriptors and a stacked ensemble. The split is grouped by formula, so no composition is on both sides. PV band gap: only about 7 % of structures are positive, so balanced accuracy is the fairer number. 98 % is not reachable honestly for stability, which depends on competing phases.");
+}
+
 // ================================================================== 18-19. app
 function shotPair(title, left, right, capL, capR, notes) {
   s = newSlide("CONTENT", title, "Application");

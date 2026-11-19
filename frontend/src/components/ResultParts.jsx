@@ -22,6 +22,9 @@ export function PropertyCard({ p }) {
           <div className="font-semibold text-ink leading-tight">{t?.title || p.title}</div>
           <div className="text-[11px] text-ink-mute">{t?.source}</div>
         </div>
+        {p.model_track === "structure" && (
+          <span className="ml-auto rounded-full bg-cyan/10 px-2 py-0.5 text-[10px] font-semibold text-cyan" title="Composition + crystal-structure stacked ensemble">+ structure</span>
+        )}
       </div>
       <div className="mt-2 flex justify-center">
         <Gauge value={p.probability} threshold={p.threshold} positive={t?.positive || "positive"} />
@@ -30,8 +33,11 @@ export function PropertyCard({ p }) {
       <div className="mt-3 space-y-1 text-xs text-ink-soft border-t border-line pt-3">
         <div className="flex justify-between"><span>Method</span><b className="text-ink text-right">{p.method || "–"}</b></div>
         <div className="flex justify-between gap-2"><span>Configuration</span><span className="text-right font-mono text-[11px]">{p.config || "–"}</span></div>
-        <div className="flex justify-between"><span>Test ROC-AUC · F1</span>
-          <b className="text-ink">{fmt(p.test_metrics?.["ROC-AUC"])} · {fmt(p.test_metrics?.["F1-Score"])}</b></div>
+        <div className="flex justify-between"><span>Test accuracy · ROC-AUC</span>
+          <b className="text-ink">{fmt(p.test_metrics?.Accuracy)} · {fmt(p.test_metrics?.["ROC-AUC"])}</b></div>
+        {p.ssl_probability != null && (
+          <div className="flex justify-between"><span>SSL model (1,000 labels)</span><span className="font-mono">{(100 * p.ssl_probability).toFixed(0)}%</span></div>
+        )}
       </div>
     </div>
   );
@@ -58,10 +64,10 @@ export function Explanation({ p }) {
   const t = TASK[p.task];
   if (!e) return <p className="text-sm text-ink-mute">No explanation available for this model.</p>;
   if (e.type === "shap") {
-    const data = e.items.map((d) => ({ name: d.feature, value: +d.contribution.toFixed(3), raw: d.value }));
+    const data = e.items.map((d) => ({ name: d.structural ? `${d.feature} ◆` : d.feature, value: +d.contribution.toFixed(3), raw: d.value }));
     return (
       <div>
-        <p className="text-xs text-ink-soft mb-2">SHAP contributions (log-odds): <span style={{ color: POS }} className="font-semibold">→ {t?.positive}</span> · <span style={{ color: NEG }} className="font-semibold">← {t?.negative}</span></p>
+        <p className="text-xs text-ink-soft mb-2">SHAP contributions (log-odds): <span style={{ color: POS }} className="font-semibold">→ {t?.positive}</span> · <span style={{ color: NEG }} className="font-semibold">← {t?.negative}</span>{e.items.some((d) => d.structural) && " · ◆ crystal-structure descriptor"}</p>
         <ResponsiveContainer width="100%" height={36 * data.length + 30}>
           <BarChart data={data} layout="vertical" margin={{ left: 10, right: 30 }}>
             <CartesianGrid {...GRID} horizontal={false} />

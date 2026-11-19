@@ -8,11 +8,13 @@ import Models from "../components/lab/Models.jsx";
 import BandGap from "../components/lab/BandGap.jsx";
 import Unsupervised from "../components/lab/Unsupervised.jsx";
 import SelfSup from "../components/lab/SelfSup.jsx";
+import HighAccuracy from "../components/lab/HighAccuracy.jsx";
 
 const TABS = [
   { id: "datasets", label: "Datasets" },
   { id: "ssl", label: "SSL experiments" },
   { id: "models", label: "Best models" },
+  { id: "accuracy", label: "High accuracy" },
   { id: "bandgap", label: "Band gap · GA & AD" },
   { id: "unsupervised", label: "Unsupervised" },
   { id: "selfsup", label: "Self-supervised" },
@@ -34,6 +36,7 @@ export default function ResearchLab() {
           {tab === "datasets" && <Datasets data={data} />}
           {tab === "ssl" && <SSL data={data} />}
           {tab === "models" && <Models data={data} />}
+          {tab === "accuracy" && <HighAccuracy data={data} />}
           {tab === "bandgap" && <BandGap data={data} />}
           {tab === "unsupervised" && <Unsupervised data={data} />}
           {tab === "selfsup" && <SelfSup data={data} />}

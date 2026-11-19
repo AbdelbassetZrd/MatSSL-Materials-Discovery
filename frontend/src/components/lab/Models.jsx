@@ -2,7 +2,7 @@ import { CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, X
 import { ChartTooltip, SectionHeader } from "../ui.jsx";
 import { AXIS, GRID, SERIES, TASK, fmt, big } from "../../lib/theme.js";
 
-function Confusion({ cm, pos, neg }) {
+export function Confusion({ cm, pos, neg }) {
   const [[tn, fp], [fn, tp]] = cm;
   const total = tn + fp + fn + tp;
   const cell = (v, good) => (

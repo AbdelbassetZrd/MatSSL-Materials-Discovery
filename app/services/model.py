@@ -24,7 +24,7 @@ MODELS_DIR = ROOT / "app" / "models"
 PRED_DIR = ROOT / "data" / "predictions"
 sys.path.insert(0, str(ROOT / "pipeline"))
 
-from featurize import featurize_formulas, parse_formula  # noqa: E402
+from featurize import feature_names, featurize_formulas, parse_formula  # noqa: E402
 from run_ssl_experiments import Preprocessor  # noqa: E402
 from self_supervised import MaskedAutoencoder  # noqa: E402
 
@@ -72,6 +72,7 @@ class ModelInfo(BaseModel):
     config: str | None = None
     source: str | None = None
     test_metrics: dict | None = None
+    high_accuracy: dict | None = None
 
 
 class TaskPrediction(BaseModel):
@@ -86,6 +87,8 @@ class TaskPrediction(BaseModel):
     config: str | None = None
     test_metrics: dict | None = None
     explanation: dict | None = None
+    model_track: str = "composition"
+    ssl_probability: float | None = None
 
 
 PRETTY = {
@@ -125,7 +128,36 @@ def pretty(name: str) -> str:
         return f"stoichiometry {name}"
     if name.startswith("AE "):
         return f"self-supervised embedding {name[3:]}"
+    if name in STRUCT_PRETTY:
+        return STRUCT_PRETTY[name]
+    if name.startswith("struct_cs_"):
+        return f"{name[10:]} crystal system"
     return name
+
+
+STRUCT_PRETTY = {
+    "struct_nprim": "atoms in primitive cell",
+    "struct_nsym_sites": "symmetry-distinct sites",
+    "struct_formula_units": "formula units per cell",
+    "struct_vpa": "volume per atom",
+    "struct_density": "density",
+    "struct_packing": "packing fraction",
+    "struct_vol_ratio": "volume vs elemental volumes",
+    "struct_spg": "space group number",
+    "struct_pg_order": "point-group order",
+    "struct_b_a": "lattice ratio b/a",
+    "struct_c_a": "lattice ratio c/a",
+    "struct_angle_dev": "lattice angle deviation from 90 deg",
+    "struct_nn_min": "shortest interatomic distance",
+    "struct_nn_mean": "mean nearest-neighbour distance",
+    "struct_nn_std": "spread of nearest-neighbour distances",
+    "struct_ratio_min": "shortest bond / covalent radii",
+    "struct_ratio_mean": "mean bond / covalent radii",
+    "struct_cn_mean": "mean coordination number",
+    "struct_cn_std": "spread of coordination numbers",
+    "struct_cn_min": "minimum coordination number",
+    "struct_cn_max": "maximum coordination number",
+}
 
 
 class _Registry:
@@ -134,6 +166,7 @@ class _Registry:
         self.scalers: dict[str, object] = {}
         self.ae = None
         self.rules: dict[str, pd.DataFrame] = {}
+        self.hiacc: dict[str, dict] = {}
         self.load()
 
     def load(self) -> None:
@@ -152,6 +185,14 @@ class _Registry:
                     logger.info("loaded %s model (%s)", task, pkg.get("config"))
                 except Exception as exc:  # pragma: no cover - logged for ops
                     logger.error("could not load %s model: %s", task, exc)
+        for task in TASKS:
+            hfile = MODELS_DIR / f"{task}_hiacc_model.pkl"
+            if hfile.exists():
+                try:
+                    self.hiacc[task] = joblib.load(hfile)
+                    logger.info("loaded %s structure-aware model", task)
+                except Exception as exc:  # pragma: no cover
+                    logger.error("could not load %s structure model: %s", task, exc)
         ae_path = MODELS_DIR / "self_supervised_autoencoder.pkl"
         if ae_path.exists():
             self.ae = joblib.load(ae_path)
@@ -181,6 +222,11 @@ def models_info() -> list[ModelInfo]:
                 config=(pkg or {}).get("config"),
                 test_metrics=(pkg or {}).get("test_metrics")
                 or (pkg or {}).get("registry", {}).get("test_metrics"),
+                high_accuracy=(
+                    {k: reg.hiacc[task][k] for k in ("method", "config", "test_metrics")}
+                    if task in reg.hiacc
+                    else None
+                ),
             )
         )
     return out
@@ -324,20 +370,78 @@ def experiments() -> dict:
     raise FileNotFoundError("dashboard.json not found - run pipeline/export_dashboard.py")
 
 
+def _structure_for(formula: str) -> tuple[dict | None, dict | None, str]:
+    """(structure, its descriptors, status) - status: found / unknown / offline / unused."""
+    from app.services import structure as structures
+
+    if not get_registry().hiacc:
+        return None, None, "unused"
+    try:
+        s = structures.ground_state(formula)
+    except structures.StructureServiceError as exc:
+        logger.warning("structure lookup failed: %s", exc)
+        return None, None, "offline"
+    except Exception:  # formula pymatgen cannot handle
+        return None, None, "unknown"
+    if s is None:
+        return None, None, "unknown"
+    feats = structures.descriptors(s)
+    return (s, feats, "found") if feats else (None, None, "unknown")
+
+
+def _explain_hiacc(hp: dict, raw: pd.DataFrame, X: np.ndarray, sfeat: dict, top: int = 6):
+    contrib = _tree_contrib(hp["lgbm"], X)
+    names = hp["feature_columns"]
+    if contrib is None or len(contrib) != len(names):
+        return None
+    items = []
+    for i in np.argsort(-np.abs(contrib))[:top]:
+        n = names[i]
+        val = sfeat.get(n) if n.startswith("struct_") else float(raw[n].iloc[0])
+        items.append(
+            {
+                "feature": pretty(n),
+                "value": val,
+                "contribution": float(contrib[i]),
+                "structural": n.startswith("struct_"),
+            }
+        )
+    return {"type": "shap", "items": items}
+
+
 def predict(formula: str) -> dict:
-    """Predict every available property for one formula."""
+    """Predict every available property for one formula.
+
+    If the lowest-energy crystal structure is known (Alexandria) and a structure-aware model
+    exists, the high-accuracy model (composition + structure, stacked ensemble) is used;
+    otherwise the semi-supervised composition model selected by the SSL study."""
     reg = get_registry()
     raw = _features(formula)
+    s, sfeat, status = _structure_for(formula)
     preds = []
     for task, meta in TASKS.items():
         if task not in reg.models:
             continue
         pkg = reg.models[task]
         X = _task_matrix(task, raw)
-        p = float(np.clip(pkg["model"].predict_proba(X)[0, 1], 0, 1))
-        t = float(pkg.get("threshold", 0.5))  # calibrated for rare classes
-        y = int(p >= t)
+        p_ssl = float(np.clip(pkg["model"].predict_proba(X)[0, 1], 0, 1))
+        hp = reg.hiacc.get(task)
         entry = pkg.get("registry", {})
+        if hp is not None and sfeat is not None:
+            xs = np.array([[sfeat[c] for c in hp["structure_columns"]]], dtype=np.float32)
+            Xh = np.hstack([raw[feature_names()].to_numpy(np.float32), xs])
+            p = float(np.clip(hp["model"].predict_proba(Xh)[0, 1], 0, 1))
+            t = float(hp["threshold"])
+            track, method, config = "structure", hp["method"], hp["config"]
+            metrics, expl = hp["test_metrics"], _explain_hiacc(hp, raw, Xh, sfeat)
+        else:
+            p, t = p_ssl, float(pkg.get("threshold", 0.5))  # calibrated for rare classes
+            track = "composition"
+            method = pkg.get("method") or entry.get("method")
+            config = entry.get("config") or pkg.get("config")
+            metrics = entry.get("test_metrics") or pkg.get("test_metrics")
+            expl = explain(task, raw, X)
+        y = int(p >= t)
         preds.append(
             TaskPrediction(
                 task=task,
@@ -347,16 +451,30 @@ def predict(formula: str) -> dict:
                 probability=p,
                 confidence=(p - t) / (1 - t) if y else (t - p) / t,
                 threshold=t,
-                method=pkg.get("method") or entry.get("method"),
-                config=entry.get("config") or pkg.get("config"),
-                test_metrics=entry.get("test_metrics") or pkg.get("test_metrics"),
-                explanation=explain(task, raw, X),
+                method=method,
+                config=config,
+                test_metrics=metrics,
+                explanation=expl,
+                model_track=track,
+                ssl_probability=p_ssl if track == "structure" else None,
             ).model_dump()
         )
+    structure_info = None
+    if s is not None:
+        structure_info = {
+            "id": s["id"],
+            "source": "Alexandria (PBE)",
+            "e_above_hull": s.get("e_above_hull"),
+            "spacegroup": int(sfeat["struct_spg"]),
+            "n_atoms_primitive": int(sfeat["struct_nprim"]),
+            "density": sfeat["struct_density"],
+        }
     return {
         "formula": formula,
         "predictions": preds,
         "applicability_domain": applicability_domain(raw),
+        "structure": structure_info,
+        "structure_status": status,
     }
 
 
