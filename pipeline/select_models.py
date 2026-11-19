@@ -9,7 +9,19 @@ from __future__ import annotations
 
 import json
 import shutil
+import sys
 from pathlib import Path
+
+import joblib
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from run_ssl_experiments import Preprocessor  # noqa: E402
+from self_supervised import MaskedAutoencoder  # noqa: E402
+
+import __main__  # noqa: E402
+
+__main__.Preprocessor = Preprocessor  # pickles written by scripts run as __main__
+__main__.MaskedAutoencoder = MaskedAutoencoder
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS, PRED = ROOT / "app" / "models", ROOT / "data" / "predictions"
@@ -30,7 +42,9 @@ def main() -> None:
             print(f"{task}: no candidate model yet")
             continue
         _, pool, S, dep = max(cands, key=lambda c: c[0])
-        shutil.copy(MODELS / f"{task}_{pool}_model.pkl", MODELS / f"{task}_model.pkl")
+        # re-save compressed (graph models store their training graph; GitHub limit 100 MB)
+        joblib.dump(joblib.load(MODELS / f"{task}_{pool}_model.pkl"), MODELS / f"{task}_model.pkl",
+                    compress=("xz", 3))
         shutil.copy(MODELS / f"{task}_{pool}_scaler.pkl", MODELS / f"{task}_scaler.pkl")
         registry[task] = {
             "model_file": f"{task}_model.pkl", "scaler_file": f"{task}_scaler.pkl",
