@@ -8,55 +8,69 @@ compositions.
 
 \subsection*{Comparison of SSL Methods}
 
-\resfig{\textwidth}{results/stability/gnome/stability_methods_comparison_balanced.png}{Comparison
-of SSL methods on the Stability dataset (unlabeled pool: GNoME).}
+\resfig{\textwidth}{results/stability/indist/stability_methods_comparison_balanced.png}{Comparison
+of SSL methods on the Stability dataset (unlabeled pool: same database, labels hidden).}
 
-\maybeinput{table_stability_gnome}
 \maybeinput{table_stability_indist}
+\maybeinput{table_stability_gnome}
 
-With the GNoME pool, \StabGnBestMethod{} (\texttt{\StabGnBestConfig}) reaches \StabGnBestComp{}
-against \StabGnBaseComp{} for the tuned \StabGnBaseConfig{} baseline (\StabGnImpr\%), within
-one standard deviation. Self-Training is tied with the baseline. Label Propagation and Label
-Spreading stay below 0.59 (ROC-AUC $\approx$ 0.70). Compositions with the same elements can be stable or unstable depending on their
-stoichiometry and structure, so neighbouring points in descriptor space often carry different
-labels, and propagating labels along the graph fails. With the same-database pool, the best
-SSL method is \StabInBestSSL{} with \StabInBestSSLComp{} (\StabInImpr\%).
+Stability gives the largest semi-supervised gain of the project. With unlabeled compositions
+from the same database, \StabInBestMethod{} (\texttt{\StabInBestConfig}) reaches
+\StabInBestComp{} against \StabInBaseComp{} for the tuned \StabInBaseConfig{} baseline
+(\StabInImpr\%). It is better for each of the three seeds (+0.011, +0.001 and +0.003) and
+improves both the F1-score (0.583 against 0.579) and the ROC-AUC (0.794 against 0.788). The
+two descriptor views of Co-Training (elemental properties versus stoichiometry and valence
+electrons) are designed to make different errors, so that each view can teach the other. Self-Training and
+Cluster-then-Label are tied with the baseline.
+
+With the GNoME pool, the gain shrinks to \StabGnImpr\% (\StabGnBestMethod{},
+\StabGnBestComp{}), within one standard deviation. In both settings Label Propagation and Label
+Spreading stay below 0.60 (ROC-AUC $\approx$ 0.70). Compositions with the same elements can be
+stable or unstable depending on their stoichiometry and structure. As a result, neighbouring
+points in descriptor space often carry different labels, and propagating labels along the
+graph fails.
 
 \subsection*{Effect of the Number of Unlabeled Compositions}
 
-\resfig{\textwidth}{results/stability/gnome/stability_learning_curves.png}{Composite score and
-F1-score versus the number of unlabeled compositions (stability, GNoME pool).}
+\resfig{\textwidth}{results/stability/indist/stability_learning_curves.png}{Composite score and
+F1-score versus the number of unlabeled compositions (stability, same-database pool).}
 
-\maybeinput{poolsize_stability_gnome}
 \maybeinput{poolsize_stability_indist}
+\maybeinput{poolsize_stability_gnome}
 
-The degradation with the pool size is strongest on stability. Co-Training falls from 0.684
-with 1,000 GNoME compositions to 0.525 with 100,000, and Self-Training from 0.682 to 0.615.
-A likely explanation is that GNoME was built from compositions the generative search predicted
-to be stable, so its distribution is very different from Alexandria's. As the pool grows, the
+The degradation with the pool size is strongest on stability. With the same-database pool,
+Co-Training falls from 0.689 with 1,000 unlabeled compositions to 0.588 with 100,000. With
+GNoME it falls from 0.684 to 0.525, and Self-Training from 0.682 to 0.615. A likely
+explanation is that GNoME was built from compositions the generative search predicted to be
+stable, so its distribution is very different from Alexandria's. As the pool grows, the
 pseudo-labels on these compositions increasingly outweigh the 1,000 true labels.
 
 \subsection*{Label Budget and Supervised Model Zoo}
 
-\resfig{0.8\textwidth}{results/stability/gnome/stability_label_budget_curve.png}{Label-budget
-curve for stability: best supervised baseline versus best SSL configuration.}
+\resfig{0.8\textwidth}{results/stability/indist/stability_label_budget_curve.png}{Label-budget
+curve for stability: best supervised baseline versus best SSL configuration (same-database
+pool).}
 
+\maybeinput{budget_stability_indist}
 \maybeinput{budget_stability_gnome}
-\maybeinput{zoo_stability_gnome}
+\maybeinput{zoo_stability_indist}
 
-The baseline gains 0.13 composite points between 250 and 5,000 labels, and the fully
-supervised model trained on all 349,432 training labels reaches \StabGnFullComp{} (ROC-AUC
-\StabGnFullAUC{}). Even with every label, composition alone cannot decide stability, which
-also depends on the crystal structure and on the competing phases. With 250 labels, the
-pseudo-labels of Co-Training hurt (0.570 against 0.603); from 2,500 labels on, the two curves
-are equivalent.
+With the same-database pool, Co-Training is above the baseline from 500 to 2,500 labels
+(+0.017 at 500, +0.005 at 1,000 and +0.007 at 2,500), and the curves cross at 5,000 labels.
+This is the range where semi-supervised learning is expected to help: enough labels for
+reliable first predictions, but not enough for the supervised model to see every chemistry.
+With the GNoME pool, the pseudo-labels hurt at 250 labels (0.570 against 0.603). The baseline
+gains 0.13 composite points between 250 and 5,000 labels. The fully supervised model trained on
+all 349,432 training labels reaches \StabInFullComp{} (ROC-AUC \StabInFullAUC{}). Even with
+every label, composition alone cannot decide stability, which also depends on the crystal
+structure and on the competing phases.
 
 \subsection*{Selected Model}
 
-Re-trained on all training labels plus the unlabeled pool, the deployed model reaches a
-composite score of \StabSelComp{} on the held-out test set (ROC-AUC \StabSelAUC{}, F1
-\StabSelFone{}, recall \StabSelRec{}). Its unlabeled pool was chosen by the deployment
-composite score (\StabSelPool{}).
+Both unlabeled-pool settings select the same configuration, so they give the same deployed
+model: \StabSelMethod{} re-trained on all training labels with 1,000 GNoME compositions as
+unlabeled data. On the held-out test set it reaches a composite score of \StabSelComp{}
+(ROC-AUC \StabSelAUC{}, F1 \StabSelFone{}, recall \StabSelRec{}).
 
 Consequently, \textbf{\StabSelMethod{}} (\texttt{\StabSelConfig}) is selected as the primary
 architecture for the deployment phase of the stability prediction module.

@@ -72,10 +72,12 @@ cd presentation && node build_deck.js                   # PowerPoint deck
 
 See `report/main.pdf` (sections 6-9) and the Research Lab page of the app. In short:
 
-* the best semi-supervised method beats a strong Optuna-tuned LightGBM baseline only slightly
-  (+0.30 % on magnetism with Self-Training, within one standard deviation elsewhere);
-* external unlabeled data (GNoME) suffers from distribution shift, and larger unlabeled pools
-  tend to hurt every method except confident Self-Training;
+* with unlabeled data from the same database, the best semi-supervised method beats a strong
+  Optuna-tuned LightGBM baseline only slightly: +0.73 % on stability (Co-Training), +0.30 % on
+  magnetism (Self-Training), a tie on metallicity;
+* external unlabeled data (GNoME) suffers from distribution shift: SSL loses on metallicity
+  (-0.30 %) and magnetism (-1.25 %). Larger unlabeled pools tend to hurt every method except
+  confident Self-Training;
 * labels matter more: the label-budget curve rises steeply from 250 to 5,000 labels.
 
 The deployed models are listed in `app/models/registry.json`.

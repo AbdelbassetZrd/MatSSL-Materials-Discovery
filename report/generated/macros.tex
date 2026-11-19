@@ -54,30 +54,38 @@
 \newcommand{\MagInDepFone}{0.8186}
 \newcommand{\MagInNTest}{12,882}
 \newcommand{\MagInRuns}{446}
-\newcommand{\MagGnBestMethod}{?}
-\newcommand{\MagGnBestConfig}{?}
-\newcommand{\MagGnBestComp}{?}
-\newcommand{\MagGnBaseComp}{?}
-\newcommand{\MagGnBaseConfig}{?}
-\newcommand{\MagGnImpr}{?}
-\newcommand{\MagGnFullComp}{?}
-\newcommand{\MagGnDepComp}{?}
-\newcommand{\MagGnDepAUC}{?}
-\newcommand{\MagGnDepFone}{?}
-\newcommand{\MagGnBestSSL}{?}
-\newcommand{\MagGnBestSSLComp}{?}
-\newcommand{\StabInBestMethod}{?}
-\newcommand{\StabInBestConfig}{?}
-\newcommand{\StabInBestComp}{?}
-\newcommand{\StabInBaseComp}{?}
-\newcommand{\StabInBaseConfig}{?}
-\newcommand{\StabInImpr}{?}
-\newcommand{\StabInFullComp}{?}
-\newcommand{\StabInDepComp}{?}
-\newcommand{\StabInDepAUC}{?}
-\newcommand{\StabInDepFone}{?}
-\newcommand{\StabInBestSSL}{?}
-\newcommand{\StabInBestSSLComp}{?}
+\newcommand{\MagGnBestMethod}{Baseline}
+\newcommand{\MagGnBestConfig}{LightGBM (tuned)}
+\newcommand{\MagGnBestComp}{0.7927}
+\newcommand{\MagGnBaseComp}{0.7927}
+\newcommand{\MagGnBaseConfig}{LightGBM (tuned)}
+\newcommand{\MagGnBestSSL}{Self-Training}
+\newcommand{\MagGnBestSSLConfig}{ST LightGBM$^*$ tau=0.75 | n=1000}
+\newcommand{\MagGnBestSSLComp}{0.7828}
+\newcommand{\MagGnImpr}{-1.25}
+\newcommand{\MagGnFullComp}{0.8950}
+\newcommand{\MagGnFullAUC}{0.9708}
+\newcommand{\MagGnDepComp}{0.8945}
+\newcommand{\MagGnDepAUC}{0.9710}
+\newcommand{\MagGnDepFone}{0.8179}
+\newcommand{\MagGnNTest}{12,882}
+\newcommand{\MagGnRuns}{446}
+\newcommand{\StabInBestMethod}{Co-Training}
+\newcommand{\StabInBestConfig}{CT LightGBM$^*$ tau=0.85 | n=1000}
+\newcommand{\StabInBestComp}{0.6885}
+\newcommand{\StabInBaseComp}{0.6835}
+\newcommand{\StabInBaseConfig}{LightGBM (tuned)}
+\newcommand{\StabInBestSSL}{Co-Training}
+\newcommand{\StabInBestSSLConfig}{CT LightGBM$^*$ tau=0.85 | n=1000}
+\newcommand{\StabInBestSSLComp}{0.6885}
+\newcommand{\StabInImpr}{+0.73}
+\newcommand{\StabInFullComp}{0.7481}
+\newcommand{\StabInFullAUC}{0.8485}
+\newcommand{\StabInDepComp}{0.7439}
+\newcommand{\StabInDepAUC}{0.8429}
+\newcommand{\StabInDepFone}{0.6448}
+\newcommand{\StabInNTest}{20,000}
+\newcommand{\StabInRuns}{446}
 \newcommand{\StabGnBestMethod}{Co-Training}
 \newcommand{\StabGnBestConfig}{CT LightGBM$^*$ tau=0.85 | n=1000}
 \newcommand{\StabGnBestComp}{0.6840}
@@ -114,7 +122,7 @@
 \newcommand{\MagSelRec}{0.9046}
 \newcommand{\StabSelMethod}{Co-Training}
 \newcommand{\StabSelConfig}{CT LightGBM$^*$ tau=0.85}
-\newcommand{\StabSelPool}{GNoME}
+\newcommand{\StabSelPool}{same database (labels hidden)}
 \newcommand{\StabSelComp}{0.7439}
 \newcommand{\StabSelAUC}{0.8429}
 \newcommand{\StabSelFone}{0.6448}

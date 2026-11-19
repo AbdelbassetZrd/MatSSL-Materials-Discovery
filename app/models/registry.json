@@ -33,7 +33,8 @@
       "Recall": 0.9045643153526971
     },
     "candidates": {
-      "indist": 0.8946970376531898
+      "indist": 0.8946970376531898,
+      "gnome": 0.894494101242721
     }
   },
   "stability": {
@@ -41,7 +42,7 @@
     "scaler_file": "stability_scaler.pkl",
     "method": "Co-Training",
     "config": "CT LightGBM* tau=0.85",
-    "selection_pool": "gnome",
+    "selection_pool": "indist",
     "test_metrics": {
       "Composite_Score": 0.7438603142202804,
       "F1-Score": 0.644770718808712,
@@ -51,6 +52,7 @@
       "Recall": 0.78645391274826
     },
     "candidates": {
+      "indist": 0.7438603142202804,
       "gnome": 0.7438603142202804
     }
   },

@@ -14,7 +14,7 @@ of SSL methods on the Magnetism dataset (unlabeled pool: same database, labels h
 \maybeinput{table_magnetism_indist}
 \maybeinput{table_magnetism_gnome}
 
-Magnetism gives the clearest semi-supervised gain of the project: \MagInBestMethod{}
+Magnetism gives the second-largest semi-supervised gain of the project: \MagInBestMethod{}
 (\texttt{\MagInBestConfig}) reaches \MagInBestComp{} against \MagInBaseComp{} for the tuned
 \MagInBaseConfig{} baseline (\MagInImpr\%). The gain is small but present for each
 of the three seeds (+0.001, +0.003 and +0.004), on both the F1-score and the ROC-AUC. The
@@ -22,8 +22,10 @@ confidently pseudo-labelled magnetic compositions add examples of the minority c
 Co-Training and the graph methods lose 0.08--0.12 composite points: their pseudo-labels follow
 the majority class, so the rare magnetic class is diluted.
 
-With GNoME as the unlabeled pool, the best SSL method is \MagGnBestSSL{} with
-\MagGnBestSSLComp{} (\MagGnImpr\% against the same baseline).
+With GNoME as the unlabeled pool, no SSL method beats the baseline. The best one,
+\MagGnBestSSL{} (\texttt{\MagGnBestSSLConfig}), reaches \MagGnBestSSLComp{}
+(\MagGnImpr\%), the largest loss of the project. Its best threshold is only 0.75, which
+means it accepts more pseudo-labels, on compositions that differ from the labeled data.
 
 \subsection*{Effect of the Number of Unlabeled Compositions}
 
@@ -36,7 +38,8 @@ F1-score versus the number of unlabeled compositions (magnetism, same-database p
 Self-Training is the only method whose score stays flat (0.79--0.80) from 1,000 to 51,528
 unlabeled compositions. With its 0.9 threshold, a larger pool only adds a few more confident
 pseudo-labels. Every other method degrades as the pool grows: Cluster-then-Label drops from
-0.78 to 0.70 and Co-Training from 0.72 to 0.64.
+0.78 to 0.70 and Co-Training from 0.72 to 0.64. With GNoME, every method, including
+Self-Training, stays below the baseline (0.7927) at every pool size.
 
 \subsection*{Label Budget and Supervised Model Zoo}
 
@@ -44,11 +47,13 @@ pseudo-labels. Every other method degrades as the pool grows: Cluster-then-Label
 curve for magnetism: best supervised baseline versus best SSL configuration.}
 
 \maybeinput{budget_magnetism_indist}
+\maybeinput{budget_magnetism_gnome}
 \maybeinput{zoo_magnetism_indist}
 
 The label-budget curve shows where SSL is useful: with only 250 or 500 labels, Self-Training
-is about 0.005 above the baseline. The gap closes at 2,500 labels, because a supervised model
-then sees enough magnetic compositions on its own. The fully supervised model
+on the same-database pool is about 0.005 above the baseline. The gap closes at 2,500 labels,
+because a supervised model then sees enough magnetic compositions on its own. With the GNoME
+pool, Self-Training is below the baseline at every budget (by 0.023 with 250 labels). The fully supervised model
 (\MagInFullComp{}, ROC-AUC \MagInFullAUC{}) is still 0.10 above any 1,000-label model.
 LightGBM is the best supervised family; the tuned version wins by a small margin over the
 default one.

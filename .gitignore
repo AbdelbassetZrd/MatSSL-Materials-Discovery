@@ -215,3 +215,5 @@ catboost_info/
 
 node_modules/
 frontend/dist/
+
+report/build_tmp/

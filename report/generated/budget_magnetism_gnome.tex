@@ -1,0 +1,17 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lcc}
+\toprule
+Labeled samples & Best SSL: ST LightGBM$^*$ tau=0.75 & Best supervised baseline\\
+\midrule
+250 & 0.686$\pm$0.005 & 0.709$\pm$0.021 \\
+500 & 0.744$\pm$0.023 & 0.757$\pm$0.017 \\
+1,000 & 0.794$\pm$0.013 & 0.802$\pm$0.009 \\
+2,500 & 0.831$\pm$0.003 & 0.834$\pm$0.001 \\
+5,000 & 0.852$\pm$0.002 & 0.854$\pm$0.003 \\
+\midrule
+All training labels (51,528) & \multicolumn{2}{c}{0.8950 (fully supervised)}\\
+\bottomrule
+\end{tabular}
+\caption*{Label-budget study (GNoME unlabeled pool).}
+\end{table}

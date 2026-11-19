@@ -2,11 +2,13 @@
 \section{Conclusion}
 
 This project highlights both the potential and limitations of Semi-Supervised Learning for
-materials discovery. Working with only 1,000 labels, more than one million compositions from
-five databases and more than 2,600 trained models, we found that SSL can reduce labelling
-costs. Its success, however, strongly depends on data characteristics. Self-Training with a
-strict confidence threshold was the most reliable method and was deployed for metallicity
-and magnetism. \StabSelMethod{} was deployed for stability. Unlabeled data from a different
+materials discovery. We worked with only 1,000 labels, about 1.2 million compositions from
+four open databases and more than 2,600 trained models. SSL can reduce labelling costs: with
+unlabeled data from the same database, Co-Training improved stability prediction by
+\StabInImpr\% and Self-Training improved magnetism by \MagInImpr\% over a tuned LightGBM.
+Its success, however, strongly depends on data characteristics. Self-Training with a strict
+confidence threshold was the most reliable method and was deployed for metallicity and
+magnetism. \StabSelMethod{} was deployed for stability. Unlabeled data from a different
 distribution (GNoME) and larger unlabeled pools tended to hurt rather than help.
 
 Complementing these approaches, our traditional materials-informatics pipeline for the

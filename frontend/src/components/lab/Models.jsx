@@ -65,7 +65,7 @@ export default function Models({ data }) {
                 ))}
               </div>
               <Confusion cm={d.confusion} pos={TASK[t].positive} neg={TASK[t].negative} />
-              <div className="text-[11px] text-ink-mute">{big(d.n_test)} held-out test compositions{d.selection_pool && d.selection_pool !== "–" ? ` · unlabeled pool: ${d.selection_pool === "indist" ? "same database" : "GNoME"}` : ""}</div>
+              <div className="text-[11px] text-ink-mute">{big(d.n_test)} held-out test compositions{d.selection_pool && d.selection_pool !== "–" ? ` · selected with the ${d.selection_pool === "indist" ? "same-database" : "GNoME"} pool` : ""}</div>
             </div>
           );
         })}

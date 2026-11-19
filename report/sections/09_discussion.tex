@@ -2,24 +2,26 @@
 \section{Discussion and Limitations}\label{sec:discussion}
 
 The results show that the performance gains achieved using SSL are not always significant
-(Table~\ref{tab:ssl-overview}). With 1,000 labels, the best semi-supervised method beats the
-Optuna-tuned supervised baseline by at most \MagInImpr\% (magnetism, Self-Training). On
-metallicity and stability the gain is within one standard deviation, and with the GNoME pool
-on metallicity no SSL method beats the baseline at all. This suggests that SSL is not a
-universal solution and that its effectiveness depends on data distribution and underlying
-assumptions:
+(Table~\ref{tab:ssl-overview}). With 1,000 labels and unlabeled data from the same
+database, the best semi-supervised method beats the Optuna-tuned supervised baseline by
+\StabInImpr\% on stability (Co-Training) and \MagInImpr\% on magnetism (Self-Training), with
+a gain on each of the three seeds. On metallicity the result is a tie (\MetalInImpr\%). With
+the GNoME pool, SSL loses on metallicity (\MetalGnImpr\%) and magnetism (\MagGnImpr\%). This
+suggests that SSL is not a universal solution and that its effectiveness depends on data
+distribution and underlying assumptions:
 \begin{itemize}
   \item \textbf{Strong baselines.} Gradient-boosted trees trained on 142 Magpie descriptors
   already capture most of what 1,000 labels can teach. The label-budget curves show that SSL
-  helps most at 250--500 labels and that the gap closes after 2,500 labels.
+  helps most with a few hundred to 2,500 labels, and that the gap closes at 2,500--5,000
+  labels.
   \item \textbf{Distribution shift.} The KS statistics between labeled and GNoME compositions
   reach 0.48 (Figure~\ref{fig:shift}). Unlabeled data from a different distribution violate the
-  cluster and manifold assumptions, which is why the GNoME pool is never better than the
-  same-database pool for the graph methods.
+  cluster and manifold assumptions. As a result, for all three tasks the best SSL method is
+  better with the same-database pool than with GNoME.
   \item \textbf{More unlabeled data is not better.} For almost every method the composite
   score decreases from 1,000 to 100,000 unlabeled compositions: errors in the pseudo-labels
-  accumulate faster than useful information. Only Self-Training with a high confidence
-  threshold (0.9) is robust to the pool size.
+  accumulate faster than useful information. Self-Training with a high confidence threshold
+  (0.9) degrades the least, because it only accepts pseudo-labels it is sure about.
   \item \textbf{Graph methods do not scale to this feature space.} Label Propagation and
   Label Spreading are always last, even after class-mass normalization. Euclidean neighbours in
   descriptor space do not share labels reliably, and an exact RBF graph is only possible for
