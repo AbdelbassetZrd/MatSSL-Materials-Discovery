@@ -89,9 +89,10 @@ def main() -> None:
                                        [pm(r[f"{m}_mean"], r[f"{m}_std"]) for m in METRICS])
                             + r" \\")
             tab = ("\\begin{table}[H]\n\\centering\\scriptsize\n\\setlength{\\tabcolsep}{3pt}\n"
+                   "\\resizebox{\\textwidth}{!}{%\n"
                    "\\begin{tabular}{llcccccc}\n\\toprule\nMethod & Best configuration & "
                    "Accuracy & Precision & Recall & F1 & ROC-AUC & Composite\\\\\n\\midrule\n"
-                   + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n"
+                   + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}\n"
                    f"\\caption*{{{esc(task.capitalize())} -- unlabeled pool: {pool_name}. "
                    f"1,000 labeled compositions, mean$\\pm$std over 3 seeds, "
                    f"{S['training_setup']['n_test_evaluated']:,} test compositions.}}\n"
@@ -153,6 +154,62 @@ def main() -> None:
             dst.mkdir(parents=True, exist_ok=True)
             for f in d.glob("*.png"):
                 shutil.copy(f, dst / f.name)
+
+    # deployed models (written by pipeline/select_models.py)
+    reg_file = ROOT / "app" / "models" / "registry.json"
+    reg = json.loads(reg_file.read_text()) if reg_file.exists() else {}
+    for task, key in [*TASKS.items(), ("band_gap", "Gap")]:
+        r = reg.get(task, {})
+        tm = r.get("test_metrics", {})
+        mac(key + "SelMethod", esc(r.get("method", "?")))
+        mac(key + "SelConfig", esc(r.get("config", "?")))
+        mac(key + "SelPool", POOLS.get(r.get("selection_pool", ""), "--"))
+        for m, short in [("Composite_Score", "Comp"), ("ROC-AUC", "AUC"), ("F1-Score", "Fone"),
+                         ("Accuracy", "Acc"), ("Precision", "Prec"), ("Recall", "Rec")]:
+            mac(key + "Sel" + short, f"{tm[m]:.4f}" if m in tm else "?")
+    rows = []
+    for task, name in [("metallicity", "Metallicity"), ("magnetism", "Magnetism"),
+                       ("stability", "Stability"), ("band_gap", "PV band gap")]:
+        r = reg.get(task)
+        if not r:
+            continue
+        tm = r["test_metrics"]
+        rows.append(f"{name} & {esc(r['method'])} & {esc(r['config'])} & "
+                    + " & ".join(f"{tm.get(m, float('nan')):.3f}"
+                                 for m in ["Accuracy", "Precision", "Recall", "F1-Score",
+                                           "ROC-AUC"]) + r" \\")
+    (GEN / "deployed.tex").write_text(
+        "\\begin{table}[H]\n\\centering\\small\n\\setlength{\\tabcolsep}{4pt}\n"
+        "\\resizebox{\\textwidth}{!}{%\n"
+        "\\begin{tabular}{lllccccc}\n\\toprule\nTask & Method & Configuration & Acc. & Prec. & "
+        "Rec. & F1 & ROC-AUC\\\\\n\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n"
+        "\\end{tabular}}\n\\caption{Deployed models, re-trained on all training labels and "
+        "evaluated once on the held-out test sets.}\\label{tab:deployed}\n\\end{table}\n",
+        encoding="utf-8")
+
+    # overview: best SSL vs tuned baseline for every task x pool
+    rows = []
+    short = {"indist": "same database", "gnome": "GNoME"}
+    for task in TASKS:
+        for pool in POOLS:
+            sj = PRED / task / pool / f"ssl_summary_{task}.json"
+            if not sj.exists():
+                rows.append(f"{task.capitalize()} & {short[pool]} & "
+                            r"\multicolumn{4}{c}{\textit{running}} \\")
+                continue
+            S = json.loads(sj.read_text())
+            b = S["best_ssl_model"]
+            rows.append(f"{task.capitalize()} & {short[pool]} & "
+                        f"{S['best_supervised_baseline']['composite_score']:.4f} & "
+                        f"{esc(b['Method'])} & {b['Composite_Score_mean']:.4f} & "
+                        f"{S['ssl_improvement_over_best_baseline_pct']:+.2f}\\% \\\\")
+    (GEN / "ssl_overview.tex").write_text(
+        "\\begin{table}[H]\n\\centering\\small\n\\begin{tabular}{llcccc}\n\\toprule\n"
+        "Task & Unlabeled pool & Tuned baseline & Best SSL method & SSL composite & Gain\\\\\n"
+        "\\midrule\n" + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\caption{Best "
+        "semi-supervised method versus the Optuna-tuned supervised baseline (1,000 labels, "
+        "composite score, mean of 3 seeds).}\\label{tab:ssl-overview}\n\\end{table}\n",
+        encoding="utf-8")
 
     # band gap
     bj = PRED / "band_gap" / "band_gap_summary.json"

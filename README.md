@@ -39,7 +39,7 @@ featurisers (identical results, ~65,000 compositions/second).
 
 ```
 app/            FastAPI backend (routes/materials.py, services/model.py, trained models in app/models)
-frontend/       React + Vite web interface (periodic-table editor, 3D crystal viewer, results)
+frontend/       MatSSL Studio: React + Vite + Tailwind + Recharts web interface
 pipeline/       data download, featurisation, experiments, GA/AD, unsupervised analysis
 notebooks/      data_enhancing / eda / training notebooks per dataset, band_gap, unsupervised
 data/predictions/  all result tables (CSV/JSON) and figures
@@ -61,7 +61,39 @@ uv run python pipeline/unsupervised_analysis.py         # association rules + cl
 bash pipeline/run_all.sh                                # SSL campaign (3 tasks x 2 pools)
 uv run python pipeline/band_gap_ga_ad.py                # GA + applicability domain
 uv run python pipeline/select_models.py                 # choose deployed models
+uv run python pipeline/build_neighbor_index.py          # embedding index for /similar
+uv run python pipeline/export_dashboard.py              # Research Lab data (dashboard.json)
+uv run python pipeline/build_notebooks.py               # regenerate the notebooks
+bash report/build.sh                                    # tables, macros and report PDF
+cd presentation && node build_deck.js                   # PowerPoint deck
 ```
+
+## Results (1,000 labels, composite = (F1 + ROC-AUC)/2, mean of 3 seeds)
+
+See `report/main.pdf` (sections 6-9) and the Research Lab page of the app. In short:
+
+* the best semi-supervised method beats a strong Optuna-tuned LightGBM baseline only slightly
+  (+0.30 % on magnetism with Self-Training, within one standard deviation elsewhere);
+* external unlabeled data (GNoME) suffers from distribution shift, and larger unlabeled pools
+  tend to hurt every method except confident Self-Training;
+* labels matter more: the label-budget curve rises steeply from 250 to 5,000 labels.
+
+The deployed models are listed in `app/models/registry.json`.
+
+## MatSSL Studio (web application)
+
+| Page | What it shows |
+|---|---|
+| Overview | key figures, processing pipeline, deployed models with test scores |
+| Composition Studio | periodic table (element cards, property heat maps), formula editor, atomic fractions, 3D crystal from the Alexandria OPTIMADE API |
+| Results | probability gauges with calibrated thresholds, profile radar, applicability domain and chemical-space map, SHAP explanation, nearest known materials (self-supervised embedding), chemistry checks and association rules, CSV/JSON export |
+| Research Lab | datasets and shift, SSL comparisons, learning and label-budget curves, model zoo, deployed models (ROC, confusion matrices), GA and applicability domain, association rules and clusters, autoencoder; works offline from `dashboard.json` |
+| Compare | up to four compositions side by side |
+| Demo tour | scripted walk-through for the presentation (keyboard ← / →) |
+
+API endpoints (FastAPI, documentation at `/docs`): `POST /materials/predict`,
+`POST /materials/batch-predict`, `POST /materials/analyze`, `GET /materials/similar`,
+`GET /materials/structure`, `GET /materials/experiments`, `GET /materials/models-info`.
 
 ## Run the application
 

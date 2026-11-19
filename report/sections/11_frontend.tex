@@ -1,46 +1,54 @@
 \clearpage
 \section{Frontend Interface}
 
-To demonstrate practical applicability, a web application was developed with React (frontend)
-and FastAPI (backend). The backend exposes the deployed models through a REST API
-(\texttt{/materials/predict}, \texttt{/materials/analyze}, \texttt{/materials/structure},
-\texttt{/materials/models-info}), while the frontend allows users to build a chemical
-composition, inspect its crystal structure and receive stability, magnetism, metallicity and
-photovoltaic band-gap predictions. The application is packaged in a single Docker image in which
-FastAPI also serves the compiled React interface.
+To demonstrate practical applicability, a web application, \textbf{MatSSL Studio}, was developed
+with React (frontend) and FastAPI (backend). The backend exposes the deployed models through a REST
+API (\texttt{/materials/predict}, \texttt{/analyze}, \texttt{/similar}, \texttt{/structure},
+\texttt{/experiments}, \texttt{/models-info}). The frontend lets users build a chemical
+composition, inspect its crystal structure, and receive stability, magnetism, metallicity and
+photovoltaic band-gap predictions, each with an explanation and a reliability check. Beyond
+prediction, a \textbf{Research Lab} presents every experiment of this report interactively, a
+\textbf{Compare} page ranks candidate materials side by side, and a guided \textbf{demo tour}
+supports the oral presentation. The whole application ships as a single Docker image in which
+FastAPI also serves the compiled interface.
 
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/01_start.png}
-  \caption{Starting Interface}
-\end{figure}
+The application has five sections:
+\begin{itemize}
+  \item \textbf{Overview:} project figures, the processing pipeline and the deployed models with
+  their test scores.
+  \item \textbf{Composition Studio:} an interactive periodic table (element cards, heat maps of
+  electronegativity, radius or melting point), a formula box synchronized with the table, the
+  atomic fractions and the lowest-energy crystal structure retrieved from the Alexandria
+  database and rendered in 3D.
+  \item \textbf{Results:} for every property, a probability gauge with the calibrated decision
+  threshold, the selected method and its test metrics. The page also shows:
+  \begin{itemize}
+    \item a profile radar of the four probabilities;
+    \item the position of the material in the training chemical space with the
+    applicability-domain verdict;
+    \item a ``why this prediction'' panel: exact SHAP contributions of the LightGBM-based models,
+    or descriptor percentiles otherwise;
+    \item the nearest known materials in the self-supervised embedding, with their true labels;
+    \item the chemistry checks and the association rules that apply.
+  \end{itemize}
+  \item \textbf{Research Lab:} datasets and distribution shift, the SSL comparison with learning
+  and label-budget curves, the selected models with ROC curves and confusion matrices, the
+  genetic algorithm and applicability domain, the association-rule explorer and clusters, and
+  the self-supervised autoencoder. It also works offline from a static copy of the results.
+  \item \textbf{Compare:} up to four compositions side by side.
+\end{itemize}
 
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/02_editor.png}
-  \caption{Composition editor Interface (periodic table)}
-\end{figure}
+\newcommand{\shot}[2]{\begin{figure}[H]\centering
+  \safeimg{\textwidth}{#1}\caption{#2}\end{figure}}
+\renewcommand{\safeimg}[2]{\IfFileExists{figures/#2}{\includegraphics[width=#1,height=0.78\textheight,keepaspectratio]{#2}}{%
+  \fbox{\parbox[c][3cm][c]{#1}{\centering\small pending: \texttt{\detokenize{#2}}}}}}
 
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/03_input.png}
-  \caption{Inputing formula Interface}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/04_viewer.png}
-  \caption{3D crystal View Interface}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/05_analyze.png}
-  \caption{Analyze Material Interface}
-\end{figure}
-
-\begin{figure}[H]
-  \centering
-  \safeimg{\textwidth}{screenshots/06_results.png}
-  \caption{Results Interface}
-\end{figure}
+\shot{screenshots/01_start.png}{Starting Interface}
+\shot{screenshots/02_editor.png}{Composition editor Interface (periodic table, formula, fractions, 3D crystal)}
+\shot{screenshots/03_input.png}{Inputing formula Interface (example library, CsPbI$_3$)}
+\shot{screenshots/04_viewer.png}{3D crystal View Interface (Fe$_2$O$_3$ from the Alexandria database)}
+\shot{screenshots/05_analyze.png}{Analyze Material Interface (Nd$_2$Fe$_{14}$B: gauges, chemical space, SHAP explanation, nearest known materials)}
+\shot{screenshots/06_results.png}{Results Interface (LiFePO$_4$)}
+\shot{screenshots/07_lab_ssl.png}{Research Lab: semi-supervised experiments}
+\shot{screenshots/08_lab_models.png}{Research Lab: selected models, confusion matrices and ROC curves}
+\shot{screenshots/11_compare.png}{Compare Interface (battery cathodes)}

@@ -124,14 +124,14 @@ analysis for every dataset.
 \begin{figure}[H]
   \centering
   \includegraphics[width=\textwidth]{stability/labeled_vs_unlabeled.png}
-  \caption{Distribution Labeled vs unlabeled}
+  \caption{Distribution Labeled vs unlabeled}\label{fig:shift}
 \end{figure}
 
 The Kolmogorov--Smirnov tests confirm that labeled and unlabeled compositions are not drawn
 from exactly the same distribution: for Alexandria most KS statistics stay below 0.25, whereas
 for the Materials Project metallicity data they reach 0.43--0.48 (mean electronegativity,
 melting temperature, number of elements). This distribution shift is an important factor in
-the SSL results (Section~9).
+the SSL results (Section~\ref{sec:discussion}).
 
 \begin{figure}[H]
   \centering

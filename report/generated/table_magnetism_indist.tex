@@ -1,0 +1,19 @@
+\begin{table}[H]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\resizebox{\textwidth}{!}{%
+\begin{tabular}{llcccccc}
+\toprule
+Method & Best configuration & Accuracy & Precision & Recall & F1 & ROC-AUC & Composite\\
+\midrule
+Self-Training & ST LightGBM$^*$ tau=0.9 | n=1000 & 0.869$\pm$0.003 & 0.684$\pm$0.010 & 0.676$\pm$0.023 & 0.680$\pm$0.011 & 0.911$\pm$0.003 & 0.795$\pm$0.007 \\
+Baseline & LightGBM (tuned) & 0.867$\pm$0.002 & 0.679$\pm$0.008 & 0.675$\pm$0.025 & 0.677$\pm$0.011 & 0.908$\pm$0.002 & 0.793$\pm$0.006 \\
+Self-Supervised (AE) & LightGBM$^*$ on raw+ae features & 0.867$\pm$0.002 & 0.682$\pm$0.007 & 0.661$\pm$0.014 & 0.672$\pm$0.006 & 0.907$\pm$0.002 & 0.789$\pm$0.002 \\
+Cluster-then-Label & CtL LightGBM$^*$ k=100 purity=0.8 | n=1000 & 0.865$\pm$0.004 & 0.690$\pm$0.004 & 0.625$\pm$0.038 & 0.656$\pm$0.020 & 0.905$\pm$0.006 & 0.780$\pm$0.013 \\
+Co-Training & CT LightGBM$^*$ tau=0.85 | n=1000 & 0.828$\pm$0.003 & 0.577$\pm$0.008 & 0.617$\pm$0.037 & 0.596$\pm$0.016 & 0.840$\pm$0.012 & 0.718$\pm$0.014 \\
+Label Spreading & LS knn k=10 alpha=0.2 | n=1000 & 0.811$\pm$0.013 & 0.541$\pm$0.033 & 0.535$\pm$0.044 & 0.538$\pm$0.037 & 0.816$\pm$0.021 & 0.677$\pm$0.029 \\
+Label Propagation & LP knn k=10 | n=1000 & 0.810$\pm$0.013 & 0.537$\pm$0.033 & 0.530$\pm$0.049 & 0.534$\pm$0.039 & 0.814$\pm$0.021 & 0.674$\pm$0.030 \\
+\bottomrule
+\end{tabular}}
+\caption*{Magnetism -- unlabeled pool: same database (labels hidden). 1,000 labeled compositions, mean$\pm$std over 3 seeds, 12,882 test compositions.}
+\end{table}

@@ -1,4 +1,70 @@
 \clearpage
 \section{Conclusion}
 
-(Results are being computed.)
+This project highlights both the potential and limitations of Semi-Supervised Learning for
+materials discovery. Working with only 1,000 labels, more than one million compositions from
+five databases and more than 2,600 trained models, we found that SSL can reduce labelling
+costs. Its success, however, strongly depends on data characteristics. Self-Training with a
+strict confidence threshold was the most reliable method and was deployed for metallicity
+and magnetism. \StabSelMethod{} was deployed for stability. Unlabeled data from a different
+distribution (GNoME) and larger unlabeled pools tended to hurt rather than help.
+
+Complementing these approaches, our traditional materials-informatics pipeline for the
+photovoltaic band gap showed robust performance. A genetic algorithm reduced the 142
+descriptors to \GAFinalN{} without loss of ROC-AUC, which makes the model easier to
+interpret, and the applicability-domain assessment gives a reliable confidence estimate for
+every prediction. The unsupervised (association rules, clustering) and self-supervised (masked
+autoencoder) components turned the unlabeled data into interpretable chemical knowledge and a
+materials embedding. They are all exposed, together with the four deployed models, in the
+MatSSL Studio web application.
+
+Future work will explore hybrid approaches that combine the data efficiency of SSL with the
+interpretability of traditional materials informatics, alongside active learning,
+structure-aware graph neural networks and richer representations of materials.
+
+\begin{thebibliography}{99}
+\bibitem{vanengelen} J.~E. van Engelen and H.~H. Hoos, \emph{A survey on semi-supervised
+learning}, Machine Learning 109, 373--440, 2020.
+\bibitem{zhu} X.~Zhu and Z.~Ghahramani, \emph{Learning from labeled and unlabeled data with
+label propagation}, Technical Report CMU-CALD-02-107, Carnegie Mellon University, 2002.
+\bibitem{zhou} D.~Zhou, O.~Bousquet, T.~N. Lal, J.~Weston and B.~Sch\"olkopf, \emph{Learning
+with local and global consistency}, NeurIPS, 2004.
+\bibitem{blum} A.~Blum and T.~Mitchell, \emph{Combining labeled and unlabeled data with
+co-training}, COLT, 1998.
+\bibitem{yarowsky} D.~Yarowsky, \emph{Unsupervised word sense disambiguation rivaling
+supervised methods}, ACL, 1995.
+\bibitem{agrawal} R.~Agrawal and R.~Srikant, \emph{Fast algorithms for mining association
+rules}, VLDB, 1994.
+\bibitem{magpie} L.~Ward, A.~Agrawal, A.~Choudhary and C.~Wolverton, \emph{A general-purpose
+machine learning framework for predicting properties of inorganic materials}, npj
+Computational Materials 2, 16028, 2016.
+\bibitem{matminer} L.~Ward et al., \emph{Matminer: an open source toolkit for materials data
+mining}, Computational Materials Science 152, 60--69, 2018.
+\bibitem{pymatgen} S.~P. Ong et al., \emph{Python Materials Genomics (pymatgen)}, Computational
+Materials Science 68, 314--319, 2013.
+\bibitem{matbench} A.~Dunn, Q.~Wang, A.~Ganose, D.~Dopp and A.~Jain, \emph{Benchmarking
+materials property prediction methods: the Matbench test set and Automatminer reference
+algorithm}, npj Computational Materials 6, 138, 2020.
+\bibitem{mp} A.~Jain et al., \emph{The Materials Project: a materials genome approach to
+accelerating materials innovation}, APL Materials 1, 011002, 2013.
+\bibitem{jarvis} K.~Choudhary et al., \emph{The joint automated repository for various
+integrated simulations (JARVIS) for data-driven materials design}, npj Computational
+Materials 6, 173, 2020.
+\bibitem{alexandria} J.~Schmidt et al., \emph{Machine-learning-assisted determination of the
+global zero-temperature phase diagram of materials}, Advanced Materials 35, 2210788, 2023.
+\bibitem{gnome} A.~Merchant et al., \emph{Scaling deep learning for materials discovery},
+Nature 624, 80--85, 2023.
+\bibitem{deap} F.-A. Fortin et al., \emph{DEAP: evolutionary algorithms made easy}, Journal of
+Machine Learning Research 13, 2171--2175, 2012.
+\bibitem{oecd} OECD, \emph{Guidance document on the validation of (quantitative)
+structure-activity relationship [(Q)SAR] models}, OECD Series on Testing and Assessment
+No.~69, 2007.
+\bibitem{sklearn} F.~Pedregosa et al., \emph{Scikit-learn: machine learning in Python},
+Journal of Machine Learning Research 12, 2825--2830, 2011.
+\bibitem{lightgbm} G.~Ke et al., \emph{LightGBM: a highly efficient gradient boosting decision
+tree}, NeurIPS, 2017.
+\bibitem{optuna} T.~Akiba et al., \emph{Optuna: a next-generation hyperparameter optimization
+framework}, KDD, 2019.
+\bibitem{shap} S.~M. Lundberg and S.-I. Lee, \emph{A unified approach to interpreting model
+predictions}, NeurIPS, 2017.
+\end{thebibliography}

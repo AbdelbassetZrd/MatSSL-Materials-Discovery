@@ -68,6 +68,11 @@
 % include a figure if it exists, otherwise a placeholder box (results still running)
 \newcommand{\safeimg}[2]{\IfFileExists{figures/#2}{\includegraphics[width=#1]{#2}}{%
   \fbox{\parbox[c][3cm][c]{#1}{\centering\small pending: \texttt{\detokenize{#2}}}}}}
+% input a generated table if it exists (an experiment may still be running)
+\newcommand{\maybeinput}[1]{\IfFileExists{generated/#1.tex}{\input{generated/#1}}{%
+  \begin{center}\fbox{\small pending: \texttt{\detokenize{#1}}}\end{center}}}
+% one figure with optional second panel
+\newcommand{\resfig}[3]{\begin{figure}[H]\centering\safeimg{#1}{#2}\caption{#3}\end{figure}}
 
 \begin{document}
 

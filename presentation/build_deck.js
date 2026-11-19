@@ -345,11 +345,34 @@ bullets(s, ["Criterion: highest mean Composite = (F1 + ROC-AUC)/2 over 3 seeds a
   "Ties are broken in favour of the simpler model"], 0.6, 4.6, 12.1, 2.0, 15);
 s.addNotes("Requirement 6: the best model and the criteria used to choose it.");
 
-// ================================================================== 18. app
-s = newSlide("CONTENT", "Deployed web application", "Application");
-const shots = ["screenshots/02_editor.png", "screenshots/04_viewer.png", "screenshots/05_analyze.png", "screenshots/06_results.png"];
-shots.forEach((p, i) => image(s, p, 0.6 + (i % 2) * 6.15, 1.35 + Math.floor(i / 2) * 2.85, 5.95, 2.7, p));
-s.addNotes("React + Vite frontend (periodic-table composition editor, 3D crystal viewer from the Alexandria OPTIMADE API), FastAPI backend, single Docker image. Live demo here.");
+// ================================================================== 18-19. app
+function shotPair(title, left, right, capL, capR, notes) {
+  s = newSlide("CONTENT", title, "Application");
+  [[left, capL], [right, capR]].forEach(([p, cap], i) => {
+    const x = 0.6 + i * 6.15;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 1.35, w: 5.95, h: 4.75, rectRadius: 0.08,
+      fill: { color: C.background2 }, line: { color: "E2E8F0", width: 1 }, objectName: "frame " + p });
+    image(s, p, x + 0.1, 1.45, 5.75, 4.55, p);
+    s.addText(cap, { x, y: 6.2, w: 5.95, h: 0.7, fontSize: 14, color: C.text1, margin: 0,
+      valign: "top", isTextBox: true, objectName: "caption " + p });
+  });
+  s.addNotes(notes);
+}
+shotPair("MatSSL Studio: compose, predict, explain",
+  "screenshots/deck/studio.png", "screenshots/deck/results.png",
+  "Periodic-table editor synced with the formula; 3D crystal from the Alexandria database",
+  "Four calibrated predictions, applicability domain and position in chemical space",
+  "React + Vite frontend, FastAPI backend, one Docker image. Live demo: LiFePO4 then Nd2Fe14B. Every prediction shows the deployed method, its test scores and whether the material lies inside the applicability domain.");
+shotPair("Why this prediction? Explanations and similar materials",
+  "screenshots/deck/explain.png", "screenshots/deck/compare.png",
+  "Exact SHAP contributions (LightGBM) and nearest known materials in the self-supervised embedding",
+  "Compare up to four candidates, e.g. battery cathodes LiFePO4 · LiMnPO4 · LiCoO2",
+  "The 32-d masked-autoencoder embedding powers the nearest-material search; association rules mined by Apriori are matched to the query.");
+shotPair("Research Lab: every experiment, interactive",
+  "screenshots/deck/lab_ssl.png", "screenshots/deck/lab_models.png",
+  "SSL comparison, learning curves and label budget for every task and unlabeled pool",
+  "Deployed models with test confusion matrices and ROC curves",
+  "The Research Lab reads a static JSON export of all result files, so it also works offline during the presentation.");
 
 // ================================================================== 19. discussion
 s = newSlide("CONTENT", "Discussion and limitations", "Conclusion");

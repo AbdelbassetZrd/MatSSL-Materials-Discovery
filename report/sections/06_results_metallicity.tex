@@ -1,4 +1,67 @@
 \clearpage
 \section{Results Comparison on Metallicity}
 
-(Results are being computed.)
+The metallicity task (Materials Project, \MetalN{} compositions, \MetalPos{}\% metals) was
+trained with 1,000 labeled compositions and five semi-supervised methods, the masked-autoencoder
+features and nine supervised baselines (\MetalInRuns{} models per unlabeled pool). Every score
+is the mean over 3 seeds on the same \MetalInNTest{} held-out test compositions.
+
+\subsection*{Comparison of SSL Methods}
+
+\resfig{\textwidth}{results/metallicity/indist/metallicity_methods_comparison_balanced.png}{Comparison
+of SSL methods on the Metallicity dataset (unlabeled pool: same database, labels hidden).}
+
+\maybeinput{table_metallicity_indist}
+\maybeinput{table_metallicity_gnome}
+
+With the unlabeled compositions taken from the same database, \MetalInBestMethod{}
+(\texttt{\MetalInBestConfig}) reaches a composite score of \MetalInBestComp{}, against
+\MetalInBaseComp{} for the Optuna-tuned \MetalInBaseConfig{} baseline (\MetalInImpr\%).
+Self-Training, Cluster-then-Label and the self-supervised features are statistically tied with
+the baseline (differences below one standard deviation). The graph methods (Label Propagation
+and Label Spreading) are clearly behind (composite $\approx 0.85$): the $k$-NN graph built on
+142 descriptors does not separate metals from insulators as well as a boosted tree does.
+
+With GNoME as the unlabeled pool, no SSL method beats the baseline: the best one,
+\MetalGnBestSSL{}, reaches \MetalGnBestSSLComp{} (\MetalGnImpr\%), and the graph methods fall
+to 0.75--0.79. GNoME compositions follow a different distribution (Figure~\ref{fig:shift}), so the labels
+that are propagated or pseudo-labelled on them are less reliable.
+
+\subsection*{Effect of the Number of Unlabeled Compositions}
+
+\resfig{\textwidth}{results/metallicity/indist/metallicity_learning_curves.png}{Composite score
+and F1-score versus the number of unlabeled compositions (metallicity, same-database pool).}
+
+\maybeinput{poolsize_metallicity_indist}
+\maybeinput{poolsize_metallicity_gnome}
+
+Adding more unlabeled compositions does \emph{not} help: every method is best with the
+smallest pool (1,000 unlabeled) and degrades steadily up to the largest one (60,945
+for the same database, 100,000 for GNoME). Self-Training is the most
+robust, because its 0.9 confidence threshold only accepts pseudo-labels the model is sure
+about. The graph methods degrade fastest, because each additional unlabeled node also spreads
+errors.
+
+\subsection*{Label Budget and Supervised Model Zoo}
+
+\resfig{0.8\textwidth}{results/metallicity/indist/metallicity_label_budget_curve.png}{Label-budget
+curve for metallicity: best supervised baseline versus best SSL configuration.}
+
+\maybeinput{budget_metallicity_indist}
+\maybeinput{zoo_metallicity_indist}
+
+Labels matter much more than unlabeled data: going from 1,000 to 5,000 labels raises the
+composite from about 0.87 to 0.90, while using all \MetalN{} compositions brings the fully
+supervised model to \MetalInFullComp{} (ROC-AUC \MetalInFullAUC{}). The SSL and baseline curves
+overlap at every budget (differences of at most 0.001). Among supervised
+models, gradient boosting (LightGBM, XGBoost) and Random Forest are equivalent; linear, $k$-NN
+and MLP models are about 0.02 lower.
+
+\subsection*{Selected Model}
+
+The deployed model keeps the architecture selected at 1,000 labels and is re-trained on all
+training labels plus the unlabeled pool. On the held-out test set it reaches a composite score
+of \MetalSelComp{} (ROC-AUC \MetalSelAUC{}, F1 \MetalSelFone{}, accuracy \MetalSelAcc{}).
+
+Consequently, \textbf{\MetalSelMethod{}} (\texttt{\MetalSelConfig}) is selected as the primary
+architecture for the deployment phase of the metallicity prediction module.

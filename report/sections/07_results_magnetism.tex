@@ -1,4 +1,63 @@
 \clearpage
 \section{Results Comparison on Magnetism}
 
-(Results are being computed.)
+The magnetism task (JARVIS-DFT, \MagN{} compositions, \MagPos{}\% magnetic) is the most
+imbalanced of the three SSL tasks, so the F1-score is lower than the ROC-AUC for every model.
+The protocol is the same as for metallicity: 1,000 labels, 3 seeds and \MagInNTest{} held-out
+test compositions.
+
+\subsection*{Comparison of SSL Methods}
+
+\resfig{\textwidth}{results/magnetism/indist/magnetism_methods_comparison_balanced.png}{Comparison
+of SSL methods on the Magnetism dataset (unlabeled pool: same database, labels hidden).}
+
+\maybeinput{table_magnetism_indist}
+\maybeinput{table_magnetism_gnome}
+
+Magnetism gives the clearest semi-supervised gain of the project: \MagInBestMethod{}
+(\texttt{\MagInBestConfig}) reaches \MagInBestComp{} against \MagInBaseComp{} for the tuned
+\MagInBaseConfig{} baseline (\MagInImpr\%). The gain is small but present for each
+of the three seeds (+0.001, +0.003 and +0.004), on both the F1-score and the ROC-AUC. The
+confidently pseudo-labelled magnetic compositions add examples of the minority class.
+Co-Training and the graph methods lose 0.08--0.12 composite points: their pseudo-labels follow
+the majority class, so the rare magnetic class is diluted.
+
+With GNoME as the unlabeled pool, the best SSL method is \MagGnBestSSL{} with
+\MagGnBestSSLComp{} (\MagGnImpr\% against the same baseline).
+
+\subsection*{Effect of the Number of Unlabeled Compositions}
+
+\resfig{\textwidth}{results/magnetism/indist/magnetism_learning_curves.png}{Composite score and
+F1-score versus the number of unlabeled compositions (magnetism, same-database pool).}
+
+\maybeinput{poolsize_magnetism_indist}
+\maybeinput{poolsize_magnetism_gnome}
+
+Self-Training is the only method whose score stays flat (0.79--0.80) from 1,000 to 51,528
+unlabeled compositions. With its 0.9 threshold, a larger pool only adds a few more confident
+pseudo-labels. Every other method degrades as the pool grows: Cluster-then-Label drops from
+0.78 to 0.70 and Co-Training from 0.72 to 0.64.
+
+\subsection*{Label Budget and Supervised Model Zoo}
+
+\resfig{0.8\textwidth}{results/magnetism/indist/magnetism_label_budget_curve.png}{Label-budget
+curve for magnetism: best supervised baseline versus best SSL configuration.}
+
+\maybeinput{budget_magnetism_indist}
+\maybeinput{zoo_magnetism_indist}
+
+The label-budget curve shows where SSL is useful: with only 250 or 500 labels, Self-Training
+is about 0.005 above the baseline. The gap closes at 2,500 labels, because a supervised model
+then sees enough magnetic compositions on its own. The fully supervised model
+(\MagInFullComp{}, ROC-AUC \MagInFullAUC{}) is still 0.10 above any 1,000-label model.
+LightGBM is the best supervised family; the tuned version wins by a small margin over the
+default one.
+
+\subsection*{Selected Model}
+
+Re-trained on all training labels plus the unlabeled pool, the deployed model reaches a
+composite score of \MagSelComp{} on the held-out test set (ROC-AUC \MagSelAUC{}, F1
+\MagSelFone{}, recall \MagSelRec{}, precision \MagSelPrec{}).
+
+Consequently, \textbf{\MagSelMethod{}} (\texttt{\MagSelConfig}) is selected as the primary
+architecture for the deployment phase of the magnetism prediction module.

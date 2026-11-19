@@ -6,42 +6,54 @@
 \newcommand{\StabPos}{29.5}
 \newcommand{\GapN}{78,164}
 \newcommand{\GapPos}{6.7}
-\newcommand{\MetalInBestMethod}{?}
-\newcommand{\MetalInBestConfig}{?}
-\newcommand{\MetalInBestComp}{?}
-\newcommand{\MetalInBaseComp}{?}
-\newcommand{\MetalInBaseConfig}{?}
-\newcommand{\MetalInImpr}{?}
-\newcommand{\MetalInFullComp}{?}
-\newcommand{\MetalInDepComp}{?}
-\newcommand{\MetalInDepAUC}{?}
-\newcommand{\MetalInDepFone}{?}
-\newcommand{\MetalInBestSSL}{?}
-\newcommand{\MetalInBestSSLComp}{?}
-\newcommand{\MetalGnBestMethod}{?}
-\newcommand{\MetalGnBestConfig}{?}
-\newcommand{\MetalGnBestComp}{?}
-\newcommand{\MetalGnBaseComp}{?}
-\newcommand{\MetalGnBaseConfig}{?}
-\newcommand{\MetalGnImpr}{?}
-\newcommand{\MetalGnFullComp}{?}
-\newcommand{\MetalGnDepComp}{?}
-\newcommand{\MetalGnDepAUC}{?}
-\newcommand{\MetalGnDepFone}{?}
-\newcommand{\MetalGnBestSSL}{?}
-\newcommand{\MetalGnBestSSLComp}{?}
-\newcommand{\MagInBestMethod}{?}
-\newcommand{\MagInBestConfig}{?}
-\newcommand{\MagInBestComp}{?}
-\newcommand{\MagInBaseComp}{?}
-\newcommand{\MagInBaseConfig}{?}
-\newcommand{\MagInImpr}{?}
-\newcommand{\MagInFullComp}{?}
-\newcommand{\MagInDepComp}{?}
-\newcommand{\MagInDepAUC}{?}
-\newcommand{\MagInDepFone}{?}
-\newcommand{\MagInBestSSL}{?}
-\newcommand{\MagInBestSSLComp}{?}
+\newcommand{\MetalInBestMethod}{Self-Training}
+\newcommand{\MetalInBestConfig}{ST LightGBM$^*$ tau=0.9 | n=1000}
+\newcommand{\MetalInBestComp}{0.8754}
+\newcommand{\MetalInBaseComp}{0.8753}
+\newcommand{\MetalInBaseConfig}{LightGBM (tuned)}
+\newcommand{\MetalInBestSSL}{Self-Training}
+\newcommand{\MetalInBestSSLConfig}{ST LightGBM$^*$ tau=0.9 | n=1000}
+\newcommand{\MetalInBestSSLComp}{0.8754}
+\newcommand{\MetalInImpr}{+0.01}
+\newcommand{\MetalInFullComp}{0.9133}
+\newcommand{\MetalInFullAUC}{0.9506}
+\newcommand{\MetalInDepComp}{0.9136}
+\newcommand{\MetalInDepAUC}{0.9506}
+\newcommand{\MetalInDepFone}{0.8766}
+\newcommand{\MetalInNTest}{15,487}
+\newcommand{\MetalInRuns}{446}
+\newcommand{\MetalGnBestMethod}{Baseline}
+\newcommand{\MetalGnBestConfig}{LightGBM (tuned)}
+\newcommand{\MetalGnBestComp}{0.8753}
+\newcommand{\MetalGnBaseComp}{0.8753}
+\newcommand{\MetalGnBaseConfig}{LightGBM (tuned)}
+\newcommand{\MetalGnBestSSL}{Cluster-then-Label}
+\newcommand{\MetalGnBestSSLConfig}{CtL LightGBM$^*$ k=100 purity=0.8 [raw+AE] | n=1000}
+\newcommand{\MetalGnBestSSLComp}{0.8726}
+\newcommand{\MetalGnImpr}{-0.30}
+\newcommand{\MetalGnFullComp}{0.9133}
+\newcommand{\MetalGnFullAUC}{0.9506}
+\newcommand{\MetalGnDepComp}{0.9126}
+\newcommand{\MetalGnDepAUC}{0.9501}
+\newcommand{\MetalGnDepFone}{0.8750}
+\newcommand{\MetalGnNTest}{15,487}
+\newcommand{\MetalGnRuns}{446}
+\newcommand{\MagInBestMethod}{Self-Training}
+\newcommand{\MagInBestConfig}{ST LightGBM$^*$ tau=0.9 | n=1000}
+\newcommand{\MagInBestComp}{0.7950}
+\newcommand{\MagInBaseComp}{0.7927}
+\newcommand{\MagInBaseConfig}{LightGBM (tuned)}
+\newcommand{\MagInBestSSL}{Self-Training}
+\newcommand{\MagInBestSSLConfig}{ST LightGBM$^*$ tau=0.9 | n=1000}
+\newcommand{\MagInBestSSLComp}{0.7950}
+\newcommand{\MagInImpr}{+0.30}
+\newcommand{\MagInFullComp}{0.8950}
+\newcommand{\MagInFullAUC}{0.9708}
+\newcommand{\MagInDepComp}{0.8947}
+\newcommand{\MagInDepAUC}{0.9708}
+\newcommand{\MagInDepFone}{0.8186}
+\newcommand{\MagInNTest}{12,882}
+\newcommand{\MagInRuns}{446}
 \newcommand{\MagGnBestMethod}{?}
 \newcommand{\MagGnBestConfig}{?}
 \newcommand{\MagGnBestComp}{?}
@@ -82,6 +94,42 @@
 \newcommand{\StabGnDepFone}{0.6448}
 \newcommand{\StabGnNTest}{20,000}
 \newcommand{\StabGnRuns}{446}
+\newcommand{\MetalSelMethod}{Self-Training}
+\newcommand{\MetalSelConfig}{ST LightGBM$^*$ tau=0.9}
+\newcommand{\MetalSelPool}{same database (labels hidden)}
+\newcommand{\MetalSelComp}{0.9136}
+\newcommand{\MetalSelAUC}{0.9506}
+\newcommand{\MetalSelFone}{0.8766}
+\newcommand{\MetalSelAcc}{0.8877}
+\newcommand{\MetalSelPrec}{0.9200}
+\newcommand{\MetalSelRec}{0.8371}
+\newcommand{\MagSelMethod}{Self-Training}
+\newcommand{\MagSelConfig}{ST LightGBM$^*$ tau=0.9}
+\newcommand{\MagSelPool}{same database (labels hidden)}
+\newcommand{\MagSelComp}{0.8947}
+\newcommand{\MagSelAUC}{0.9708}
+\newcommand{\MagSelFone}{0.8186}
+\newcommand{\MagSelAcc}{0.9175}
+\newcommand{\MagSelPrec}{0.7475}
+\newcommand{\MagSelRec}{0.9046}
+\newcommand{\StabSelMethod}{Co-Training}
+\newcommand{\StabSelConfig}{CT LightGBM$^*$ tau=0.85}
+\newcommand{\StabSelPool}{GNoME}
+\newcommand{\StabSelComp}{0.7439}
+\newcommand{\StabSelAUC}{0.8429}
+\newcommand{\StabSelFone}{0.6448}
+\newcommand{\StabSelAcc}{0.7448}
+\newcommand{\StabSelPrec}{0.5463}
+\newcommand{\StabSelRec}{0.7865}
+\newcommand{\GapSelMethod}{GA-selected descriptors + RF}
+\newcommand{\GapSelConfig}{52 GA descriptors}
+\newcommand{\GapSelPool}{--}
+\newcommand{\GapSelComp}{0.6783}
+\newcommand{\GapSelAUC}{0.9033}
+\newcommand{\GapSelFone}{0.4532}
+\newcommand{\GapSelAcc}{0.9140}
+\newcommand{\GapSelPrec}{0.3931}
+\newcommand{\GapSelRec}{0.5351}
 \newcommand{\GAInitAUC}{0.8123}
 \newcommand{\GAFinalAUC}{0.8286}
 \newcommand{\GAInitFit}{0.7911}

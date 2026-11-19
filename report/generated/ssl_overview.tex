@@ -1,0 +1,16 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{llcccc}
+\toprule
+Task & Unlabeled pool & Tuned baseline & Best SSL method & SSL composite & Gain\\
+\midrule
+Metallicity & same database & 0.8753 & Self-Training & 0.8754 & +0.01\% \\
+Metallicity & GNoME & 0.8753 & Cluster-then-Label & 0.8726 & -0.30\% \\
+Magnetism & same database & 0.7927 & Self-Training & 0.7950 & +0.30\% \\
+Magnetism & GNoME & \multicolumn{4}{c}{\textit{running}} \\
+Stability & same database & \multicolumn{4}{c}{\textit{running}} \\
+Stability & GNoME & 0.6835 & Co-Training & 0.6840 & +0.06\% \\
+\bottomrule
+\end{tabular}
+\caption{Best semi-supervised method versus the Optuna-tuned supervised baseline (1,000 labels, composite score, mean of 3 seeds).}\label{tab:ssl-overview}
+\end{table}

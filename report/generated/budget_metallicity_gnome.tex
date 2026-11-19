@@ -1,0 +1,17 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lcc}
+\toprule
+Labeled samples & Best SSL: CtL LightGBM$^*$ k=100 purity=0.8 [raw+AE] & Best supervised baseline\\
+\midrule
+250 & 0.841$\pm$0.003 & 0.844$\pm$0.004 \\
+500 & 0.864$\pm$0.003 & 0.867$\pm$0.002 \\
+1,000 & 0.869$\pm$0.003 & 0.874$\pm$0.003 \\
+2,500 & 0.881$\pm$0.003 & 0.886$\pm$0.001 \\
+5,000 & 0.892$\pm$0.001 & 0.897$\pm$0.001 \\
+\midrule
+All training labels (61,945) & \multicolumn{2}{c}{0.9133 (fully supervised)}\\
+\bottomrule
+\end{tabular}
+\caption*{Label-budget study (GNoME unlabeled pool).}
+\end{table}
