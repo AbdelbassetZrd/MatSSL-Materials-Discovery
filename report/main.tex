@@ -65,6 +65,10 @@
 
 \input{generated/macros}
 
+% include a figure if it exists, otherwise a placeholder box (results still running)
+\newcommand{\safeimg}[2]{\IfFileExists{figures/#2}{\includegraphics[width=#1]{#2}}{%
+  \fbox{\parbox[c][3cm][c]{#1}{\centering\small pending: \texttt{\detokenize{#2}}}}}}
+
 \begin{document}
 
 % ================================================================== title page
