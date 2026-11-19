@@ -1,0 +1,428 @@
+{
+  "association_rules": {
+    "stability": {
+      "n_transactions": 436791,
+      "base_rate": 0.294545904105167,
+      "n_rules": 67,
+      "top_rules": [
+        {
+          "antecedents": "Er, Y",
+          "consequents": "STABLE",
+          "support": 0.003010593166983752,
+          "confidence": 0.658158158158158,
+          "lift": 2.234484163538611,
+          "leverage": 0.001663260652343744,
+          "conviction": 2.063685627522512
+        },
+        {
+          "antecedents": "Dy, Y",
+          "consequents": "STABLE",
+          "support": 0.003090723023139213,
+          "confidence": 0.6484149855907781,
+          "lift": 2.2014055417292884,
+          "leverage": 0.0016867458982740995,
+          "conviction": 2.006496485864812
+        },
+        {
+          "antecedents": "La, Pr",
+          "consequents": "STABLE",
+          "support": 0.0030998807209855514,
+          "confidence": 0.6401891252955083,
+          "lift": 2.1734782808825956,
+          "leverage": 0.0016736503563891465,
+          "conviction": 1.9606247211794638
+        },
+        {
+          "antecedents": "Sm, Y",
+          "consequents": "STABLE",
+          "support": 0.003044934533907521,
+          "confidence": 0.6354515050167224,
+          "lift": 2.157393792139903,
+          "leverage": 0.0016335396624653107,
+          "conviction": 1.9351447217665603
+        },
+        {
+          "antecedents": "La, Nd",
+          "consequents": "STABLE",
+          "support": 0.002992277771291075,
+          "confidence": 0.6347741622146673,
+          "lift": 2.155094175025508,
+          "leverage": 0.001603810480178074,
+          "conviction": 1.9315558290524748
+        },
+        {
+          "antecedents": "Tb, Y",
+          "consequents": "STABLE",
+          "support": 0.0032120625196031967,
+          "confidence": 0.6325518485121732,
+          "lift": 2.1475492943413053,
+          "leverage": 0.001716375073421246,
+          "conviction": 1.9198738462512144
+        },
+        {
+          "antecedents": "Nd, Sm",
+          "consequents": "STABLE",
+          "support": 0.0030037248935989983,
+          "confidence": 0.6283524904214559,
+          "lift": 2.13329223616399,
+          "leverage": 0.0015957017251463776,
+          "conviction": 1.898180608541767
+        },
+        {
+          "antecedents": "Tm, Y",
+          "consequents": "STABLE",
+          "support": 0.002671758346669231,
+          "confidence": 0.6277568585260893,
+          "lift": 2.131270032198275,
+          "leverage": 0.0014181591751398141,
+          "conviction": 1.8951433009660326
+        },
+        {
+          "antecedents": "La, Sm",
+          "consequents": "STABLE",
+          "support": 0.0027015208646698308,
+          "confidence": 0.6273258904837853,
+          "lift": 2.1298068713248846,
+          "leverage": 0.0014330861999862197,
+          "conviction": 1.8929517180858504
+        },
+        {
+          "antecedents": "Nd, Pr",
+          "consequents": "STABLE",
+          "support": 0.0030197508648300902,
+          "confidence": 0.6254148885727833,
+          "lift": 2.123318911776414,
+          "leverage": 0.001597566543821193,
+          "conviction": 1.8832945420787375
+        }
+      ]
+    },
+    "magnetism": {
+      "n_transactions": 64410,
+      "base_rate": 0.20575997515913677,
+      "n_rules": 26,
+      "top_rules": [
+        {
+          "antecedents": "F, Mn",
+          "consequents": "MAGNETIC",
+          "support": 0.0035242974693370593,
+          "confidence": 0.9537815126050421,
+          "lift": 4.635408377491192,
+          "leverage": 0.0027639982287241955,
+          "conviction": 17.184465992011425
+        },
+        {
+          "antecedents": "Mn, O",
+          "consequents": "MAGNETIC",
+          "support": 0.019313771153547585,
+          "confidence": 0.9510703363914373,
+          "lift": 4.622231975173356,
+          "leverage": 0.01513531986480126,
+          "conviction": 16.232280507685154
+        },
+        {
+          "antecedents": "Li, Mn",
+          "consequents": "MAGNETIC",
+          "support": 0.007157273715261606,
+          "confidence": 0.948559670781893,
+          "lift": 4.610030060745622,
+          "leverage": 0.00560472988779164,
+          "conviction": 15.440026082906368
+        },
+        {
+          "antecedents": "Fe, Li",
+          "consequents": "MAGNETIC",
+          "support": 0.006287843502561714,
+          "confidence": 0.9375,
+          "lift": 4.556279710254282,
+          "leverage": 0.004907804544810634,
+          "conviction": 12.707840397453811
+        },
+        {
+          "antecedents": "Cr, Li",
+          "consequents": "MAGNETIC",
+          "support": 0.003664027324949542,
+          "confidence": 0.921875,
+          "lift": 4.4803417150833775,
+          "leverage": 0.0028462264610970497,
+          "conviction": 10.166272317963049
+        },
+        {
+          "antecedents": "Fe, O",
+          "consequents": "MAGNETIC",
+          "support": 0.016736531594472907,
+          "confidence": 0.9058823529411765,
+          "lift": 4.40261694355551,
+          "leverage": 0.012935035391408589,
+          "conviction": 8.438800263934171
+        },
+        {
+          "antecedents": "Cr, O",
+          "consequents": "MAGNETIC",
+          "support": 0.009346374786523831,
+          "confidence": 0.8466947960618847,
+          "lift": 4.114963541412963,
+          "leverage": 0.007075060668558512,
+          "conviction": 5.180776675796824
+        },
+        {
+          "antecedents": "Co, O",
+          "consequents": "MAGNETIC",
+          "support": 0.01224965067536097,
+          "confidence": 0.8393617021276596,
+          "lift": 4.079324472500004,
+          "leverage": 0.0092467881284026,
+          "conviction": 4.944275651327229
+        },
+        {
+          "antecedents": "Li, V",
+          "consequents": "MAGNETIC",
+          "support": 0.005076851420586865,
+          "confidence": 0.8054187192118226,
+          "lift": 3.9143604998440726,
+          "leverage": 0.0037798703630708037,
+          "conviction": 4.081790507410005
+        },
+        {
+          "antecedents": "Mn",
+          "consequents": "MAGNETIC",
+          "support": 0.041251358484707346,
+          "confidence": 0.8005423320277192,
+          "lift": 3.8906611035920466,
+          "leverage": 0.03064869806624476,
+          "conviction": 3.9819979493154456
+        }
+      ]
+    },
+    "metallicity": {
+      "n_transactions": 77432,
+      "base_rate": 0.47657299307779727,
+      "n_rules": 47,
+      "top_rules": [
+        {
+          "antecedents": "Pm",
+          "consequents": "METAL",
+          "support": 0.005101250129145573,
+          "confidence": 0.9681372549019608,
+          "lift": 2.0314563959018113,
+          "leverage": 0.0025901206067809007,
+          "conviction": 16.427555294173747
+        },
+        {
+          "antecedents": "Ga, Ni",
+          "consequents": "METAL",
+          "support": 0.0032157247649550573,
+          "confidence": 0.9325842696629213,
+          "lift": 1.9568550530740698,
+          "leverage": 0.0015724120628193528,
+          "conviction": 7.764167269346
+        },
+        {
+          "antecedents": "Ir",
+          "consequents": "METAL",
+          "support": 0.016582291559045358,
+          "confidence": 0.8935281837160753,
+          "lift": 1.8749031033955652,
+          "leverage": 0.007737945667775668,
+          "conviction": 4.9161085552105
+        },
+        {
+          "antecedents": "Al, Ni",
+          "consequents": "METAL",
+          "support": 0.0032415538795330097,
+          "confidence": 0.8869257950530035,
+          "lift": 1.8610492158296075,
+          "leverage": 0.0014997655098535924,
+          "conviction": 4.629057592468229
+        },
+        {
+          "antecedents": "Rh",
+          "consequents": "METAL",
+          "support": 0.021321934084099596,
+          "confidence": 0.8833600856072766,
+          "lift": 1.8535672361590876,
+          "leverage": 0.009818745169149665,
+          "conviction": 4.487546219897234
+        },
+        {
+          "antecedents": "Pd",
+          "consequents": "METAL",
+          "support": 0.02325911767744602,
+          "confidence": 0.8330249768732656,
+          "lift": 1.747948349933627,
+          "leverage": 0.009952593100601849,
+          "conviction": 3.1347622963041633
+        },
+        {
+          "antecedents": "Os",
+          "consequents": "METAL",
+          "support": 0.0077874780452526085,
+          "confidence": 0.8294360385144429,
+          "lift": 1.7404176286989959,
+          "leverage": 0.003312989901235166,
+          "conviction": 3.068801887358398
+        },
+        {
+          "antecedents": "Ru",
+          "consequents": "METAL",
+          "support": 0.018261184006612252,
+          "confidence": 0.8278688524590164,
+          "lift": 1.737129179546002,
+          "leverage": 0.00774890649632093,
+          "conviction": 3.0408616592623208
+        },
+        {
+          "antecedents": "Yb",
+          "consequents": "METAL",
+          "support": 0.015252092158280814,
+          "confidence": 0.8276103714085494,
+          "lift": 1.7365868050215925,
+          "leverage": 0.006469293559225944,
+          "conviction": 3.036302190560908
+        },
+        {
+          "antecedents": "Tc",
+          "consequents": "METAL",
+          "support": 0.0036419051554912696,
+          "confidence": 0.8221574344023324,
+          "lift": 1.725144828481963,
+          "leverage": 0.0015308330325229298,
+          "conviction": 2.9432043176117295
+        }
+      ]
+    },
+    "band_gap": {
+      "n_transactions": 78164,
+      "base_rate": 0.06656517066680313,
+      "n_rules": 6,
+      "top_rules": [
+        {
+          "antecedents": "Se",
+          "consequents": "PV_GAP",
+          "support": 0.008661276290875595,
+          "confidence": 0.17891120507399574,
+          "lift": 2.6877600294837216,
+          "leverage": 0.005438787602947866,
+          "conviction": 1.1368256820717144
+        },
+        {
+          "antecedents": "O, V",
+          "consequents": "PV_GAP",
+          "support": 0.006038585538099381,
+          "confidence": 0.16298342541436464,
+          "lift": 2.4484790436456656,
+          "leverage": 0.0035723256965986662,
+          "conviction": 1.1151927663980767
+        },
+        {
+          "antecedents": "Fe, O",
+          "consequents": "PV_GAP",
+          "support": 0.006537536461798271,
+          "confidence": 0.1443910709239898,
+          "lift": 2.169168492735487,
+          "leverage": 0.0035236919938870033,
+          "conviction": 1.0909596634776035
+        },
+        {
+          "antecedents": "Br",
+          "consequents": "PV_GAP",
+          "support": 0.00347986285246405,
+          "confidence": 0.1411520498183705,
+          "lift": 2.120509095138019,
+          "leverage": 0.0018388121913549764,
+          "conviction": 1.086845266540828
+        },
+        {
+          "antecedents": "S",
+          "consequents": "PV_GAP",
+          "support": 0.011347935110792693,
+          "confidence": 0.13504872107186358,
+          "lift": 2.0288195721432145,
+          "leverage": 0.005754566796228916,
+          "conviction": 1.079176194166597
+        },
+        {
+          "antecedents": "V",
+          "consequents": "PV_GAP",
+          "support": 0.006678266209508213,
+          "confidence": 0.13419023136246785,
+          "lift": 2.015922591623282,
+          "leverage": 0.003365506961083565,
+          "conviction": 1.0781061419555036
+        }
+      ]
+    }
+  },
+  "gnome_element_rules": {
+    "n_transactions": 554054,
+    "n_rules": 7,
+    "top_rules": [
+      {
+        "antecedents": "Hf",
+        "consequents": "Zr",
+        "support": 0.010493561999371903,
+        "confidence": 0.22897877200582883,
+        "lift": 4.8920913332401765
+      },
+      {
+        "antecedents": "Zr",
+        "consequents": "Hf",
+        "support": 0.010493561999371903,
+        "confidence": 0.22419311302201828,
+        "lift": 4.892091333240176
+      },
+      {
+        "antecedents": "Co",
+        "consequents": "P",
+        "support": 0.025100441473213803,
+        "confidence": 0.22669035665384366,
+        "lift": 2.9032106436477436
+      },
+      {
+        "antecedents": "P",
+        "consequents": "Co",
+        "support": 0.025100441473213803,
+        "confidence": 0.3214599417502658,
+        "lift": 2.9032106436477436
+      },
+      {
+        "antecedents": "Pr",
+        "consequents": "Nd",
+        "support": 0.016559757713147095,
+        "confidence": 0.22343171634521722,
+        "lift": 2.5140787199011574
+      },
+      {
+        "antecedents": "Ti",
+        "consequents": "Si",
+        "support": 0.012305659737137535,
+        "confidence": 0.3251621518504388,
+        "lift": 2.259366812327159
+      },
+      {
+        "antecedents": "Sc",
+        "consequents": "Si",
+        "support": 0.01969302631151476,
+        "confidence": 0.3050150956055015,
+        "lift": 2.11937637990181
+      }
+    ]
+  },
+  "clustering": {
+    "best_k": 3,
+    "silhouette": {
+      "3": 0.16317844570463036,
+      "4": 0.15398895289583142,
+      "5": 0.13180850782814757,
+      "6": 0.1355288021272724,
+      "7": 0.14442546865734723,
+      "8": 0.13506358004856941,
+      "9": 0.14062609155385872,
+      "10": 0.14847281320839592,
+      "11": 0.1465672407621658,
+      "12": 0.1459505370437767
+    },
+    "pca_explained_2d": 0.30418218549509146,
+    "n_points": 200000
+  }
+}

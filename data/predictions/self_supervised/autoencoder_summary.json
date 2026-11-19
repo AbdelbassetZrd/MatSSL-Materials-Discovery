@@ -1,0 +1,20 @@
+{
+  "pretext_task": "masked feature reconstruction (denoising autoencoder)",
+  "n_unlabeled_samples": 554054,
+  "architecture": [
+    142,
+    128,
+    32,
+    128,
+    142
+  ],
+  "embedding_dim": 32,
+  "mask_rate": 0.25,
+  "epochs": 20,
+  "final": {
+    "epoch": 20,
+    "loss": 0.02566021887468486,
+    "val_r2_all": 0.9120555520057678,
+    "val_r2_masked_features": 0.9071837663650513
+  }
+}

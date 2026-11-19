@@ -1,0 +1,46 @@
+[project]
+name = "materials-ssl"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.12"
+dependencies = [
+    "asyncpg>=0.32.0",
+    "deap>=1.4.4",
+    "fastapi[standard]>=0.115",
+    "httpx>=0.28.1",
+    "ipykernel>=7.4.0",
+    "jarvis-tools>=2026.6.12",
+    "joblib>=1.6.0",
+    "jupyter>=1.1.1",
+    "lightgbm>=4.7.0",
+    "matminer>=0.10.1",
+    "matplotlib>=3.11.2",
+    "mlxtend>=0.25.0",
+    "nbconvert>=7.17.2",
+    "nbformat>=5.11.1",
+    "numpy>=2.5.5",
+    "optuna>=5.1.0",
+    "pandas>=2.3.3",
+    "prometheus-fastapi-instrumentator>=8.1.0",
+    "pyarrow>=26.0.1",
+    "pydantic-settings>=2.16.3",
+    "pymatgen>=2026.10.24",
+    "python-dotenv>=1.2.4",
+    "requests>=2.34.2",
+    "scikit-learn>=1.9.1",
+    "scipy>=1.18.1",
+    "seaborn>=0.13.2",
+    "sentry-sdk[fastapi]>=2.75.0",
+    "sqlalchemy[asyncio]>=2.1.9",
+    "tqdm>=4.70.1",
+    "uvicorn[standard]>=0.54.0",
+    "xgboost>=3.4.1",
+]
+
+[dependency-groups]
+dev = [
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.5.0",
+    "pytest-cov>=7.1.0",
+    "ruff>=0.17.5",
+]
