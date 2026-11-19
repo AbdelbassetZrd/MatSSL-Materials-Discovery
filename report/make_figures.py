@@ -61,23 +61,24 @@ def principle():
 def descriptor_table():
     forms = pd.Series(["LiFePO4", "Fe2O3", "GaAs", "Nd2Fe14B", "SrTiO3", "Cu"])
     X, _ = featurize_formulas(forms)
-    cols = {"MagpieData mean Electronegativity": "mean χ",
-            "MagpieData range Electronegativity": "range χ",
-            "MagpieData mean CovalentRadius": "mean radius (pm)",
-            "MagpieData mean NValence": "mean valence e⁻",
-            "MagpieData mean GSmagmom": "mean elem. μ (μB)",
-            "MagpieData mean GSbandgap": "mean elem. Eg (eV)",
-            "0-norm": "n elements", "frac d valence electrons": "frac d e⁻"}
-    T = X[list(cols)].rename(columns=cols).round(3)
+    cols = {"MagpieData mean Electronegativity": "mean\nχ",
+            "MagpieData range Electronegativity": "range\nχ",
+            "MagpieData mean CovalentRadius": "mean radius\n(pm)",
+            "MagpieData mean NValence": "mean valence\nelectrons",
+            "MagpieData mean GSmagmom": "mean elem.\nμ (μB)",
+            "MagpieData mean GSbandgap": "mean elem.\nEg (eV)",
+            "0-norm": "number of\nelements", "frac d valence electrons": "fraction of\nd electrons"}
+    T = X[list(cols)].rename(columns=cols).round(2)
     T.insert(0, "formula", forms.values)
     fig, ax = plt.subplots(figsize=(13, 2.6))
     ax.axis("off")
     tb = ax.table(cellText=T.values, colLabels=T.columns, loc="center", cellLoc="center")
     tb.auto_set_font_size(False)
     tb.set_fontsize(10)
-    tb.scale(1, 1.6)
+    tb.scale(1, 1.75)
     for (r, _c), cell in tb.get_celld().items():
         if r == 0:
+            cell.set_height(cell.get_height() * 1.6)
             cell.set_facecolor("#1e293b")
             cell.set_text_props(color="white", weight="bold")
         elif r % 2 == 0:

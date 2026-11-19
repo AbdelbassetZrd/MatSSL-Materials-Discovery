@@ -286,7 +286,7 @@ def main() -> None:  # noqa: PLR0915
                  "selected_idx": sel.tolist(), "feature_columns": cols,
                  "pca": pca, "kmeans": km, "nn": nn, "ad_threshold": thr,
                  "task": "band_gap", "target": "in_pv_window (1.1-1.7 eV)"},
-                MODELS / "band_gap_model.pkl")
+                MODELS / "band_gap_model.pkl", compress=("xz", 3))
     joblib.dump(prep, MODELS / "band_gap_scaler.pkl")
     summary = {
         "dataset": {"n": len(df), "positive_rate": float(df["target"].mean()),

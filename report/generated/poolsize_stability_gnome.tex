@@ -1,0 +1,17 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lcccc}
+\toprule
+Method & $n_u$=1,000 & $n_u$=5,000 & $n_u$=25,000 & $n_u$=100,000\\
+\midrule
+Cluster-then-Label & 0.6683 & 0.6494 & 0.6161 & 0.5817 \\
+Co-Training & 0.6840 & 0.5953 & 0.5534 & 0.5249 \\
+Label Propagation & 0.5878 & 0.5852 & 0.4790 & 0.4669 \\
+Label Spreading & 0.5859 & 0.5706 & 0.5185 & 0.5301 \\
+Self-Training & 0.6821 & 0.6801 & 0.6689 & 0.6154 \\
+\midrule
+Best supervised baseline & \multicolumn{4}{c}{0.6835}\\
+\bottomrule
+\end{tabular}
+\caption*{Composite score versus number of unlabeled compositions (GNoME).}
+\end{table}

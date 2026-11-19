@@ -1,0 +1,221 @@
+\subsection{Genetic Algorithm for Feature Selection}
+
+The genetic algorithm (GA) was employed on the photovoltaic band-gap task to identify an
+optimal subset of composition descriptors while maximizing predictive performance as measured
+by ROC-AUC. The GA was configured with the following parameters: population size of 100
+individuals, 20 generations, crossover probability of 0.8, mutation probability of 0.2, an
+elite size of 5 and a feature-count penalty $\lambda = 0.05$. Fitness was evaluated with 3-fold
+cross-validation on a stratified sample of 6,000 training compositions; seven model families
+were compared first, and the best one (\GapBestModel{}) was used for the final model.
+
+\input{generated/gap_models}
+
+\subsubsection{Evolution of Fitness and Feature Count}
+
+The GA demonstrated effective convergence over 20 generations (Figure~\ref{fig:ga}). The
+fitness of the best individual increased steadily from \GAInitFit{} to \GAFinalFit{}, and the
+cross-validated ROC-AUC of the best descriptor subset from \GAInitAUC{} to \GAFinalAUC{}
+(+2.0\%), above the \GAAllCV{} obtained with all 142 descriptors under the same protocol.
+Concurrently, the average number of selected descriptors in the population decreased from
+\GAInitAvgN{} to \GAFinalAvgN{}, and the final individual keeps only \GAFinalN{} of the 142
+descriptors, a 63.4\% reduction in feature dimensionality.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/band_gap/band_gap_ga_evolution.png}
+  \caption{Evolution of fitness (ROC-AUC) and feature count during genetic algorithm
+  optimization. (A) Fitness values showing steady improvement over generations. (B) Feature
+  count evolution demonstrating effective feature reduction while maintaining predictive
+  performance.}\label{fig:ga}
+\end{figure}
+
+\subsubsection{Feature Selection Performance}
+
+The GA successfully identified a compact yet informative descriptor subset. On the 15,633
+held-out test compositions, the final model reaches an ROC-AUC of \GapGAAUC{} with only
+\GAFinalN{} descriptors, compared with \GapAllAUC{} using all 142 descriptors: a favorable
+trade-off between model complexity and predictive performance. Because positives are rare
+(\GapPos{}\%), the decision threshold was then calibrated by maximizing F1 on out-of-fold
+predictions of the \emph{training} set ($t=\GapThr{}$), which raised the test F1 from
+\GapGAFone{} to \GapTunedFone{} and the recall from \GapGARec{} to \GapTunedRec{} without
+changing the ROC-AUC.
+
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lccc}
+\toprule
+Metric & Initial & Final & Change\\
+\midrule
+Best fitness & \GAInitFit{} & \GAFinalFit{} & +2.4\%\\
+CV ROC-AUC of best subset & \GAInitAUC{} & \GAFinalAUC{} & +2.0\%\\
+Number of features (all $\rightarrow$ GA) & 142 & \GAFinalN{} & $-$63.4\%\\
+Feature Count (population average) & \GAInitAvgN{} & \GAFinalAvgN{} & $-$27.3\%\\
+Minimum Fitness & \GAInitMinFit{} & \GAFinalMinFit{} & +2.8\%\\
+\midrule
+Test ROC-AUC (all vs GA descriptors) & \GapAllAUC{} & \GapGAAUC{} & $-$0.4\%\\
+Test F1 (GA, threshold 0.5 vs calibrated) & \GapGAFone{} & \GapTunedFone{} & +50.1\%\\
+\bottomrule
+\end{tabular}
+\caption*{Genetic Algorithm Feature Selection Results}
+\end{table}
+
+\subsubsection{Descriptor Category Analysis}
+
+The selected \GAFinalN{} descriptors represent diverse elemental properties:
+\input{generated/ga_categories}
+The dominance of valence-electron descriptors (number of filled and unfilled $s$, $p$, $d$, $f$
+states) is physically sound: the band gap is set by the occupation of the valence and
+conduction bands. The feature reduction from 142 to \GAFinalN{} descriptors improves model
+interpretability and reduces computational requirements while maintaining competitive
+predictive performance.
+
+\subsection{Applicability Domain Assessment}
+
+To ensure reliable predictions and assess model generalizability, multiple applicability
+domain (AD) methods were employed in the space of the \GAFinalN{} GA-selected descriptors. The
+AD defines the chemical space where the model provides trustworthy predictions, based on the
+training data characteristics.
+
+\subsubsection{PCA-Based Applicability Domain}
+Principal Component Analysis (PCA) was performed to visualize the chemical-space distribution
+(Figure~\ref{fig:adpca}). The first two principal components explained \ADPCAVar{}\% of total
+variance (PC1: \ADPCone{}\%, PC2: \ADPCtwo{}\%). While this moderate variance explanation
+reflects the high dimensionality of the descriptor space, the projection reveals consistent
+distributions between training and test sets.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/band_gap/band_gap_ad_pca.png}
+  \caption{PCA-based applicability domain analysis. (A) Training set distribution in PCA
+  space. (B) Test set projected onto the same PCA space, showing good overlap with training
+  distribution.}\label{fig:adpca}
+\end{figure}
+
+\subsubsection{K-Means Clustering Analysis}
+K-means clustering with $k=6$ was applied to partition the chemical space
+(Figure~\ref{fig:adkm}). Test compositions were assigned to the nearest training cluster
+centroids, providing a cluster-based AD assessment. The cluster proportions are almost
+identical for training and test sets (for example 29.3\% vs 28.8\% for the largest cluster
+and 8.8\% vs 8.9\% for the smallest), indicating consistent chemical-space coverage.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/band_gap/band_gap_ad_kmeans.png}
+  \caption{K-means clustering for applicability domain assessment. (A) Training set
+  clustering with 6 clusters. (B) Test set assigned to training clusters, showing consistent
+  chemical space coverage.}\label{fig:adkm}
+\end{figure}
+
+\subsubsection{Distance-Based AD Classification}
+A distance-based approach was implemented using the 95th percentile of the training
+nearest-neighbour distances as the AD threshold ($D \le \ADThr{}$, Figure~\ref{fig:addist}).
+Of the \ADNTest{} test compositions, \ADNIn{} (\ADFracIn{}\%) fell within the applicability
+domain, while \ADNOut{} compositions (\ADFracOut{}\%) were identified as outliers.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/band_gap/band_gap_ad_distance.png}
+  \caption{Distance-based applicability domain classification. (A) Distance distribution
+  comparison between training and test sets. (B) AD classification showing \ADFracIn{}\% of
+  test compositions within the applicability domain.}\label{fig:addist}
+\end{figure}
+
+\subsubsection{AD Concordance and Reliability}
+The multi-method AD approach demonstrated strong concordance:
+\begin{itemize}
+  \item \textbf{High Coverage:} \ADFracIn{}\% of test compositions within the AD.
+  \item \textbf{Conservative Threshold:} the 95th percentile ensures reliable predictions.
+  \item \textbf{Consistent Results:} all three methods (PCA, clustering, distance-based)
+  indicated similar AD boundaries.
+  \item \textbf{Reliability check:} inside the AD the model retrieves \ADRecInT{} of the
+  photovoltaic compositions (F1 = \ADFoneInT{}), outside only \ADRecOutT{} (F1 =
+  \ADFoneOutT{}); the precision--recall AUC also drops from \ADPRIn{} to \ADPROut{}.
+\end{itemize}
+
+Compositions identified outside the AD represent chemistries distinct from the training space
+and should be treated with caution; the web application therefore reports the AD status with
+every prediction.
+
+\clearpage
+\subsection{Unsupervised Analysis: Association Rules and Clustering}
+
+\subsubsection{Association Rules}
+Apriori mining found \RulesStab{} rules for stability, \RulesMag{} for magnetism, \RulesMetal{}
+for metallicity and \RulesGap{} for the photovoltaic band gap (minimum support 0.2--0.3\%,
+lift $\ge 1.2$, confidence $\ge \min(0.5, 2\times\text{base rate})$). Without any
+supervised model, the rules rediscover textbook chemistry:
+
+\begin{table}[H]
+\centering\scriptsize
+\begin{subtable}{0.49\textwidth}\centering\input{generated/rules_magnetism}
+\caption{Magnetism (base rate \MagPos{}\%)}\end{subtable}\hfill
+\begin{subtable}{0.49\textwidth}\centering\input{generated/rules_stability}
+\caption{Stability (base rate \StabPos{}\%)}\end{subtable}\\[0.6em]
+\begin{subtable}{0.49\textwidth}\centering\input{generated/rules_metallicity}
+\caption{Metallicity (base rate \MetalPos{}\%)}\end{subtable}\hfill
+\begin{subtable}{0.49\textwidth}\centering\input{generated/rules_band_gap}
+\caption{PV band gap (base rate \GapPos{}\%)}\end{subtable}
+\caption*{Top association rules (element sets $\Rightarrow$ property).}
+\end{table}
+
+\begin{itemize}
+  \item \textbf{Magnetism:} Mn, Fe, Cr and Co compounds, especially oxides and fluorides, are
+  magnetic in more than 85\% of the cases (lift $\approx$ 4--4.6), reflecting their partially
+  filled $3d$ shells.
+  \item \textbf{Stability:} pairs of rare-earth elements (Er--Y, Dy--Y, La--Pr, Nd--Sm) are
+  about 2.2 times more often stable than average: these chemically similar elements substitute
+  easily for each other in stable structures.
+  \item \textbf{Metallicity:} compounds of platinum-group metals (Ir, Rh, Pd, Os, Ru) are metals
+  in 83--89\% of the cases.
+  \item \textbf{Photovoltaic band gap:} selenides, sulfides, bromides and vanadium/iron oxides
+  are enriched 2.0--2.7 times in the photovoltaic window, the classic absorber chemistries.
+\end{itemize}
+
+On GNoME alone (no property), element co-occurrence rules such as Zr $\Leftrightarrow$ Hf (lift
+4.9), Co $\Leftrightarrow$ P (2.9) and Pr $\Leftrightarrow$ Nd (2.5) reveal the chemical
+families explored by the generative search.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{0.75\textwidth}{results/unsupervised/association_rules_magnetism.png}
+  \caption{Top association rules for magnetism (bar length = lift, colour = confidence).}
+\end{figure}
+
+\subsubsection{Clustering of the Materials Space}
+PCA followed by K-Means was applied to 100,000 GNoME compositions and 25,000 compositions of
+each labeled dataset (175,000 points). The silhouette criterion selects $k=\KBest{}$
+(Figure~\ref{fig:km}), and the three clusters, found without any label, correspond to
+well-known material families: (i) rare-earth / noble-metal intermetallics (92\% metals),
+(ii) $p$-block and transition-metal intermetallics (85\% metals), and (iii) ionic compounds
+dominated by O, F, S (only 22\% metals but 31\% magnetic and 9.6\% in the photovoltaic window).
+The unsupervised structure is therefore strongly aligned with the target properties, which is
+the \emph{cluster assumption} exploited by Cluster-then-Label and by the graph-based methods.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{\textwidth}{results/unsupervised/kmeans_pca_clusters.png}
+  \caption{K-Means clusters in PCA space (left) and position of the labeled datasets with
+  respect to the unlabeled GNoME pool (right).}\label{fig:km}
+\end{figure}
+
+\begin{figure}[H]
+  \centering
+  \safeimg{0.85\textwidth}{results/unsupervised/kmeans_cluster_property_rates.png}
+  \caption{Property rates inside each K-Means cluster.}
+\end{figure}
+
+\subsection{Self-Supervised Pre-training}
+The masked autoencoder was trained for 20 epochs on 526,352 GNoME compositions (5\% held out).
+It reconstructs the full descriptor vector with a validation $R^2$ of \AERtwo{} and the
+\emph{masked} (hidden) descriptors with $R^2 = \AERtwoMasked{}$, showing that the 32-dimensional
+embedding captures the correlations between elemental properties. Its downstream value is
+reported in the result tables as the ``Self-Supervised (AE)'' rows: concatenating the embedding
+to the raw descriptors keeps the performance of the tuned baseline, whereas the embedding alone
+loses information compared with the 142 descriptors.
+
+\begin{figure}[H]
+  \centering
+  \safeimg{0.8\textwidth}{unsupervised/autoencoder_training.png}
+  \caption{Self-supervised masked-autoencoder training (reconstruction loss and validation
+  $R^2$).}
+\end{figure}

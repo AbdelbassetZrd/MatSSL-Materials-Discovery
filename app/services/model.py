@@ -56,9 +56,9 @@ TASKS = {
         "source": "Alexandria",
     },
     "band_gap": {
-        "title": "Photovoltaic band gap",
-        "positive": "In PV window (1.1-1.7 eV)",
-        "negative": "Outside PV window",
+        "title": "Photovoltaic band gap (DFT-PBE)",
+        "positive": "PBE gap in 1.1-1.7 eV window",
+        "negative": "PBE gap outside 1.1-1.7 eV",
         "source": "Materials Project",
     },
 }
@@ -173,7 +173,8 @@ def predict(formula: str) -> dict:
         pkg = reg.models[task]
         X = _task_matrix(task, raw)
         p = float(np.clip(pkg["model"].predict_proba(X)[0, 1], 0, 1))
-        y = int(p >= 0.5)
+        t = float(pkg.get("threshold", 0.5))  # calibrated for rare classes
+        y = int(p >= t)
         preds.append(
             TaskPrediction(
                 task=task,
@@ -181,7 +182,7 @@ def predict(formula: str) -> dict:
                 prediction=y,
                 prediction_label=meta["positive"] if y else meta["negative"],
                 probability=p,
-                confidence=abs(p - 0.5) * 2,
+                confidence=(p - t) / (1 - t) if y else (t - p) / t,
                 method=pkg.get("method")
                 or (
                     "Genetic-algorithm descriptors + gradient boosting"

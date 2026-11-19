@@ -34,9 +34,11 @@ def pm(m, s, d=3):
 def main() -> None:
     GEN.mkdir(parents=True, exist_ok=True)
     macros = []
+    values = {}
 
     def mac(name, value):
         macros.append(f"\\newcommand{{\\{name}}}{{{value}}}")
+        values[name] = value
 
     # dataset sizes
     for task, key in [*TASKS.items(), ("band_gap", "Gap")]:
@@ -182,6 +184,21 @@ def main() -> None:
             "ADAUCIn": f"{ad['metrics_inside']['ROC-AUC']:.4f}",
             "ADAUCOut": f"{ad['metrics_outside']['ROC-AUC']:.4f}",
             "ADThr": f"{ad['distance_threshold_95pct']:.3f}",
+            "GapThr": f"{B['decision_threshold']['value']:.2f}",
+            "GapTunedFone": f"{B['test_ga_descriptors_tuned_threshold']['F1-Score']:.4f}",
+            "GapTunedRec": f"{B['test_ga_descriptors_tuned_threshold']['Recall']:.4f}",
+            "GapTunedPrec": f"{B['test_ga_descriptors_tuned_threshold']['Precision']:.4f}",
+            "GapGARec": f"{B['test_ga_descriptors']['Recall']:.4f}",
+            "ADFoneInT": f"{ad['metrics_inside_tuned']['F1-Score']:.3f}",
+            "ADFoneOutT": f"{ad['metrics_outside_tuned']['F1-Score']:.3f}",
+            "ADRecInT": f"{ad['metrics_inside_tuned']['Recall']:.3f}",
+            "ADRecOutT": f"{ad['metrics_outside_tuned']['Recall']:.3f}",
+            "ADFoneIn": f"{ad['metrics_inside']['F1-Score']:.3f}",
+            "ADFoneOut": f"{ad['metrics_outside']['F1-Score']:.3f}",
+            "ADRecIn": f"{ad['metrics_inside']['Recall']:.3f}",
+            "ADRecOut": f"{ad['metrics_outside']['Recall']:.3f}",
+            "ADPRIn": f"{ad['metrics_inside']['PR-AUC']:.3f}",
+            "ADPROut": f"{ad['metrics_outside']['PR-AUC']:.3f}",
         }.items():
             mac(k, v)
         cats = ga["descriptor_categories"]
@@ -232,6 +249,7 @@ def main() -> None:
         mac("AERtwoMasked", f"{a['final']['val_r2_masked_features']:.3f}")
 
     (GEN / "macros.tex").write_text("\n".join(macros) + "\n", encoding="utf-8")
+    (GEN / "values.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
     print(f"wrote {len(macros)} macros and tables to {GEN}")
 
 

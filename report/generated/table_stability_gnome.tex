@@ -1,0 +1,18 @@
+\begin{table}[H]
+\centering\scriptsize
+\setlength{\tabcolsep}{3pt}
+\begin{tabular}{llcccccc}
+\toprule
+Method & Best configuration & Accuracy & Precision & Recall & F1 & ROC-AUC & Composite\\
+\midrule
+Co-Training & CT LightGBM$^*$ tau=0.85 | n=1000 & 0.730$\pm$0.012 & 0.536$\pm$0.019 & 0.634$\pm$0.013 & 0.581$\pm$0.007 & 0.787$\pm$0.013 & 0.684$\pm$0.010 \\
+Baseline & LightGBM (tuned) & 0.729$\pm$0.002 & 0.533$\pm$0.003 & 0.633$\pm$0.006 & 0.579$\pm$0.003 & 0.788$\pm$0.002 & 0.684$\pm$0.003 \\
+Self-Training & ST LightGBM$^*$ tau=0.9 | n=1000 & 0.726$\pm$0.002 & 0.530$\pm$0.003 & 0.634$\pm$0.007 & 0.577$\pm$0.002 & 0.787$\pm$0.002 & 0.682$\pm$0.002 \\
+Self-Supervised (AE) & LightGBM$^*$ on raw+ae features & 0.725$\pm$0.002 & 0.530$\pm$0.002 & 0.608$\pm$0.015 & 0.566$\pm$0.007 & 0.780$\pm$0.002 & 0.673$\pm$0.004 \\
+Cluster-then-Label & CtL LightGBM$^*$ k=100 purity=0.8 | n=1000 & 0.717$\pm$0.005 & 0.516$\pm$0.007 & 0.623$\pm$0.005 & 0.565$\pm$0.005 & 0.772$\pm$0.005 & 0.668$\pm$0.005 \\
+Label Propagation & LP rbf | n=1000 & 0.678$\pm$0.003 & 0.458$\pm$0.003 & 0.503$\pm$0.055 & 0.479$\pm$0.027 & 0.697$\pm$0.011 & 0.588$\pm$0.019 \\
+Label Spreading & LS rbf alpha=0.2 | n=1000 & 0.676$\pm$0.004 & 0.455$\pm$0.002 & 0.507$\pm$0.061 & 0.478$\pm$0.029 & 0.694$\pm$0.011 & 0.586$\pm$0.020 \\
+\bottomrule
+\end{tabular}
+\caption*{Stability -- unlabeled pool: GNoME. 1,000 labeled compositions, mean$\pm$std over 3 seeds, 20,000 test compositions.}
+\end{table}
