@@ -53,6 +53,7 @@ The project asks whether we can still predict well from only **1,000 labels** by
 ## Tech stack
 
 **ML and data:** Python 3.12, scikit-learn, LightGBM, XGBoost, Optuna, DEAP, mlxtend, pandas, NumPy, pymatgen, spglib, matminer, PyArrow, Matplotlib
+**Chemistry:** RDKit (Python and WebAssembly), pymatgen, spglib, matminer, Ketcher
 **Web:** FastAPI, Pydantic, httpx, React 18, Vite, Tailwind CSS, React Router, TanStack Query, Recharts, 3Dmol.js
 **Engineering:** uv, Docker, GitHub Actions, pytest, ruff, Jupyter, LaTeX (Tectonic), pptxgenjs
 
@@ -67,27 +68,31 @@ The project asks whether we can still predict well from only **1,000 labels** by
 
 ---
 
-## Planned extensions (roadmap)
+## Beyond materials: molecules and a Design Lab
 
-The platform is being extended from materials to **molecules and medicine**, and to more **industries**. The full plan is in [ROADMAP_extensions.md](ROADMAP_extensions.md).
+The platform now covers a second scientific domain and a discovery workflow. Details and results:
+[ROADMAP_extensions.md](ROADMAP_extensions.md).
 
-1. **Toxicity prediction.** Draw a molecule and get its predicted toxicity on the 12 Tox21 endpoints, clinical toxicity (ClinTox) and mutagenicity (AMES). It will use RDKit descriptors, Morgan fingerprints and the same semi-supervised methods, with ZINC as the unlabeled pool.
+**Molecule Studio + toxicity (built).** Build a molecule (drawing canvas, fragment builder, or
+SMILES), and get a predicted toxicity profile over the 12 Tox21 assays plus clinical toxicity.
+It reuses the materials protocol unchanged: 217 RDKit descriptors and a 2048-bit Morgan
+fingerprint, a train/test split grouped by **Bemis-Murcko scaffold** (the molecular equivalent of
+grouping by formula), an ablation, a stacked ensemble and a calibrated threshold. 249,424
+unlabeled ZINC molecules play the role GNoME plays for materials. Mean ROC-AUC **0.768** across
+10 endpoints, up to 0.895 on mitochondrial toxicity. Explanations decode fingerprint bits back
+into the substructure they stand for.
 
-2. **Illness and therapeutic-efficacy simulator.**
-   - The user **builds molecules** in a molecule editor.
-   - The app links molecules to illnesses through a **knowledge graph**: illness → protein targets (Open Targets) → known active molecules (ChEMBL).
-   - The user **selects an illness** and sees its description, targets and known drugs.
-   - The user then **tests their own molecules** against it. Each molecule gets an efficacy score built from per-target activity models, combined with toxicity, drug-likeness and an applicability-domain check. The verdict is *likely effective / uncertain / unlikely*.
-   - This is in-silico screening for research and education, not medical advice.
+**Design Lab (built).** Pick a target application - superconductor, solar absorber, permanent
+magnet or battery cathode - score your own composition for it, and let the models rank
+candidates from the **554,054 unlabeled GNoME compositions** nobody has measured. It adds a new
+model for the superconducting critical temperature (MAE **2.9 K**, R² **0.93**, ROC-AUC **0.99**
+for "above liquid nitrogen"). Left to its own devices, the ranking returns **cuprates** for
+superconductors and **vanadium fluorophosphates** for cathodes - the families real high-Tc
+superconductors and sodium-ion cathodes belong to.
 
-3. **Industry modules.** Specialised screeners built on the same materials pipeline:
-   - **batteries:** electrode voltage and capacity;
-   - **solar cells:** absorption efficiency;
-   - **magnets:** Curie temperature;
-   - **thermoelectrics:** zT;
-   - **superconductors:** critical temperature.
-
----
+**Protein-target activity (next).** Test your molecules against the protein targets that public
+databases associate with an illness, using activity models trained on measured ChEMBL data.
+In-silico screening for research and teaching, not medical advice.
 
 ## Ready-to-paste CV lines
 
@@ -97,7 +102,8 @@ The platform is being extended from materials to **molecules and medicine**, and
 - Benchmarked **5 semi-supervised methods** against Optuna-tuned baselines (about 2,700 models, 3 seeds, label-budget curves). Co-Training gave a **+0.73 %** gain; I showed that distribution shift in the unlabeled data cancels the benefit.
 - Added unsupervised (Apriori rules, K-Means) and self-supervised (masked autoencoder on 554k samples) learning, plus genetic-algorithm feature selection (142 → 52) and an applicability domain.
 - Trained stacked ensembles with leakage-free grouped splits: **91–95 % accuracy** and **ROC-AUC 0.96–0.98** on metallicity, magnetism and stability.
-- Deployed everything as **MatSSL Studio** (FastAPI + React + Docker), with SHAP explanations, a 3D crystal viewer and an interactive results dashboard; CI with pytest and GitHub Actions.
+- Extended the same protocol to **molecules**: RDKit descriptors + Morgan fingerprints, scaffold-grouped splits, 12 Tox21 toxicity endpoints (mean ROC-AUC 0.77), and a superconductor Tc model (MAE 2.9 K, R² 0.93) that ranks 554k unlabeled compositions and recovers the cuprate and vanadium-fluorophosphate families unaided.
+- Deployed everything as **MatSSL Studio** (FastAPI + React + Docker), with SHAP explanations, a molecule editor, a 3D crystal viewer and an interactive results dashboard; CI with pytest and GitHub Actions.
 
 **Short version (LinkedIn / portfolio):**
-*Built MatSSL, an end-to-end ML platform that predicts properties of inorganic materials from scarce labels. It covers 1.2 M compositions, semi-supervised, unsupervised and self-supervised learning, about 2,700 benchmarked models, and stacked ensembles reaching up to 94.6 % accuracy, deployed as a FastAPI + React web app with explanations and a 3D crystal viewer. Next: toxicity prediction and an illness/drug-efficacy simulator.*
+*Built MatSSL, an end-to-end ML platform that predicts properties of inorganic materials and molecules from scarce labels. It covers 1.2 M compositions and 260 k molecules, semi-supervised, unsupervised and self-supervised learning, about 2,700 benchmarked models, stacked ensembles up to 94.6 % accuracy, molecular toxicity models and a Design Lab that screens 554 k unmeasured compositions for batteries and superconductors - deployed as a FastAPI + React web app with explanations, a molecule editor and a 3D crystal viewer.*
