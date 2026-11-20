@@ -1,0 +1,244 @@
+{
+ "endpoint": "CT_TOX",
+ "title": "Clinical trial toxicity",
+ "dataset": {
+  "n_molecules": 1461,
+  "n_scaffolds": 912,
+  "positive_rate": 0.07665982203969883,
+  "n_train": 1169,
+  "n_test": 292,
+  "n_features": 2265
+ },
+ "ablation": [
+  {
+   "Model": "1. RDKit descriptors (LightGBM)",
+   "Accuracy": 0.9315068493150684,
+   "Precision": 0.6,
+   "Recall": 0.2727272727272727,
+   "F1-Score": 0.375,
+   "ROC-AUC": 0.9232323232323232,
+   "PR-AUC": 0.5456429229347164,
+   "Composite_Score": 0.6491161616161616,
+   "Balanced_Accuracy": 0.6289562289562289,
+   "Threshold": 0.5
+  },
+  {
+   "Model": "2. + Morgan fingerprint",
+   "Accuracy": 0.9315068493150684,
+   "Precision": 0.6,
+   "Recall": 0.2727272727272727,
+   "F1-Score": 0.375,
+   "ROC-AUC": 0.912962962962963,
+   "PR-AUC": 0.5251059868694437,
+   "Composite_Score": 0.6439814814814815,
+   "Balanced_Accuracy": 0.6289562289562289,
+   "Threshold": 0.5
+  },
+  {
+   "Model": "3. + Optuna-tuned LightGBM (CV logloss 0.1961)",
+   "Accuracy": 0.9246575342465754,
+   "Precision": 0.5,
+   "Recall": 0.22727272727272727,
+   "F1-Score": 0.3125,
+   "ROC-AUC": 0.9018518518518518,
+   "PR-AUC": 0.44312195321832387,
+   "Composite_Score": 0.607175925925926,
+   "Balanced_Accuracy": 0.6043771043771043,
+   "Threshold": 0.5
+  },
+  {
+   "Model": "4. + stacking (LightGBM + XGBoost + HistGB)",
+   "Accuracy": 0.9212328767123288,
+   "Precision": 0.46153846153846156,
+   "Recall": 0.2727272727272727,
+   "F1-Score": 0.34285714285714286,
+   "ROC-AUC": 0.9158249158249159,
+   "PR-AUC": 0.4897740536235672,
+   "Composite_Score": 0.6293410293410293,
+   "Balanced_Accuracy": 0.6234006734006734,
+   "Threshold": 0.5
+  },
+  {
+   "Model": "5. + F1-optimal threshold (t = 0.25, chosen on train)",
+   "Accuracy": 0.9246575342465754,
+   "Precision": 0.5,
+   "Recall": 0.5454545454545454,
+   "F1-Score": 0.5217391304347826,
+   "ROC-AUC": 0.9158249158249159,
+   "PR-AUC": 0.4897740536235672,
+   "Composite_Score": 0.7187820231298492,
+   "Balanced_Accuracy": 0.7505050505050506,
+   "Threshold": 0.24533349729401163
+  }
+ ],
+ "final": {
+  "Model": "5. + F1-optimal threshold (t = 0.25, chosen on train)",
+  "Accuracy": 0.9246575342465754,
+  "Precision": 0.5,
+  "Recall": 0.5454545454545454,
+  "F1-Score": 0.5217391304347826,
+  "ROC-AUC": 0.9158249158249159,
+  "PR-AUC": 0.4897740536235672,
+  "Composite_Score": 0.7187820231298492,
+  "Balanced_Accuracy": 0.7505050505050506,
+  "Threshold": 0.24533349729401163
+ },
+ "threshold": 0.24533349729401163,
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "tuned_params": {
+  "n_estimators": 200,
+  "learning_rate": 0.024443269457417885,
+  "num_leaves": 15,
+  "min_child_samples": 39,
+  "colsample_bytree": 0.6447097256648954,
+  "subsample": 0.9350060741234096,
+  "reg_lambda": 8.212461922256873
+ },
+ "tuning_cv_logloss": 0.19605887817898063,
+ "confusion": [
+  [
+   258,
+   12
+  ],
+  [
+   10,
+   12
+  ]
+ ],
+ "roc": [
+  {
+   "fpr": 0.0,
+   "tpr": 0.0
+  },
+  {
+   "fpr": 0.0,
+   "tpr": 0.0455
+  },
+  {
+   "fpr": 0.0037,
+   "tpr": 0.0455
+  },
+  {
+   "fpr": 0.0037,
+   "tpr": 0.1364
+  },
+  {
+   "fpr": 0.0074,
+   "tpr": 0.1364
+  },
+  {
+   "fpr": 0.0074,
+   "tpr": 0.1818
+  },
+  {
+   "fpr": 0.0111,
+   "tpr": 0.1818
+  },
+  {
+   "fpr": 0.0111,
+   "tpr": 0.2727
+  },
+  {
+   "fpr": 0.037,
+   "tpr": 0.2727
+  },
+  {
+   "fpr": 0.037,
+   "tpr": 0.5455
+  },
+  {
+   "fpr": 0.0444,
+   "tpr": 0.5455
+  },
+  {
+   "fpr": 0.0444,
+   "tpr": 0.6364
+  },
+  {
+   "fpr": 0.0556,
+   "tpr": 0.6364
+  },
+  {
+   "fpr": 0.0556,
+   "tpr": 0.6818
+  },
+  {
+   "fpr": 0.0593,
+   "tpr": 0.6818
+  },
+  {
+   "fpr": 0.0593,
+   "tpr": 0.7273
+  },
+  {
+   "fpr": 0.1704,
+   "tpr": 0.7273
+  },
+  {
+   "fpr": 0.1704,
+   "tpr": 0.7727
+  },
+  {
+   "fpr": 0.2111,
+   "tpr": 0.7727
+  },
+  {
+   "fpr": 0.2111,
+   "tpr": 0.8182
+  },
+  {
+   "fpr": 0.2222,
+   "tpr": 0.8182
+  },
+  {
+   "fpr": 0.2222,
+   "tpr": 0.8636
+  },
+  {
+   "fpr": 0.2296,
+   "tpr": 0.8636
+  },
+  {
+   "fpr": 0.2296,
+   "tpr": 0.9091
+  },
+  {
+   "fpr": 0.2481,
+   "tpr": 0.9091
+  },
+  {
+   "fpr": 0.2481,
+   "tpr": 0.9545
+  },
+  {
+   "fpr": 0.3074,
+   "tpr": 0.9545
+  },
+  {
+   "fpr": 0.3074,
+   "tpr": 1.0
+  },
+  {
+   "fpr": 1.0,
+   "tpr": 1.0
+  }
+ ],
+ "top_features": {
+  "BCUT2D_MRLOW": 0.2556,
+  "SMR_VSA3": 0.0693,
+  "BalabanJ": 0.0682,
+  "fr_quatN": 0.0401,
+  "MaxAbsPartialCharge": 0.0286,
+  "SlogP_VSA2": 0.0266,
+  "SMR_VSA6": 0.0239,
+  "BCUT2D_LOGPLOW": 0.0236,
+  "FpDensityMorgan3": 0.0224,
+  "Kappa2": 0.0206,
+  "SlogP_VSA1": 0.0191,
+  "BCUT2D_MWHI": 0.015
+ }
+}

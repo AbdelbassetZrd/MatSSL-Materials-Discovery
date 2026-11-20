@@ -113,7 +113,7 @@ Two extensions on top of the materials core. Full write-up:
 **Molecule Studio + toxicity.** Draw a molecule, build it from fragments, or paste a SMILES, and
 get a predicted toxicity profile (12 Tox21 assays + clinical toxicity). Same protocol as the
 materials track, with Bemis-Murcko **scaffold-grouped** splits and 249k unlabeled ZINC molecules
-as the pool. Mean ROC-AUC **0.768** over 10 endpoints (0.895 on mitochondrial toxicity).
+as the pool. Mean ROC-AUC **0.772** over the 12 Tox21 assays (0.895 mitochondrial toxicity, 0.916 clinical toxicity).
 
 **Design Lab.** Pick an application and get candidate materials, ranked from the 554k unlabeled
 GNoME compositions:

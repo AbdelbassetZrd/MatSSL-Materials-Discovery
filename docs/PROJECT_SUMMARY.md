@@ -78,8 +78,8 @@ SMILES), and get a predicted toxicity profile over the 12 Tox21 assays plus clin
 It reuses the materials protocol unchanged: 217 RDKit descriptors and a 2048-bit Morgan
 fingerprint, a train/test split grouped by **Bemis-Murcko scaffold** (the molecular equivalent of
 grouping by formula), an ablation, a stacked ensemble and a calibrated threshold. 249,424
-unlabeled ZINC molecules play the role GNoME plays for materials. Mean ROC-AUC **0.768** across
-10 endpoints, up to 0.895 on mitochondrial toxicity. Explanations decode fingerprint bits back
+unlabeled ZINC molecules play the role GNoME plays for materials. Mean ROC-AUC **0.772** across
+the 12 Tox21 assays, up to 0.895 on mitochondrial toxicity and 0.916 on clinical toxicity. Explanations decode fingerprint bits back
 into the substructure they stand for.
 
 **Design Lab (built).** Pick a target application - superconductor, solar absorber, permanent

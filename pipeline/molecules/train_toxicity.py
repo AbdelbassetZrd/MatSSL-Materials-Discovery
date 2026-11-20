@@ -123,10 +123,20 @@ def tune(X, y, groups, n_trials: int, nj: int) -> tuple[dict, float]:
     return st.best_params, st.best_value
 
 
-def best_f1_threshold(y, p) -> float:
+def best_threshold(y, p) -> tuple[float, str]:
+    """Decision threshold chosen on out-of-fold training predictions.
+
+    F1 of the positive class for the usual case (3-16 % positives). When the *positive* class
+    is the majority, as for FDA_APPROVED (95 % approved), maximising F1 degenerates to
+    predicting "positive" for everything, so balanced accuracy is maximised instead.
+    """
+    if y.mean() > 0.5:
+        grid = np.linspace(0.05, 0.95, 181)
+        bal = [balanced_accuracy_score(y, (p >= t).astype(int)) for t in grid]
+        return float(grid[int(np.argmax(bal))]), "balanced accuracy"
     prec, rec, thr = precision_recall_curve(y, p)
     f1 = 2 * prec * rec / np.maximum(prec + rec, 1e-9)
-    return float(thr[int(np.argmax(f1[:-1]))]) if len(thr) else 0.5
+    return (float(thr[int(np.argmax(f1[:-1]))]) if len(thr) else 0.5), "F1"
 
 
 def train_endpoint(endpoint: str, df: pd.DataFrame, args) -> dict | None:
@@ -196,8 +206,9 @@ def train_endpoint(endpoint: str, df: pd.DataFrame, args) -> dict | None:
     for a, b in StratifiedGroupKFold(3, shuffle=True, random_state=4).split(oof, ytr, groups[tr]):
         lr = LogisticRegression(C=1.0, max_iter=1000).fit(_logit(oof[a]), ytr[a])
         oof_meta[b] = lr.predict_proba(_logit(oof[b]))[:, 1]
-    t_best = best_f1_threshold(ytr, oof_meta)
-    final = record(f"5. + F1-optimal threshold (t = {t_best:.2f}, chosen on train)", p4, t_best)
+    t_best, criterion = best_threshold(ytr, oof_meta)
+    final = record(f"5. + {criterion}-optimal threshold (t = {t_best:.2f}, chosen on train)",
+                   p4, t_best)
 
     fpr, tpr, _ = roc_curve(yte, p4)
     keep = np.unique(np.linspace(0, len(fpr) - 1, 100).astype(int))
@@ -209,6 +220,7 @@ def train_endpoint(endpoint: str, df: pd.DataFrame, args) -> dict | None:
                     "n_test": int(len(te)), "n_features": int(Xall.shape[1])},
         "ablation": ablation, "final": final, "threshold": t_best,
         "base_models": base_names, "tuned_params": params, "tuning_cv_logloss": cv,
+        "threshold_criterion": criterion,
         "confusion": confusion_matrix(yte, (p4 >= t_best).astype(int)).tolist(),
         "roc": [{"fpr": round(float(fpr[i]), 4), "tpr": round(float(tpr[i]), 4)} for i in keep],
         "top_features": (imp / max(imp.sum(), 1)).sort_values(ascending=False).head(12).round(4)

@@ -52,23 +52,37 @@ out-of-fold training predictions. F1 rather than accuracy, because the endpoints
 
 **Results** (held-out molecules, scaffold-grouped):
 
-| Endpoint | Molecules | Positives | ROC-AUC | PR-AUC |
-|---|---|---|---|---|
-| SR-MMP (mitochondrial toxicity) | 5,804 | 15.8 % | **0.895** | 0.705 |
-| NR-AhR (aryl hydrocarbon receptor) | 6,542 | 11.7 % | 0.842 | 0.452 |
-| NR-Aromatase | 5,815 | 5.2 % | 0.826 | 0.299 |
-| SR-ARE (oxidative stress) | 5,825 | 16.2 % | 0.791 | 0.446 |
-| NR-PPAR-gamma | 6,443 | 2.9 % | 0.776 | 0.310 |
-| NR-AR-LBD | 6,751 | 3.5 % | 0.770 | 0.397 |
-| NR-ER-LBD | 6,948 | 5.0 % | 0.754 | 0.211 |
-| SR-ATAD5 (DNA damage) | 7,065 | 3.7 % | 0.750 | 0.229 |
-| NR-AR | 7,258 | 4.2 % | 0.651 | 0.351 |
-| NR-ER | 6,186 | 12.8 % | 0.621 | 0.276 |
+| Endpoint | Molecules | Positives | ROC-AUC | PR-AUC | Balanced acc. |
+|---|---|---|---|---|---|
+| SR-MMP (Mitochondrial toxicity) | 5,804 | 15.8 % | 0.895 | 0.705 | 0.762 |
+| CT_TOX (Clinical trial toxicity) | 1,461 | 7.7 % | 0.916 | 0.490 | 0.751 |
+| FDA_APPROVED (FDA approved) | 1,461 | 94.9 % | 0.902 | 0.994 | 0.679 |
+| SR-p53 (p53 stress response) | 6,767 | 6.3 % | 0.863 | 0.377 | 0.644 |
+| NR-AhR (Aryl hydrocarbon receptor) | 6,542 | 11.7 % | 0.842 | 0.452 | 0.685 |
+| NR-Aromatase (Aromatase) | 5,815 | 5.2 % | 0.826 | 0.299 | 0.578 |
+| SR-ARE (Oxidative stress (ARE)) | 5,825 | 16.2 % | 0.791 | 0.446 | 0.684 |
+| NR-PPAR-gamma (PPAR-gamma) | 6,443 | 2.9 % | 0.776 | 0.310 | 0.657 |
+| NR-AR-LBD (Androgen receptor (LBD)) | 6,751 | 3.5 % | 0.770 | 0.397 | 0.638 |
+| NR-ER-LBD (Estrogen receptor (LBD)) | 6,948 | 5.0 % | 0.754 | 0.211 | 0.585 |
+| SR-ATAD5 (DNA damage (ATAD5)) | 7,065 | 3.7 % | 0.750 | 0.229 | 0.586 |
+| SR-HSE (Heat-shock response) | 6,460 | 5.8 % | 0.720 | 0.219 | 0.631 |
+| NR-AR (Androgen receptor) | 7,258 | 4.2 % | 0.651 | 0.351 | 0.653 |
+| NR-ER (Estrogen receptor) | 6,186 | 12.8 % | 0.621 | 0.276 | 0.587 |
 
-Mean ROC-AUC **0.768**. Published Tox21 numbers are usually higher because they use *random*
+Mean ROC-AUC **0.772** over the 12 Tox21 assays. Published Tox21 numbers are usually higher because they use *random*
 splits; with a scaffold split the test molecules are structurally new, which is the harder and
 more realistic setting. The same gap was measured on materials when the split was grouped by
 formula.
+
+`FDA_APPROVED` needed a different threshold rule. With 95 % of molecules approved, maximising F1
+of the positive class degenerates to "approved for everything" (balanced accuracy exactly 0.500).
+The threshold is therefore chosen on balanced accuracy whenever the positive class is the
+majority, which lifts it to 0.679.
+
+Sanity checks on molecules the models never saw as a group: aspirin and caffeine come out **low
+risk**; **benzo[a]pyrene** comes out high risk and fires the **aryl hydrocarbon receptor**, the
+receptor polycyclic aromatic hydrocarbons actually bind; **bisphenol A** comes out high risk and
+fires the **estrogen receptor**, the mechanism it is known for.
 
 ### Application
 

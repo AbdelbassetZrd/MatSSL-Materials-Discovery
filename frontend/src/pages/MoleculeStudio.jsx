@@ -100,7 +100,7 @@ export default function MoleculeStudio() {
         <div className="card p-5">
           <SectionHeader
             title="Draw your molecule"
-            subtitle="Full chemical editor (Ketcher). Everything you draw is turned into a SMILES string below."
+            subtitle="Full chemical editor (Ketcher). Draw a structure, then press “Use what I drew” to send it to the models."
           />
           <Boundary
             title="The drawing canvas could not start"

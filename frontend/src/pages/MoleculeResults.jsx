@@ -114,7 +114,12 @@ export default function MoleculeResults() {
   const approved = r.predictions.find((p) => p.endpoint === "FDA_APPROVED");
   const whyEp = tox.find((p) => p.endpoint === why) || tox[0];
   const { cls, Icon } = RISK[r.risk.level] || RISK.Low;
-  const radar = tox.map((p) => ({ name: p.title.split(" (")[0], value: +(100 * p.probability).toFixed(1) }));
+  // the endpoint codes are short and unique; the assay titles are not ("Androgen receptor"
+  // appears twice), and duplicate axis labels make the radar collapse
+  const radar = tox.map((p) => ({
+    name: p.endpoint,
+    value: +(100 * p.probability).toFixed(1),
+  }));
 
   return (
     <div className="space-y-6">
@@ -177,10 +182,12 @@ export default function MoleculeResults() {
           <ResponsiveContainer width="100%" height={330}>
             <RadarChart data={radar} outerRadius="72%">
               <PolarGrid stroke="#E2E8F0" />
-              <PolarAngleAxis dataKey="name" tick={{ fill: "#475569", fontSize: 10 }} />
-              <PolarRadiusAxis domain={[0, 100]} tick={{ fill: "#94A3B8", fontSize: 9 }} />
+              <PolarAngleAxis dataKey="name" tick={{ fill: "#1B1F3B", fontSize: 10 }} />
+              <PolarRadiusAxis domain={[0, 100]} tick={{ fill: "#94A3B8", fontSize: 9 }}
+                tickCount={5} angle={90} />
               <Radar isAnimationActive={false} dataKey="value" name="probability (%)"
-                stroke="#4f46e5" fill="#4f46e5" fillOpacity={0.3} />
+                stroke="#4f46e5" fill="#4f46e5" fillOpacity={0.3} strokeWidth={2}
+                dot={{ r: 3 }} />
               <Tooltip content={<ChartTooltip digits={1} />} />
             </RadarChart>
           </ResponsiveContainer>
