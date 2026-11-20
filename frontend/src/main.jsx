@@ -13,6 +13,8 @@ import Compare from "./pages/Compare.jsx";
 import DesignLab from "./pages/DesignLab.jsx";
 import MoleculeStudio from "./pages/MoleculeStudio.jsx";
 import MoleculeResults from "./pages/MoleculeResults.jsx";
+import Diseases from "./pages/Diseases.jsx";
+import Screen from "./pages/Screen.jsx";
 import { MoleculeProvider } from "./lib/molecule.jsx";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } } });
@@ -33,6 +35,8 @@ createRoot(document.getElementById("root")).render(
               <Route path="design" element={<DesignLab />} />
               <Route path="molecules" element={<MoleculeStudio />} />
               <Route path="molecule-results" element={<MoleculeResults />} />
+              <Route path="diseases" element={<Diseases />} />
+              <Route path="screen" element={<Screen />} />
             </Route>
           </Routes>
         </HashRouter>

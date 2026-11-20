@@ -20,9 +20,9 @@ import numpy as np
 import pandas as pd
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import __main__  # noqa: E402
-
 from self_supervised import MaskedAutoencoder  # noqa: E402
+
+import __main__  # noqa: E402
 
 __main__.MaskedAutoencoder = MaskedAutoencoder
 

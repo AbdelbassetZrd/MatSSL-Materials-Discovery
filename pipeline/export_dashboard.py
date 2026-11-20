@@ -27,10 +27,10 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-import __main__  # noqa: E402
-
 from run_ssl_experiments import Preprocessor, stratified_take  # noqa: E402
 from self_supervised import MaskedAutoencoder  # noqa: E402
+
+import __main__  # noqa: E402
 
 __main__.Preprocessor = Preprocessor
 __main__.MaskedAutoencoder = MaskedAutoencoder

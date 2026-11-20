@@ -1,0 +1,58 @@
+{
+ "chembl_id": "CHEMBL340",
+ "symbol": "CYP3A4",
+ "name": "cytochrome P450 family 3 subfamily A member 4",
+ "dataset": {
+  "n_molecules": 1176,
+  "n_scaffolds": 774,
+  "positive_rate": 0.2066326530612245,
+  "decoy_fraction": 0.0,
+  "n_train": 940,
+  "n_test": 236
+ },
+ "metrics": {
+  "Model": "CYP3A4",
+  "Accuracy": 0.8813559322033898,
+  "Precision": 0.6909090909090909,
+  "Recall": 0.7755102040816326,
+  "F1-Score": 0.7307692307692307,
+  "ROC-AUC": 0.9210957110116774,
+  "PR-AUC": 0.8656247084718,
+  "Composite_Score": 0.8259324708904541,
+  "Balanced_Accuracy": 0.8423005565862709,
+  "Threshold": 0.21000000000000002
+ },
+ "metrics_measured_only": {
+  "n": 236,
+  "ROC-AUC": 0.9210957110116774,
+  "PR-AUC": 0.8656247084718,
+  "Balanced_Accuracy": 0.8423005565862709
+ },
+ "enrichment_factor_top1pct": 77.74102040816327,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 159,
+   "accuracy": 0.9056603773584906,
+   "roc_auc": 0.8172413793103449
+  },
+  {
+   "min_similarity": 0.3,
+   "n": 27,
+   "accuracy": 0.8888888888888888,
+   "roc_auc": 0.9
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 24,
+   "accuracy": 0.9583333333333334,
+   "roc_auc": 1.0
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.21000000000000002
+}

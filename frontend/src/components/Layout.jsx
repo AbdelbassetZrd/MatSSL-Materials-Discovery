@@ -1,5 +1,5 @@
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { Atom, FlaskConical, Hexagon, Home, LayoutGrid, Microscope, Play, Scale, ShieldAlert, Sparkles } from "lucide-react";
+import { Atom, FlaskConical, Hexagon, Home, LayoutGrid, Microscope, Play, Scale, ShieldAlert, Sparkles, Stethoscope, TestTube } from "lucide-react";
 import { useState } from "react";
 import DemoTour from "./DemoTour.jsx";
 
@@ -14,6 +14,8 @@ const MATERIALS = [
 const MOLECULES = [
   { to: "/molecules", label: "Molecule Studio", icon: Hexagon },
   { to: "/molecule-results", label: "Toxicity", icon: ShieldAlert },
+  { to: "/diseases", label: "Illnesses", icon: Stethoscope },
+  { to: "/screen", label: "Screen", icon: TestTube },
 ];
 const MOLECULE_PATHS = MOLECULES.map((l) => l.to);
 

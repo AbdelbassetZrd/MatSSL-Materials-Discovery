@@ -23,6 +23,12 @@ export const api = {
   moleculeModels: () => call("/molecules/models-info"),
   moleculePredict: (smiles) => post("/molecules/predict", { smiles }),
   moleculeProperties: (smiles) => post("/molecules/properties", { smiles }),
+  // illness screening (predicted activity against associated proteins)
+  diseases: () => call("/indications/diseases"),
+  disease: (id) => call(`/indications/diseases/${q(id)}`),
+  screen: (smiles, diseaseId = null) =>
+    post("/indications/screen", { smiles, disease_id: diseaseId }),
+  screenMatrix: (smiles) => post("/indications/matrix", { smiles }),
   // design lab
   designApplications: () => call("/design/applications"),
   designScore: (formula) => post("/design/score", { formula }),

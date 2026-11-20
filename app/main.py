@@ -12,7 +12,7 @@ from sentry_sdk.integrations.fastapi import FastApiIntegration
 from sentry_sdk.integrations.logging import LoggingIntegration
 
 # 1. Import your routers here
-from app.api.routes import design, health, materials, molecules
+from app.api.routes import design, health, indications, materials, molecules
 from app.config import settings
 from app.core.database import init_database
 from app.core.metrics import setup_metrics
@@ -122,6 +122,10 @@ app.include_router(molecules.router, prefix="/molecules", tags=["Molecular Toxic
 
 # 2c. Design Lab (score a composition for a target application)
 app.include_router(design.router, prefix="/design", tags=["Design Lab"])
+
+# 2d. Illness screening (predicted activity against associated proteins)
+app.include_router(indications.router, prefix="/indications",
+                   tags=["Illness Screening"])
 
 
 # 3. Serve the React frontend (built into frontend/dist) at /ui/

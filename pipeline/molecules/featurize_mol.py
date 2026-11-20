@@ -97,11 +97,16 @@ def featurize_smiles(smiles: list[str], n_jobs: int = 8, quiet: bool = False) ->
     desc = np.vstack([o[0] for o in out])
     fp = np.vstack([o[1] for o in out])
     scafs = [s for o in out for s in o[2]]
-    # Ipc and a few graph indices overflow on large molecules; the Preprocessor imputes NaN
+    # Ipc and a few graph indices explode on large molecules: they overflow float64 outright,
+    # and values that are merely huge become +inf once cast to float32. Both become NaN, which
+    # the Preprocessor then imputes.
     desc[~np.isfinite(desc)] = np.nan
+    desc = np.clip(desc, -3e38, 3e38)
+    desc32 = desc.astype(np.float32)
+    desc32[~np.isfinite(desc32)] = np.nan
     df = pd.concat([
         pd.DataFrame({"smiles": smiles, "scaffold": scafs}),
-        pd.DataFrame(desc.astype(np.float32), columns=DESC_NAMES),
+        pd.DataFrame(desc32, columns=DESC_NAMES),
         pd.DataFrame(fp, columns=FP_COLS),
     ], axis=1)
     if not quiet:
