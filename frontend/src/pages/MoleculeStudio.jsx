@@ -1,9 +1,12 @@
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, lazy, useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { ArrowRight, BookmarkPlus, Check, Trash2 } from "lucide-react";
-import MoleculeEditor from "../components/MoleculeEditor.jsx";
-import { ErrorBox, SectionHeader } from "../components/ui.jsx";
+// Ketcher is a large WASM bundle: load it only when this page is opened
+const MoleculeEditor = lazy(() => import("../components/MoleculeEditor.jsx"));
+import { ErrorBox, Loading, SectionHeader } from "../components/ui.jsx";
+import Boundary from "../components/Boundary.jsx";
+import FragmentBuilder from "../components/FragmentBuilder.jsx";
 import { useMolecule } from "../lib/molecule.jsx";
 import { check, depict, loadRDKit } from "../lib/rdkit.js";
 import { api } from "../api.js";
@@ -99,7 +102,14 @@ export default function MoleculeStudio() {
             title="Draw your molecule"
             subtitle="Full chemical editor (Ketcher). Everything you draw is turned into a SMILES string below."
           />
-          <MoleculeEditor smiles={ctx.smiles} onChange={(s) => commit(s)} height={430} />
+          <Boundary
+            title="The drawing canvas could not start"
+            hint="Type or paste a SMILES string on the right instead — everything else works."
+          >
+            <Suspense fallback={<Loading text="Loading the chemical editor…" />}>
+              <MoleculeEditor smiles={ctx.smiles} onChange={(s) => commit(s)} height={430} />
+            </Suspense>
+          </Boundary>
         </div>
 
         <div className="space-y-6">
@@ -157,6 +167,14 @@ export default function MoleculeStudio() {
             <ErrorBox error={props.error} />
           </div>
         </div>
+      </div>
+
+      <div className="card p-5">
+        <SectionHeader
+          title="Build a molecule from fragments"
+          subtitle="No drawing needed: combine a ring system with a substituent. Every combination is a valid molecule."
+        />
+        <FragmentBuilder rdkit={rdkit} onPick={commit} />
       </div>
 
       <div className="card p-5">

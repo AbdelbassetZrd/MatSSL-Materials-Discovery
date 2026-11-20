@@ -18,6 +18,7 @@
     "ketcher-react": "^3.8.0",
     "ketcher-standalone": "^3.8.0",
     "lucide-react": "0.460.0",
+    "raphael": "^2.3.0",
     "react": "18.3.1",
     "react-dom": "18.3.1",
     "react-router-dom": "6.28.0",
