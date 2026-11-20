@@ -1,0 +1,2068 @@
+{
+ "pool": {
+  "source": "GNoME (unlabeled)",
+  "n_scored": 554054
+ },
+ "applications": {
+  "superconductor": {
+   "title": "Superconductor",
+   "subtitle": "High critical temperature",
+   "question": "Could this composition superconduct at a usable temperature?",
+   "note": "Tc is predicted by a stacked ensemble trained on 15,542 measured compositions (SuperCon). 77 K is the liquid-nitrogen line.",
+   "examples": [
+    "YBa2Cu3O7",
+    "MgB2",
+    "Nb3Sn",
+    "LaFeAsO"
+   ],
+   "n_strong": 0,
+   "top": [
+    {
+     "formula": "Ba2La(CuO2)4",
+     "metal": 0.8666,
+     "magnetic": 0.1019,
+     "stable": 0.6542,
+     "pv_gap": 0.0,
+     "tc": 68.8362,
+     "score": 0.5848,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr2Ca2Bi2O",
+     "metal": 0.4262,
+     "magnetic": 0.0406,
+     "stable": 0.5337,
+     "pv_gap": 0.17,
+     "tc": 102.1368,
+     "score": 0.5337,
+     "application": "superconductor"
+    },
+    {
+     "formula": "KBa2Be8TlAs8",
+     "metal": 0.451,
+     "magnetic": 0.0063,
+     "stable": 0.6614,
+     "pv_gap": 0.05,
+     "tc": 58.9011,
+     "score": 0.5059,
+     "application": "superconductor"
+    },
+    {
+     "formula": "BaSr7Li4(HgAs2)6",
+     "metal": 0.534,
+     "magnetic": 0.0024,
+     "stable": 0.5868,
+     "pv_gap": 0.0367,
+     "tc": 62.158,
+     "score": 0.4737,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K7RbMg4(HgSe2)8",
+     "metal": 0.1559,
+     "magnetic": 0.0054,
+     "stable": 0.6802,
+     "pv_gap": 0.3067,
+     "tc": 52.5245,
+     "score": 0.464,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba4Cd2CuPd5O12",
+     "metal": 0.7644,
+     "magnetic": 0.0937,
+     "stable": 0.6918,
+     "pv_gap": 0.02,
+     "tc": 51.2916,
+     "score": 0.4608,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr12Zn12Te5(IrO16)3",
+     "metal": 0.3976,
+     "magnetic": 0.7413,
+     "stable": 0.7121,
+     "pv_gap": 0.04,
+     "tc": 48.8679,
+     "score": 0.4519,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs2Er2MgHgSe6",
+     "metal": 0.2308,
+     "magnetic": 0.0177,
+     "stable": 0.7754,
+     "pv_gap": 0.2533,
+     "tc": 44.795,
+     "score": 0.4511,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs4K8Bi(SbSe4)3",
+     "metal": 0.0673,
+     "magnetic": 0.0067,
+     "stable": 0.7473,
+     "pv_gap": 0.1833,
+     "tc": 46.4121,
+     "score": 0.4504,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs2K4BiSbSe6",
+     "metal": 0.0738,
+     "magnetic": 0.0058,
+     "stable": 0.7474,
+     "pv_gap": 0.1733,
+     "tc": 46.0297,
+     "score": 0.4468,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba8TmSc(CuO3)6",
+     "metal": 0.6837,
+     "magnetic": 0.2159,
+     "stable": 0.7582,
+     "pv_gap": 0.01,
+     "tc": 45.2275,
+     "score": 0.4453,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K6Rb6MgHgSe8",
+     "metal": 0.0875,
+     "magnetic": 0.009,
+     "stable": 0.7257,
+     "pv_gap": 0.1933,
+     "tc": 46.9237,
+     "score": 0.4422,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K6Rb6CdHgSe8",
+     "metal": 0.0792,
+     "magnetic": 0.0133,
+     "stable": 0.7269,
+     "pv_gap": 0.3067,
+     "tc": 46.7548,
+     "score": 0.4414,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba2FeCuSeO3",
+     "metal": 0.606,
+     "magnetic": 0.9787,
+     "stable": 0.703,
+     "pv_gap": 0.11,
+     "tc": 48.1642,
+     "score": 0.4397,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr12Zn12Te7WO48",
+     "metal": 0.1583,
+     "magnetic": 0.4533,
+     "stable": 0.7376,
+     "pv_gap": 0.0433,
+     "tc": 45.8413,
+     "score": 0.4391,
+     "application": "superconductor"
+    },
+    {
+     "formula": "KRbSr2(SbAu)4",
+     "metal": 0.4992,
+     "magnetic": 0.006,
+     "stable": 0.6564,
+     "pv_gap": 0.0867,
+     "tc": 50.9706,
+     "score": 0.4345,
+     "application": "superconductor"
+    },
+    {
+     "formula": "BaSr5(CuO3)4",
+     "metal": 0.8609,
+     "magnetic": 0.4011,
+     "stable": 0.602,
+     "pv_gap": 0.01,
+     "tc": 55.4713,
+     "score": 0.4337,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr6Zn6Te3IrO24",
+     "metal": 0.3372,
+     "magnetic": 0.7227,
+     "stable": 0.7159,
+     "pv_gap": 0.04,
+     "tc": 46.0472,
+     "score": 0.4281,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr9Zn3Co(CuO7)2",
+     "metal": 0.5685,
+     "magnetic": 0.9491,
+     "stable": 0.666,
+     "pv_gap": 0.0633,
+     "tc": 49.4653,
+     "score": 0.4278,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba6Li2Tl2Ag19Pd",
+     "metal": 0.9483,
+     "magnetic": 0.0037,
+     "stable": 0.6145,
+     "pv_gap": 0.0,
+     "tc": 53.3013,
+     "score": 0.4254,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba8ErSc(CuO3)6",
+     "metal": 0.6905,
+     "magnetic": 0.2117,
+     "stable": 0.7581,
+     "pv_gap": 0.0067,
+     "tc": 43.1777,
+     "score": 0.4251,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Rb3Sr8Tl(Cd2Sb3)4",
+     "metal": 0.339,
+     "magnetic": 0.0032,
+     "stable": 0.7017,
+     "pv_gap": 0.01,
+     "tc": 46.4089,
+     "score": 0.4229,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Rb8Li4ErIn3Bi8",
+     "metal": 0.2589,
+     "magnetic": 0.0108,
+     "stable": 0.6879,
+     "pv_gap": 0.0233,
+     "tc": 47.2897,
+     "score": 0.4225,
+     "application": "superconductor"
+    },
+    {
+     "formula": "CsKSr2(SbAu)4",
+     "metal": 0.4651,
+     "magnetic": 0.0066,
+     "stable": 0.6552,
+     "pv_gap": 0.0967,
+     "tc": 49.5867,
+     "score": 0.422,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K8Rb4Bi(SbSe4)3",
+     "metal": 0.0735,
+     "magnetic": 0.0053,
+     "stable": 0.7491,
+     "pv_gap": 0.2233,
+     "tc": 43.3683,
+     "score": 0.4219,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba6Li2TlIn2Ag19",
+     "metal": 0.9444,
+     "magnetic": 0.0034,
+     "stable": 0.6129,
+     "pv_gap": 0.0,
+     "tc": 52.761,
+     "score": 0.4199,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K2RbAg3BiSb",
+     "metal": 0.4197,
+     "magnetic": 0.0031,
+     "stable": 0.5988,
+     "pv_gap": 0.0867,
+     "tc": 53.8804,
+     "score": 0.419,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba6Li2Tl2InAg19",
+     "metal": 0.9448,
+     "magnetic": 0.0038,
+     "stable": 0.6139,
+     "pv_gap": 0.0,
+     "tc": 52.4381,
+     "score": 0.4181,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K8Mg3Cd(HgSe2)8",
+     "metal": 0.1935,
+     "magnetic": 0.0047,
+     "stable": 0.6571,
+     "pv_gap": 0.3133,
+     "tc": 48.8528,
+     "score": 0.4169,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K4Rb2BiSbSe6",
+     "metal": 0.0806,
+     "magnetic": 0.0054,
+     "stable": 0.7498,
+     "pv_gap": 0.1867,
+     "tc": 42.6177,
+     "score": 0.415,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K4Rb2BiSbTe6",
+     "metal": 0.0951,
+     "magnetic": 0.0024,
+     "stable": 0.7454,
+     "pv_gap": 0.3467,
+     "tc": 42.7807,
+     "score": 0.4141,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Rb8Li4HoTl3Sb8",
+     "metal": 0.2034,
+     "magnetic": 0.0074,
+     "stable": 0.7005,
+     "pv_gap": 0.07,
+     "tc": 45.272,
+     "score": 0.4119,
+     "application": "superconductor"
+    },
+    {
+     "formula": "KRbBaSrBi2",
+     "metal": 0.3773,
+     "magnetic": 0.0031,
+     "stable": 0.578,
+     "pv_gap": 0.0067,
+     "tc": 54.7983,
+     "score": 0.4113,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs2Li6HoTm3Se10",
+     "metal": 0.1255,
+     "magnetic": 0.016,
+     "stable": 0.7514,
+     "pv_gap": 0.3633,
+     "tc": 42.0932,
+     "score": 0.4108,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Rb8Li4HoTm3Bi8",
+     "metal": 0.2966,
+     "magnetic": 0.0151,
+     "stable": 0.6729,
+     "pv_gap": 0.02,
+     "tc": 46.9863,
+     "score": 0.4106,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs4K8Bi3SbSe12",
+     "metal": 0.0752,
+     "magnetic": 0.0058,
+     "stable": 0.7445,
+     "pv_gap": 0.15,
+     "tc": 41.9656,
+     "score": 0.4058,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K4MgCd(HgSe2)4",
+     "metal": 0.2121,
+     "magnetic": 0.0055,
+     "stable": 0.6557,
+     "pv_gap": 0.3033,
+     "tc": 47.5269,
+     "score": 0.4047,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba3SrLi2(HgAs2)3",
+     "metal": 0.5629,
+     "magnetic": 0.0025,
+     "stable": 0.5494,
+     "pv_gap": 0.0333,
+     "tc": 56.6894,
+     "score": 0.4045,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba8YEr(CuO3)6",
+     "metal": 0.6943,
+     "magnetic": 0.1912,
+     "stable": 0.7573,
+     "pv_gap": 0.0067,
+     "tc": 40.9304,
+     "score": 0.4026,
+     "application": "superconductor"
+    },
+    {
+     "formula": "KBaHgSb3Au4",
+     "metal": 0.7558,
+     "magnetic": 0.0073,
+     "stable": 0.5443,
+     "pv_gap": 0.0633,
+     "tc": 56.7051,
+     "score": 0.4008,
+     "application": "superconductor"
+    },
+    {
+     "formula": "K8Rb4Bi(SbTe4)3",
+     "metal": 0.0906,
+     "magnetic": 0.0024,
+     "stable": 0.7452,
+     "pv_gap": 0.36,
+     "tc": 41.2539,
+     "score": 0.3993,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba9Zn4(AuO7)2",
+     "metal": 0.5233,
+     "magnetic": 0.0902,
+     "stable": 0.6395,
+     "pv_gap": 0.0267,
+     "tc": 47.9069,
+     "score": 0.3979,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba7Sr3Bi2Pb4F2",
+     "metal": 0.3589,
+     "magnetic": 0.067,
+     "stable": 0.6022,
+     "pv_gap": 0.11,
+     "tc": 50.5823,
+     "score": 0.3956,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Rb4MgCd(HgSe2)4",
+     "metal": 0.1671,
+     "magnetic": 0.0066,
+     "stable": 0.6552,
+     "pv_gap": 0.3133,
+     "tc": 46.4757,
+     "score": 0.3954,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr8Li4Cd5HgAs12",
+     "metal": 0.4814,
+     "magnetic": 0.0023,
+     "stable": 0.637,
+     "pv_gap": 0.0567,
+     "tc": 47.6718,
+     "score": 0.3943,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Sr4Li2Cd(HgAs3)2",
+     "metal": 0.5311,
+     "magnetic": 0.0019,
+     "stable": 0.614,
+     "pv_gap": 0.0467,
+     "tc": 49.3867,
+     "score": 0.3938,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs2BaSr(SbAu)4",
+     "metal": 0.4722,
+     "magnetic": 0.0061,
+     "stable": 0.6557,
+     "pv_gap": 0.0833,
+     "tc": 46.1825,
+     "score": 0.3933,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba9SrBi2Pb4F2",
+     "metal": 0.3343,
+     "magnetic": 0.0846,
+     "stable": 0.5988,
+     "pv_gap": 0.12,
+     "tc": 50.4386,
+     "score": 0.3923,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Ba8DyY(CuO3)6",
+     "metal": 0.7047,
+     "magnetic": 0.1848,
+     "stable": 0.7573,
+     "pv_gap": 0.01,
+     "tc": 39.816,
+     "score": 0.3916,
+     "application": "superconductor"
+    },
+    {
+     "formula": "Cs4K11RbSn3PbSe16",
+     "metal": 0.0511,
+     "magnetic": 0.0065,
+     "stable": 0.7396,
+     "pv_gap": 0.3933,
+     "tc": 40.7228,
+     "score": 0.3911,
+     "application": "superconductor"
+    }
+   ]
+  },
+  "solar_absorber": {
+   "title": "Solar absorber",
+   "subtitle": "Band gap in the photovoltaic window",
+   "question": "Could this composition absorb sunlight efficiently?",
+   "note": "Uses the GA-selected band-gap model (PBE gap in 1.1-1.7 eV). PBE under-estimates gaps, so the window is a window on PBE values.",
+   "examples": [
+    "CsPbI3",
+    "CdTe",
+    "Cu2ZnSnS4",
+    "GaAs"
+   ],
+   "n_strong": 0,
+   "top": [
+    {
+     "formula": "Cs12Sb3AsSe16",
+     "metal": 0.0373,
+     "magnetic": 0.0148,
+     "stable": 0.6681,
+     "pv_gap": 0.8667,
+     "tc": -0.0032,
+     "score": 0.5575,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs2TbDy(ZnTe3)2",
+     "metal": 0.132,
+     "magnetic": 0.0112,
+     "stable": 0.754,
+     "pv_gap": 0.8467,
+     "tc": 25.146,
+     "score": 0.5541,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K5RbNa2(Sn3Se8)2",
+     "metal": 0.0561,
+     "magnetic": 0.0086,
+     "stable": 0.7097,
+     "pv_gap": 0.8267,
+     "tc": 24.3,
+     "score": 0.5538,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Rb12SbAs3Se16",
+     "metal": 0.0409,
+     "magnetic": 0.0084,
+     "stable": 0.668,
+     "pv_gap": 0.8633,
+     "tc": 0.0887,
+     "score": 0.5531,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Rb12Sb3AsSe16",
+     "metal": 0.0409,
+     "magnetic": 0.0087,
+     "stable": 0.668,
+     "pv_gap": 0.86,
+     "tc": -0.4835,
+     "score": 0.5509,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "TbDy3Cu4(PbS3)4",
+     "metal": 0.1797,
+     "magnetic": 0.0123,
+     "stable": 0.7047,
+     "pv_gap": 0.94,
+     "tc": 1.4152,
+     "score": 0.5434,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Pr5NdCu2(SiSe7)2",
+     "metal": 0.1977,
+     "magnetic": 0.018,
+     "stable": 0.7302,
+     "pv_gap": 0.9233,
+     "tc": 2.8339,
+     "score": 0.5409,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "TbDyCu2(PbS3)2",
+     "metal": 0.185,
+     "magnetic": 0.0121,
+     "stable": 0.7101,
+     "pv_gap": 0.93,
+     "tc": 0.671,
+     "score": 0.5383,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K2RbNaSn3Se8",
+     "metal": 0.0561,
+     "magnetic": 0.0084,
+     "stable": 0.7093,
+     "pv_gap": 0.7967,
+     "tc": 24.4467,
+     "score": 0.5334,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs2PrNd(ZnTe3)2",
+     "metal": 0.1103,
+     "magnetic": 0.0134,
+     "stable": 0.7546,
+     "pv_gap": 0.7933,
+     "tc": 19.0133,
+     "score": 0.5326,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Tb3DyCu4(PbS3)4",
+     "metal": 0.185,
+     "magnetic": 0.0123,
+     "stable": 0.7068,
+     "pv_gap": 0.9167,
+     "tc": 0.7402,
+     "score": 0.528,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsRb11(AsSe4)4",
+     "metal": 0.0378,
+     "magnetic": 0.0141,
+     "stable": 0.6639,
+     "pv_gap": 0.82,
+     "tc": 0.0529,
+     "score": 0.5238,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "PrNd5Cu2(SnSe7)2",
+     "metal": 0.2035,
+     "magnetic": 0.0174,
+     "stable": 0.7242,
+     "pv_gap": 0.9067,
+     "tc": 3.1926,
+     "score": 0.523,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Pr5NdCu2(SnSe7)2",
+     "metal": 0.2035,
+     "magnetic": 0.0177,
+     "stable": 0.7242,
+     "pv_gap": 0.9033,
+     "tc": 3.2171,
+     "score": 0.5211,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Tb3HoCu4(PbS3)4",
+     "metal": 0.1975,
+     "magnetic": 0.0127,
+     "stable": 0.7057,
+     "pv_gap": 0.92,
+     "tc": 1.0204,
+     "score": 0.521,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs8Cd4Sn9Ge3Se32",
+     "metal": 0.0636,
+     "magnetic": 0.0116,
+     "stable": 0.6445,
+     "pv_gap": 0.8633,
+     "tc": 12.3178,
+     "score": 0.521,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsK5Na2(Sn3Se8)2",
+     "metal": 0.0515,
+     "magnetic": 0.0103,
+     "stable": 0.7097,
+     "pv_gap": 0.7733,
+     "tc": 27.3501,
+     "score": 0.5206,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsK2NaSn3Se8",
+     "metal": 0.0515,
+     "magnetic": 0.0111,
+     "stable": 0.7095,
+     "pv_gap": 0.7733,
+     "tc": 25.7709,
+     "score": 0.5204,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K3Rb3Na2(Sn3Se8)2",
+     "metal": 0.0561,
+     "magnetic": 0.0091,
+     "stable": 0.7098,
+     "pv_gap": 0.7767,
+     "tc": 25.1244,
+     "score": 0.5204,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Nd3AgGeSe7",
+     "metal": 0.1362,
+     "magnetic": 0.0134,
+     "stable": 0.6714,
+     "pv_gap": 0.8967,
+     "tc": 0.1805,
+     "score": 0.52,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "TbHo3Cu4(PbS3)4",
+     "metal": 0.195,
+     "magnetic": 0.0126,
+     "stable": 0.7084,
+     "pv_gap": 0.9033,
+     "tc": 1.181,
+     "score": 0.5151,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K3RbIn4(SnSe4)4",
+     "metal": 0.0534,
+     "magnetic": 0.005,
+     "stable": 0.6524,
+     "pv_gap": 0.8233,
+     "tc": 10.888,
+     "score": 0.5084,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsRb7Ba2(AsSe4)4",
+     "metal": 0.0581,
+     "magnetic": 0.0282,
+     "stable": 0.6804,
+     "pv_gap": 0.7933,
+     "tc": 33.75,
+     "score": 0.5084,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsRb11(SbSe4)4",
+     "metal": 0.037,
+     "magnetic": 0.0108,
+     "stable": 0.671,
+     "pv_gap": 0.7867,
+     "tc": -0.4255,
+     "score": 0.5083,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "KRb3(Sb4S7)2",
+     "metal": 0.0485,
+     "magnetic": 0.0058,
+     "stable": 0.6352,
+     "pv_gap": 0.8367,
+     "tc": -1.0583,
+     "score": 0.5057,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsK4RbNa2(Sn3Se8)2",
+     "metal": 0.0515,
+     "magnetic": 0.0117,
+     "stable": 0.7097,
+     "pv_gap": 0.75,
+     "tc": 26.7709,
+     "score": 0.5049,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K8In7Ga(SnSe4)8",
+     "metal": 0.0594,
+     "magnetic": 0.0055,
+     "stable": 0.6445,
+     "pv_gap": 0.8267,
+     "tc": 1.5859,
+     "score": 0.5011,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Pr3Nd3Cu2(SiSe7)2",
+     "metal": 0.2173,
+     "magnetic": 0.0183,
+     "stable": 0.722,
+     "pv_gap": 0.8867,
+     "tc": 2.5756,
+     "score": 0.5011,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Pr2NdCuSnSe7",
+     "metal": 0.2035,
+     "magnetic": 0.0181,
+     "stable": 0.718,
+     "pv_gap": 0.8733,
+     "tc": 3.1264,
+     "score": 0.4995,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsRb3(AsSe2)4",
+     "metal": 0.0449,
+     "magnetic": 0.0086,
+     "stable": 0.5975,
+     "pv_gap": 0.8733,
+     "tc": -0.6583,
+     "score": 0.4984,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "PrNd2CuSnSe7",
+     "metal": 0.2035,
+     "magnetic": 0.0183,
+     "stable": 0.718,
+     "pv_gap": 0.8667,
+     "tc": 3.1941,
+     "score": 0.4957,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "KRb11(SbSe4)4",
+     "metal": 0.0399,
+     "magnetic": 0.0076,
+     "stable": 0.6701,
+     "pv_gap": 0.77,
+     "tc": -0.694,
+     "score": 0.4954,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K11Rb(AsSe4)4",
+     "metal": 0.0392,
+     "magnetic": 0.0081,
+     "stable": 0.6675,
+     "pv_gap": 0.77,
+     "tc": -0.4826,
+     "score": 0.4938,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Rb4Ba(AsSe4)2",
+     "metal": 0.0487,
+     "magnetic": 0.0241,
+     "stable": 0.6372,
+     "pv_gap": 0.8033,
+     "tc": 0.223,
+     "score": 0.487,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs11Rb(SbSe4)4",
+     "metal": 0.0364,
+     "magnetic": 0.0125,
+     "stable": 0.6702,
+     "pv_gap": 0.7533,
+     "tc": -0.5274,
+     "score": 0.4865,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs4CdSn6HgSe16",
+     "metal": 0.0827,
+     "magnetic": 0.0093,
+     "stable": 0.6724,
+     "pv_gap": 0.7867,
+     "tc": 14.6773,
+     "score": 0.4852,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "PrNd2CuSiSe7",
+     "metal": 0.2172,
+     "magnetic": 0.0145,
+     "stable": 0.7241,
+     "pv_gap": 0.8533,
+     "tc": 2.5358,
+     "score": 0.4837,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs8Cd3Sn12HgSe32",
+     "metal": 0.079,
+     "magnetic": 0.0096,
+     "stable": 0.6779,
+     "pv_gap": 0.7733,
+     "tc": 14.2617,
+     "score": 0.4828,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsK8Rb3(AsSe4)4",
+     "metal": 0.0431,
+     "magnetic": 0.0079,
+     "stable": 0.6715,
+     "pv_gap": 0.75,
+     "tc": 29.8936,
+     "score": 0.4819,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs3Rb3Na2(Sn3Se8)2",
+     "metal": 0.0517,
+     "magnetic": 0.0114,
+     "stable": 0.7082,
+     "pv_gap": 0.7167,
+     "tc": 24.2929,
+     "score": 0.4813,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs7RbCd4(Sn3Se8)4",
+     "metal": 0.0506,
+     "magnetic": 0.0099,
+     "stable": 0.6497,
+     "pv_gap": 0.78,
+     "tc": 11.105,
+     "score": 0.4811,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs3K5In8(SnSe4)8",
+     "metal": 0.0486,
+     "magnetic": 0.005,
+     "stable": 0.6561,
+     "pv_gap": 0.77,
+     "tc": 10.4458,
+     "score": 0.4806,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "CsRb2NaSn3Se8",
+     "metal": 0.0517,
+     "magnetic": 0.0112,
+     "stable": 0.7092,
+     "pv_gap": 0.7133,
+     "tc": 23.6209,
+     "score": 0.4798,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K2Nb2P2S11",
+     "metal": 0.0744,
+     "magnetic": 0.2202,
+     "stable": 0.5977,
+     "pv_gap": 0.8667,
+     "tc": 0.48,
+     "score": 0.4795,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Rb3Dy(TmTe3)2",
+     "metal": 0.1188,
+     "magnetic": 0.007,
+     "stable": 0.8664,
+     "pv_gap": 0.6267,
+     "tc": -0.7926,
+     "score": 0.4785,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K3Rb5In8(SnSe4)8",
+     "metal": 0.0534,
+     "magnetic": 0.005,
+     "stable": 0.6551,
+     "pv_gap": 0.77,
+     "tc": 10.5442,
+     "score": 0.4775,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs2K9Rb(AsSe4)4",
+     "metal": 0.0452,
+     "magnetic": 0.0091,
+     "stable": 0.6356,
+     "pv_gap": 0.7867,
+     "tc": 29.0989,
+     "score": 0.4774,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Cs3Tb(HoTe3)2",
+     "metal": 0.0943,
+     "magnetic": 0.007,
+     "stable": 0.8678,
+     "pv_gap": 0.6067,
+     "tc": -1.0074,
+     "score": 0.4769,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "Rb6Zn4Sn5Se17",
+     "metal": 0.0614,
+     "magnetic": 0.0116,
+     "stable": 0.6663,
+     "pv_gap": 0.76,
+     "tc": -0.206,
+     "score": 0.4753,
+     "application": "solar_absorber"
+    },
+    {
+     "formula": "K3Rb5Ba2(AsSe4)4",
+     "metal": 0.0635,
+     "magnetic": 0.0183,
+     "stable": 0.6946,
+     "pv_gap": 0.73,
+     "tc": 29.225,
+     "score": 0.4748,
+     "application": "solar_absorber"
+    }
+   ]
+  },
+  "permanent_magnet": {
+   "title": "Permanent magnet",
+   "subtitle": "Magnetic, metallic and stable",
+   "question": "Could this composition work as a hard magnet?",
+   "note": "Magnetism and metallicity come from the deployed semi-supervised models; the score does not model coercivity or anisotropy.",
+   "examples": [
+    "Nd2Fe14B",
+    "SmCo5",
+    "MnBi",
+    "Fe3O4"
+   ],
+   "n_strong": 400,
+   "top": [
+    {
+     "formula": "La3Ce4PrTe8",
+     "metal": 0.9508,
+     "magnetic": 0.9804,
+     "stable": 0.8802,
+     "pv_gap": 0.01,
+     "tc": 1.0151,
+     "score": 0.8205,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "TbNp3As4",
+     "metal": 0.9545,
+     "magnetic": 0.9851,
+     "stable": 0.8628,
+     "pv_gap": 0.0,
+     "tc": -0.7382,
+     "score": 0.8113,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "HoNp3As4",
+     "metal": 0.9554,
+     "magnetic": 0.9846,
+     "stable": 0.8617,
+     "pv_gap": 0.0,
+     "tc": -0.7218,
+     "score": 0.8106,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "DyNp3As4",
+     "metal": 0.9545,
+     "magnetic": 0.9844,
+     "stable": 0.8626,
+     "pv_gap": 0.0,
+     "tc": -0.7148,
+     "score": 0.8105,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "CeNp3S4",
+     "metal": 0.9654,
+     "magnetic": 0.9922,
+     "stable": 0.842,
+     "pv_gap": 0.0,
+     "tc": -0.4976,
+     "score": 0.8065,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "LaCe7Te8",
+     "metal": 0.9532,
+     "magnetic": 0.9808,
+     "stable": 0.8595,
+     "pv_gap": 0.0133,
+     "tc": 0.7442,
+     "score": 0.8036,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "YNp3S4",
+     "metal": 0.9621,
+     "magnetic": 0.9908,
+     "stable": 0.8393,
+     "pv_gap": 0.0033,
+     "tc": -0.3968,
+     "score": 0.8001,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "NdNp4S5",
+     "metal": 0.9571,
+     "magnetic": 0.9917,
+     "stable": 0.838,
+     "pv_gap": 0.0033,
+     "tc": -0.3931,
+     "score": 0.7954,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "PrNp4S5",
+     "metal": 0.9554,
+     "magnetic": 0.9911,
+     "stable": 0.8392,
+     "pv_gap": 0.0,
+     "tc": -0.7367,
+     "score": 0.7947,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "YU2As3",
+     "metal": 0.969,
+     "magnetic": 0.985,
+     "stable": 0.8212,
+     "pv_gap": 0.0,
+     "tc": -0.3087,
+     "score": 0.7838,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce4DySe5",
+     "metal": 0.9357,
+     "magnetic": 0.9693,
+     "stable": 0.8619,
+     "pv_gap": 0.0033,
+     "tc": -0.088,
+     "score": 0.7817,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce4HoSe5",
+     "metal": 0.9367,
+     "magnetic": 0.9681,
+     "stable": 0.8619,
+     "pv_gap": 0.0033,
+     "tc": -0.0772,
+     "score": 0.7816,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce4DyAs5",
+     "metal": 0.9424,
+     "magnetic": 0.961,
+     "stable": 0.8616,
+     "pv_gap": 0.0,
+     "tc": 0.1125,
+     "score": 0.7803,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "La4CeNd3Te8",
+     "metal": 0.9224,
+     "magnetic": 0.9578,
+     "stable": 0.8819,
+     "pv_gap": 0.0167,
+     "tc": 1.0561,
+     "score": 0.7792,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce2NpS3",
+     "metal": 0.9645,
+     "magnetic": 0.9913,
+     "stable": 0.8146,
+     "pv_gap": 0.0,
+     "tc": -0.0944,
+     "score": 0.7788,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "EuNp2P3",
+     "metal": 0.9545,
+     "magnetic": 0.9899,
+     "stable": 0.823,
+     "pv_gap": 0.0033,
+     "tc": -0.2279,
+     "score": 0.7777,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Tb2UP3",
+     "metal": 0.9505,
+     "magnetic": 0.9647,
+     "stable": 0.8474,
+     "pv_gap": 0.0033,
+     "tc": -0.5579,
+     "score": 0.7771,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce3DySe4",
+     "metal": 0.9317,
+     "magnetic": 0.9667,
+     "stable": 0.8619,
+     "pv_gap": 0.0033,
+     "tc": -0.145,
+     "score": 0.7762,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "ThNp2As3",
+     "metal": 0.9651,
+     "magnetic": 0.9858,
+     "stable": 0.8143,
+     "pv_gap": 0.0,
+     "tc": -0.4421,
+     "score": 0.7747,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "TmU2As3",
+     "metal": 0.9608,
+     "magnetic": 0.9787,
+     "stable": 0.8234,
+     "pv_gap": 0.0,
+     "tc": -0.3405,
+     "score": 0.7743,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "CeSm(PuS2)2",
+     "metal": 0.9373,
+     "magnetic": 0.9736,
+     "stable": 0.8466,
+     "pv_gap": 0.0,
+     "tc": -0.529,
+     "score": 0.7726,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce4TmSe5",
+     "metal": 0.9292,
+     "magnetic": 0.968,
+     "stable": 0.8573,
+     "pv_gap": 0.0033,
+     "tc": -0.0034,
+     "score": 0.7711,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Y2UAs3",
+     "metal": 0.9649,
+     "magnetic": 0.9706,
+     "stable": 0.8216,
+     "pv_gap": 0.0,
+     "tc": -0.2743,
+     "score": 0.7695,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ho2UP3",
+     "metal": 0.947,
+     "magnetic": 0.9595,
+     "stable": 0.8456,
+     "pv_gap": 0.0033,
+     "tc": 0.2174,
+     "score": 0.7684,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "TbCe9Se10",
+     "metal": 0.95,
+     "magnetic": 0.9754,
+     "stable": 0.8258,
+     "pv_gap": 0.0033,
+     "tc": 0.1216,
+     "score": 0.7653,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce5GeTe4",
+     "metal": 0.9605,
+     "magnetic": 0.9815,
+     "stable": 0.8108,
+     "pv_gap": 0.0,
+     "tc": -0.0477,
+     "score": 0.7643,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Dy2UP3",
+     "metal": 0.9431,
+     "magnetic": 0.9582,
+     "stable": 0.8451,
+     "pv_gap": 0.0033,
+     "tc": -0.1903,
+     "score": 0.7637,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Y2NpAs3",
+     "metal": 0.96,
+     "magnetic": 0.9703,
+     "stable": 0.8196,
+     "pv_gap": 0.0,
+     "tc": -0.1488,
+     "score": 0.7635,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce5SiSe4",
+     "metal": 0.9553,
+     "magnetic": 0.9815,
+     "stable": 0.811,
+     "pv_gap": 0.0033,
+     "tc": 0.2514,
+     "score": 0.7604,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Np2PaS3",
+     "metal": 0.9661,
+     "magnetic": 0.986,
+     "stable": 0.7971,
+     "pv_gap": 0.0,
+     "tc": -0.5506,
+     "score": 0.7593,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Np2PaAs3",
+     "metal": 0.9718,
+     "magnetic": 0.9791,
+     "stable": 0.797,
+     "pv_gap": 0.0,
+     "tc": -0.3462,
+     "score": 0.7583,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "CeThNpAs3",
+     "metal": 0.967,
+     "magnetic": 0.985,
+     "stable": 0.7932,
+     "pv_gap": 0.0,
+     "tc": -0.2196,
+     "score": 0.7554,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "La5Ce3Te8",
+     "metal": 0.9435,
+     "magnetic": 0.9757,
+     "stable": 0.819,
+     "pv_gap": 0.0133,
+     "tc": 0.8443,
+     "score": 0.754,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Tb2UAs3",
+     "metal": 0.9558,
+     "magnetic": 0.9479,
+     "stable": 0.832,
+     "pv_gap": 0.0,
+     "tc": -0.581,
+     "score": 0.7539,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Th2NpAs3",
+     "metal": 0.9619,
+     "magnetic": 0.9625,
+     "stable": 0.8094,
+     "pv_gap": 0.0,
+     "tc": -0.1389,
+     "score": 0.7494,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "SmU4N5",
+     "metal": 0.9531,
+     "magnetic": 0.9786,
+     "stable": 0.8017,
+     "pv_gap": 0.0033,
+     "tc": -0.6655,
+     "score": 0.7478,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce2ThSb3",
+     "metal": 0.9682,
+     "magnetic": 0.9365,
+     "stable": 0.8233,
+     "pv_gap": 0.0033,
+     "tc": -0.391,
+     "score": 0.7465,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "DyPu2P3",
+     "metal": 0.936,
+     "magnetic": 0.9465,
+     "stable": 0.8424,
+     "pv_gap": 0.01,
+     "tc": 0.1758,
+     "score": 0.7463,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Pu2PaAs3",
+     "metal": 0.9667,
+     "magnetic": 0.9307,
+     "stable": 0.8289,
+     "pv_gap": 0.0,
+     "tc": -0.2096,
+     "score": 0.7457,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Dy2UAs3",
+     "metal": 0.9505,
+     "magnetic": 0.9423,
+     "stable": 0.8302,
+     "pv_gap": 0.0,
+     "tc": -0.7226,
+     "score": 0.7436,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ho2UAs3",
+     "metal": 0.9526,
+     "magnetic": 0.942,
+     "stable": 0.8273,
+     "pv_gap": 0.0,
+     "tc": -0.8365,
+     "score": 0.7424,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "PrNdUAs3",
+     "metal": 0.9562,
+     "magnetic": 0.9677,
+     "stable": 0.8015,
+     "pv_gap": 0.0,
+     "tc": -0.2345,
+     "score": 0.7416,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "CePr3Te4",
+     "metal": 0.9009,
+     "magnetic": 0.9516,
+     "stable": 0.8651,
+     "pv_gap": 0.0133,
+     "tc": -0.1827,
+     "score": 0.7415,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "PrYNpAs3",
+     "metal": 0.9518,
+     "magnetic": 0.9765,
+     "stable": 0.7964,
+     "pv_gap": 0.0,
+     "tc": -0.1466,
+     "score": 0.7402,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "NpU3N4",
+     "metal": 0.961,
+     "magnetic": 0.9859,
+     "stable": 0.7793,
+     "pv_gap": 0.0,
+     "tc": -0.4826,
+     "score": 0.7384,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ce3GeSe2",
+     "metal": 0.9612,
+     "magnetic": 0.9842,
+     "stable": 0.7803,
+     "pv_gap": 0.0,
+     "tc": -0.1608,
+     "score": 0.7382,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Np3UN4",
+     "metal": 0.961,
+     "magnetic": 0.9862,
+     "stable": 0.778,
+     "pv_gap": 0.0,
+     "tc": -0.9286,
+     "score": 0.7373,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ac2CeTe3",
+     "metal": 0.9476,
+     "magnetic": 0.9502,
+     "stable": 0.8188,
+     "pv_gap": 0.0167,
+     "tc": -0.2,
+     "score": 0.7372,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "CeY2Sb3",
+     "metal": 0.9583,
+     "magnetic": 0.9356,
+     "stable": 0.8211,
+     "pv_gap": 0.0,
+     "tc": -0.188,
+     "score": 0.7361,
+     "application": "permanent_magnet"
+    },
+    {
+     "formula": "Ho2US3",
+     "metal": 0.9119,
+     "magnetic": 0.9629,
+     "stable": 0.8371,
+     "pv_gap": 0.01,
+     "tc": -0.0459,
+     "score": 0.7351,
+     "application": "permanent_magnet"
+    }
+   ]
+  },
+  "battery_cathode": {
+   "title": "Battery cathode",
+   "subtitle": "Intercalation chemistry + stability",
+   "question": "Does this composition have the makings of an intercalation cathode?",
+   "note": "Chemistry filter (working ion + redox metal + anion) combined with the stability model. It is not a voltage or capacity prediction.",
+   "examples": [
+    "LiFePO4",
+    "LiCoO2",
+    "LiMn2O4",
+    "NaFePO4"
+   ],
+   "n_strong": 400,
+   "top": [
+    {
+     "formula": "RbNaV2P2(O4F)2",
+     "metal": 0.0389,
+     "magnetic": 0.8648,
+     "stable": 0.7953,
+     "pv_gap": 0.0533,
+     "tc": 0.3916,
+     "score": 0.7798,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRbV2P2(O4F)2",
+     "metal": 0.039,
+     "magnetic": 0.836,
+     "stable": 0.7953,
+     "pv_gap": 0.0467,
+     "tc": 5.1003,
+     "score": 0.7798,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Na8Sr4V4AsP7O36",
+     "metal": 0.0684,
+     "magnetic": 0.8259,
+     "stable": 0.8067,
+     "pv_gap": 0.0567,
+     "tc": 1.0885,
+     "score": 0.7791,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8V5In3P8(O4F)8",
+     "metal": 0.0446,
+     "magnetic": 0.4828,
+     "stable": 0.7966,
+     "pv_gap": 0.1,
+     "tc": 5.5795,
+     "score": 0.7789,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K3RbV4P4(O4F)4",
+     "metal": 0.0389,
+     "magnetic": 0.847,
+     "stable": 0.794,
+     "pv_gap": 0.06,
+     "tc": 4.5383,
+     "score": 0.7786,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8VFe7P8(O7F2)4",
+     "metal": 0.0632,
+     "magnetic": 0.9745,
+     "stable": 0.8039,
+     "pv_gap": 0.04,
+     "tc": 4.2556,
+     "score": 0.7785,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K7RbTi2Sn6(PO5)8",
+     "metal": 0.0662,
+     "magnetic": 0.3055,
+     "stable": 0.8051,
+     "pv_gap": 0.02,
+     "tc": 6.5687,
+     "score": 0.7785,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8ZnFe7P8(O7F2)4",
+     "metal": 0.0611,
+     "magnetic": 0.9724,
+     "stable": 0.8022,
+     "pv_gap": 0.0333,
+     "tc": 5.6143,
+     "score": 0.7777,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4CdFe3P4(O7F2)2",
+     "metal": 0.0606,
+     "magnetic": 0.9384,
+     "stable": 0.8019,
+     "pv_gap": 0.0467,
+     "tc": 4.7025,
+     "score": 0.7776,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K7Nb4V4Zn(PO5)8",
+     "metal": 0.067,
+     "magnetic": 0.2929,
+     "stable": 0.8041,
+     "pv_gap": 0.0333,
+     "tc": 8.9596,
+     "score": 0.7772,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRb3TiSn3(PO5)4",
+     "metal": 0.0662,
+     "magnetic": 0.2362,
+     "stable": 0.8036,
+     "pv_gap": 0.0433,
+     "tc": 6.1701,
+     "score": 0.777,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8CrFe7P8(O7F2)4",
+     "metal": 0.0667,
+     "magnetic": 0.9864,
+     "stable": 0.8035,
+     "pv_gap": 0.03,
+     "tc": 4.5392,
+     "score": 0.7766,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8Nb3V4Sn(PO5)8",
+     "metal": 0.0712,
+     "magnetic": 0.3398,
+     "stable": 0.8053,
+     "pv_gap": 0.0433,
+     "tc": 8.1387,
+     "score": 0.7766,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8V5Fe3P8(O4F)8",
+     "metal": 0.0599,
+     "magnetic": 0.9746,
+     "stable": 0.8004,
+     "pv_gap": 0.07,
+     "tc": 5.4489,
+     "score": 0.7764,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Mn3FeP4(O7F2)2",
+     "metal": 0.0666,
+     "magnetic": 0.9867,
+     "stable": 0.8031,
+     "pv_gap": 0.0533,
+     "tc": 4.1512,
+     "score": 0.7764,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8Ti4Cr3In(PO4)12",
+     "metal": 0.0651,
+     "magnetic": 0.6248,
+     "stable": 0.8024,
+     "pv_gap": 0.07,
+     "tc": 8.192,
+     "score": 0.7763,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8V7FeP8(O4F)8",
+     "metal": 0.0542,
+     "magnetic": 0.971,
+     "stable": 0.7978,
+     "pv_gap": 0.0767,
+     "tc": 4.6197,
+     "score": 0.7762,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRb7Ti2Sn6(PO5)8",
+     "metal": 0.0662,
+     "magnetic": 0.2309,
+     "stable": 0.8026,
+     "pv_gap": 0.0367,
+     "tc": 6.1076,
+     "score": 0.7761,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K5Rb3Ti4Cr4(PO4)12",
+     "metal": 0.0666,
+     "magnetic": 0.9071,
+     "stable": 0.8027,
+     "pv_gap": 0.0367,
+     "tc": 5.5432,
+     "score": 0.7759,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K2MnZnB2(PO4)4",
+     "metal": 0.0931,
+     "magnetic": 0.9752,
+     "stable": 0.8138,
+     "pv_gap": 0.0567,
+     "tc": 1.2805,
+     "score": 0.7759,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRb7Ti4Cr4(PO4)12",
+     "metal": 0.0668,
+     "magnetic": 0.8996,
+     "stable": 0.8027,
+     "pv_gap": 0.0367,
+     "tc": 5.2379,
+     "score": 0.7759,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "CsK3Ba4Cr8(PO4)12",
+     "metal": 0.0693,
+     "magnetic": 0.9557,
+     "stable": 0.8034,
+     "pv_gap": 0.0033,
+     "tc": 5.1809,
+     "score": 0.7755,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRbBa2Cr4(PO4)6",
+     "metal": 0.0693,
+     "magnetic": 0.9536,
+     "stable": 0.8031,
+     "pv_gap": 0.0067,
+     "tc": 5.4068,
+     "score": 0.7752,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8Sc7VP8(O4F)8",
+     "metal": 0.0432,
+     "magnetic": 0.6636,
+     "stable": 0.7922,
+     "pv_gap": 0.0367,
+     "tc": 5.2541,
+     "score": 0.7751,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRb3Fe4P4(O7F2)2",
+     "metal": 0.0647,
+     "magnetic": 0.9831,
+     "stable": 0.801,
+     "pv_gap": 0.04,
+     "tc": 3.885,
+     "score": 0.7751,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8CrGa7P8(O4F)8",
+     "metal": 0.0446,
+     "magnetic": 0.7434,
+     "stable": 0.7925,
+     "pv_gap": 0.0533,
+     "tc": 6.2901,
+     "score": 0.7748,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "KRb7Fe8P8(O7F2)4",
+     "metal": 0.0635,
+     "magnetic": 0.9833,
+     "stable": 0.8002,
+     "pv_gap": 0.0367,
+     "tc": 3.9372,
+     "score": 0.7748,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8MgFe7P8(O7F2)4",
+     "metal": 0.069,
+     "magnetic": 0.9861,
+     "stable": 0.8024,
+     "pv_gap": 0.0167,
+     "tc": 3.3823,
+     "score": 0.7747,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8CaFe7P8(O7F2)4",
+     "metal": 0.069,
+     "magnetic": 0.986,
+     "stable": 0.8023,
+     "pv_gap": 0.0167,
+     "tc": 3.0095,
+     "score": 0.7746,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Sc3VP4(O4F)4",
+     "metal": 0.0445,
+     "magnetic": 0.7322,
+     "stable": 0.7922,
+     "pv_gap": 0.0433,
+     "tc": 5.7718,
+     "score": 0.7746,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8MgMn7P8(O7F2)4",
+     "metal": 0.0671,
+     "magnetic": 0.9879,
+     "stable": 0.8011,
+     "pv_gap": 0.07,
+     "tc": 3.4318,
+     "score": 0.7742,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Ba4Sc7Cr(PO4)12",
+     "metal": 0.0594,
+     "magnetic": 0.6289,
+     "stable": 0.7974,
+     "pv_gap": 0.05,
+     "tc": 4.0624,
+     "score": 0.7737,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Na8SrCa3V4(P2O9)4",
+     "metal": 0.0752,
+     "magnetic": 0.9492,
+     "stable": 0.8033,
+     "pv_gap": 0.0267,
+     "tc": -0.1173,
+     "score": 0.7731,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K7RbTi5Sn3(PO5)8",
+     "metal": 0.0834,
+     "magnetic": 0.3483,
+     "stable": 0.8064,
+     "pv_gap": 0.0533,
+     "tc": 6.5621,
+     "score": 0.7727,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K7RbTi4Al4(PO4)12",
+     "metal": 0.0688,
+     "magnetic": 0.4,
+     "stable": 0.8002,
+     "pv_gap": 0.0,
+     "tc": 5.2119,
+     "score": 0.7727,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K2ZnFeB2(PO4)4",
+     "metal": 0.0962,
+     "magnetic": 0.9751,
+     "stable": 0.8117,
+     "pv_gap": 0.0333,
+     "tc": 1.4462,
+     "score": 0.7727,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Cd3FeP4(O7F2)2",
+     "metal": 0.0715,
+     "magnetic": 0.9739,
+     "stable": 0.8007,
+     "pv_gap": 0.05,
+     "tc": 7.5949,
+     "score": 0.7721,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8V3Fe5P8(O4F)8",
+     "metal": 0.0642,
+     "magnetic": 0.9779,
+     "stable": 0.7976,
+     "pv_gap": 0.0467,
+     "tc": 5.2112,
+     "score": 0.772,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K2MnGaP2(O4F)2",
+     "metal": 0.0608,
+     "magnetic": 0.9677,
+     "stable": 0.7962,
+     "pv_gap": 0.1333,
+     "tc": 5.5236,
+     "score": 0.772,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Fe3CoP4(O7F2)2",
+     "metal": 0.0739,
+     "magnetic": 0.9885,
+     "stable": 0.8013,
+     "pv_gap": 0.0233,
+     "tc": 3.8723,
+     "score": 0.7716,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8Ga5Fe3P8(O4F)8",
+     "metal": 0.0618,
+     "magnetic": 0.9555,
+     "stable": 0.7956,
+     "pv_gap": 0.0367,
+     "tc": 6.2135,
+     "score": 0.771,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Li12ScV7(PO4)12",
+     "metal": 0.079,
+     "magnetic": 0.9455,
+     "stable": 0.8026,
+     "pv_gap": 0.0433,
+     "tc": -0.4292,
+     "score": 0.7709,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Cs12Ca3LaFe4(P2O7)8",
+     "metal": 0.0803,
+     "magnetic": 0.9501,
+     "stable": 0.8031,
+     "pv_gap": 0.0433,
+     "tc": 6.4501,
+     "score": 0.7708,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K2GaFeP2(O4F)2",
+     "metal": 0.0626,
+     "magnetic": 0.9595,
+     "stable": 0.7956,
+     "pv_gap": 0.0367,
+     "tc": 5.4534,
+     "score": 0.7707,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4Zn3FeB4(PO4)8",
+     "metal": 0.0967,
+     "magnetic": 0.9761,
+     "stable": 0.8098,
+     "pv_gap": 0.03,
+     "tc": 1.5486,
+     "score": 0.7706,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4TaNbV2(PO5)4",
+     "metal": 0.0708,
+     "magnetic": 0.2866,
+     "stable": 0.7988,
+     "pv_gap": 0.0133,
+     "tc": 6.9988,
+     "score": 0.7705,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K4MnCd3P4(O7F2)2",
+     "metal": 0.0773,
+     "magnetic": 0.9605,
+     "stable": 0.8013,
+     "pv_gap": 0.0767,
+     "tc": 7.8256,
+     "score": 0.7704,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Na8V7CrP8(O4F)8",
+     "metal": 0.0519,
+     "magnetic": 0.9351,
+     "stable": 0.7908,
+     "pv_gap": 0.1767,
+     "tc": -0.2031,
+     "score": 0.7703,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "K8Mn5Fe3P8(O4F)8",
+     "metal": 0.0671,
+     "magnetic": 0.9878,
+     "stable": 0.7969,
+     "pv_gap": 0.05,
+     "tc": 4.0934,
+     "score": 0.7702,
+     "application": "battery_cathode"
+    },
+    {
+     "formula": "Li3VIn(PO4)3",
+     "metal": 0.0773,
+     "magnetic": 0.8255,
+     "stable": 0.8011,
+     "pv_gap": 0.24,
+     "tc": -0.4086,
+     "score": 0.7702,
+     "application": "battery_cathode"
+    }
+   ]
+  }
+ }
+}

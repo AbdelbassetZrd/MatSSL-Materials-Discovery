@@ -26,3 +26,18 @@ class StackedEnsemble:
 
     def predict(self, X, threshold: float = 0.5) -> np.ndarray:
         return (self.predict_proba(X)[:, 1] >= threshold).astype(int)
+
+
+class StackedRegressor:
+    """Base regressors -> their predictions -> ridge meta-learner (used for superconductor Tc)."""
+
+    def __init__(self, bases: list, meta, names: list[str]):
+        self.bases = bases
+        self.meta = meta
+        self.names = names
+
+    def base_predict(self, X) -> np.ndarray:
+        return np.column_stack([m.predict(X) for m in self.bases])
+
+    def predict(self, X) -> np.ndarray:
+        return self.meta.predict(self.base_predict(X))

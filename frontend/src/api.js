@@ -19,6 +19,17 @@ export const api = {
   analyze: (formula) => post("/materials/analyze", { formula }),
   similar: (formula, k = 8) => call(`/materials/similar?formula=${q(formula)}&k=${k}`),
   structure: (formula) => call(`/materials/structure?formula=${q(formula)}`),
+  // molecules
+  moleculeModels: () => call("/molecules/models-info"),
+  moleculePredict: (smiles) => post("/molecules/predict", { smiles }),
+  moleculeProperties: (smiles) => post("/molecules/properties", { smiles }),
+  // design lab
+  designApplications: () => call("/design/applications"),
+  designScore: (formula) => post("/design/score", { formula }),
+  designCandidates: (application, limit = 30, elements = "", exclude = "") =>
+    call(`/design/candidates?application=${q(application)}&limit=${limit}`
+      + (elements.trim() ? `&elements=${q(elements.trim())}` : "")
+      + (exclude.trim() ? `&exclude=${q(exclude.trim())}` : "")),
   // Research Lab data: API first, then the static copy bundled with the app (offline demo)
   experiments: async () => {
     try {

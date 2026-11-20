@@ -10,6 +10,10 @@ import Studio from "./pages/Studio.jsx";
 import Results from "./pages/Results.jsx";
 import ResearchLab from "./pages/ResearchLab.jsx";
 import Compare from "./pages/Compare.jsx";
+import DesignLab from "./pages/DesignLab.jsx";
+import MoleculeStudio from "./pages/MoleculeStudio.jsx";
+import MoleculeResults from "./pages/MoleculeResults.jsx";
+import { MoleculeProvider } from "./lib/molecule.jsx";
 
 const qc = new QueryClient({ defaultOptions: { queries: { staleTime: 5 * 60 * 1000, retry: 1 } } });
 
@@ -17,6 +21,7 @@ createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <QueryClientProvider client={qc}>
       <CompositionProvider>
+        <MoleculeProvider>
         <HashRouter>
           <Routes>
             <Route element={<Layout />}>
@@ -25,9 +30,13 @@ createRoot(document.getElementById("root")).render(
               <Route path="results" element={<Results />} />
               <Route path="lab" element={<ResearchLab />} />
               <Route path="compare" element={<Compare />} />
+              <Route path="design" element={<DesignLab />} />
+              <Route path="molecules" element={<MoleculeStudio />} />
+              <Route path="molecule-results" element={<MoleculeResults />} />
             </Route>
           </Routes>
         </HashRouter>
+        </MoleculeProvider>
       </CompositionProvider>
     </QueryClientProvider>
   </React.StrictMode>
