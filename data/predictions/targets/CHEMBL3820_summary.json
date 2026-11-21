@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL3820",
+ "symbol": "GCK",
+ "name": "glucokinase",
+ "dataset": {
+  "n_molecules": 831,
+  "n_scaffolds": 493,
+  "positive_rate": 0.7003610108303249,
+  "decoy_fraction": 0.2767749699157641,
+  "n_train": 665,
+  "n_test": 166,
+  "n_measured_active": 582,
+  "n_measured_inactive": 19
+ },
+ "metrics": {
+  "Model": "GCK",
+  "Accuracy": 0.9578313253012049,
+  "Precision": 0.9823008849557522,
+  "Recall": 0.9568965517241379,
+  "F1-Score": 0.9694323144104804,
+  "ROC-AUC": 0.9777586206896552,
+  "PR-AUC": 0.9902044829388787,
+  "Composite_Score": 0.9735954675500678,
+  "Balanced_Accuracy": 0.9584482758620689,
+  "Threshold": 0.775
+ },
+ "metrics_measured_only": {
+  "n": 121,
+  "ROC-AUC": 0.8758620689655172,
+  "PR-AUC": 0.9934279719373955,
+  "Balanced_Accuracy": 0.778448275862069,
+  "n_measured_minority": 19,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": false
+ },
+ "enrichment_factor_top1pct": 95.76582604220278,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 43,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 41,
+   "accuracy": 0.8780487804878049,
+   "roc_auc": 0.7192982456140351
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 74,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.775
+}

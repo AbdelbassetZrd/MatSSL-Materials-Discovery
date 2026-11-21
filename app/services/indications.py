@@ -22,6 +22,7 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[2]
 MODELS_DIR = ROOT / "app" / "models"
 PROC = ROOT / "data" / "processed"
+PRED = ROOT / "data" / "predictions" / "targets"
 sys.path.insert(0, str(ROOT / "pipeline"))
 sys.path.insert(0, str(ROOT / "pipeline" / "molecules"))
 
@@ -49,6 +50,15 @@ class _Registry:
             try:
                 pkg = joblib.load(p)
                 pkg["active_bits"] = np.unpackbits(pkg["active_fingerprints"], axis=1)
+                # The ROC-AUC stored in the model file is computed over all held-out molecules,
+                # including the presumed-inactive ZINC decoys. The summary carries the honest
+                # figure over measured molecules only, together with the number of measured
+                # molecules of the rarer class it rests on - which is what decides whether it
+                # means anything. See pipeline/molecules/guard_target_metrics.py.
+                sf = PRED / f"{pkg['chembl_id']}_summary.json"
+                if sf.exists():
+                    s = json.loads(sf.read_text(encoding="utf-8"))
+                    pkg["measured_only"] = s.get("metrics_measured_only") or {}
                 self.targets[pkg["chembl_id"]] = pkg
             except Exception as exc:  # pragma: no cover - logged for ops
                 logger.error("could not load %s: %s", p.name, exc)
@@ -77,6 +87,16 @@ def _nearest_active(pkg: dict, bits: np.ndarray) -> tuple[float | None, str | No
     return float(sim[i]), (str(smiles[i]) if smiles is not None and i < len(smiles) else None)
 
 
+def _quality(pkg: dict) -> dict:
+    """How well measured this model actually is, as three fields the interface can show."""
+    mo = pkg.get("measured_only") or {}
+    return {
+        "roc_auc_measured": mo.get("ROC-AUC"),
+        "n_measured_minority": mo.get("n_measured_minority"),
+        "well_supported": bool(mo.get("well_supported")),
+    }
+
+
 def target_profile(smiles: str) -> dict:
     """Predicted activity of one molecule against every modelled protein target."""
     reg = get_registry()
@@ -96,6 +116,7 @@ def target_profile(smiles: str) -> dict:
             "nearest_active": nearest,
             "decoy_fraction": pkg.get("decoy_fraction"),
             "test_roc_auc": (pkg.get("test_metrics") or {}).get("ROC-AUC"),
+            **_quality(pkg),
         }
     return profile
 
@@ -123,7 +144,8 @@ def disease_detail(disease_id: str) -> dict:
         pkg = reg.targets.get(t["chembl_id"])
         targets.append({**t, "modelled": pkg is not None,
                         "test_roc_auc": (pkg or {}).get("test_metrics", {}).get("ROC-AUC"),
-                        "decoy_fraction": (pkg or {}).get("decoy_fraction")})
+                        "decoy_fraction": (pkg or {}).get("decoy_fraction"),
+                        **_quality(pkg or {})})
     return {"id": d["id"], "label": d["label"], "name": d["name"],
             "description": d["description"], "targets": targets,
             "known_drugs": d["known_drugs"], "disclaimer": DISCLAIMER}

@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL4588",
+ "symbol": "MMP8",
+ "name": "matrix metallopeptidase 8",
+ "dataset": {
+  "n_molecules": 1222,
+  "n_scaffolds": 581,
+  "positive_rate": 0.7004909983633388,
+  "decoy_fraction": 0.13829787234042554,
+  "n_train": 978,
+  "n_test": 244,
+  "n_measured_active": 856,
+  "n_measured_inactive": 197
+ },
+ "metrics": {
+  "Model": "MMP8",
+  "Accuracy": 0.9672131147540983,
+  "Precision": 0.9939393939393939,
+  "Recall": 0.9590643274853801,
+  "F1-Score": 0.9761904761904762,
+  "ROC-AUC": 0.9950332452134903,
+  "PR-AUC": 0.997790091746489,
+  "Composite_Score": 0.9856118607019833,
+  "Balanced_Accuracy": 0.9726828486741969,
+  "Threshold": 0.73
+ },
+ "metrics_measured_only": {
+  "n": 206,
+  "ROC-AUC": 0.989640768588137,
+  "PR-AUC": 0.997790091746489,
+  "Balanced_Accuracy": 0.9652464494569757,
+  "n_measured_minority": 197,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 94.48462366529924,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 49,
+   "accuracy": 1.0,
+   "roc_auc": 1.0
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 79,
+   "accuracy": 0.9620253164556962,
+   "roc_auc": 0.9908675799086759
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 91,
+   "accuracy": 0.967032967032967,
+   "roc_auc": 0.979591836734694
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.73
+}

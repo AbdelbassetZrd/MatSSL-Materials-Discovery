@@ -388,6 +388,150 @@ def main() -> None:
         fig.savefig(dst / "ablation_all.png", dpi=150)
         plt.close(fig)
 
+    # illness screening (pipeline/molecules/train_targets.py + validate_indications.py)
+    T = PRED / "targets"
+    tsum = [json.loads(f.read_text(encoding="utf-8")) for f in sorted(T.glob("*_summary.json"))]
+    if tsum:
+        kb_f = ROOT / "data" / "processed" / "diseases.json"
+        kb = json.loads(kb_f.read_text(encoding="utf-8")) if kb_f.exists() else {}
+        auc = [s["metrics"]["ROC-AUC"] for s in tsum]
+        # only targets with enough measured molecules of the rarer class enter this average;
+        # see pipeline/molecules/guard_target_metrics.py for why
+        well = [s for s in tsum if (s["metrics_measured_only"] or {}).get("well_supported")]
+        thin = [s for s in tsum if (s["metrics_measured_only"] or {}).get("reportable")
+                and not (s["metrics_measured_only"] or {}).get("well_supported")]
+        aucm = [s["metrics_measured_only"]["ROC-AUC"] for s in well]
+        ef = [s["enrichment_factor_top1pct"] for s in tsum]
+        dec = [s["dataset"]["decoy_fraction"] for s in tsum]
+        wsmin = next((s["metrics_measured_only"]["well_supported_threshold"] for s in tsum
+                      if (s["metrics_measured_only"] or {}).get("well_supported_threshold")), 60)
+        mac("TgtNWellSupported", f"{len(well):,}")
+        mac("TgtNThin", f"{len(thin):,}")
+        mac("TgtNWithheld", f"{len(tsum) - len(well) - len(thin):,}")
+        mac("TgtEFMin", f"{min(ef):.0f}")
+        mac("TgtMinMinority", f"{wsmin:,}")
+        mac("TgtNModels", f"{len(tsum):,}")
+        mac("TgtNDiseases", f"{len(kb.get('diseases', [])):,}")
+        mac("TgtNProteins", f"{len(kb.get('targets', [])):,}")
+        mac("TgtNMols", f"{sum(s['dataset']['n_molecules'] for s in tsum):,}")
+        mac("TgtAUC", f"{sum(auc) / len(auc):.3f}")
+        mac("TgtAUCMeasured", f"{sum(aucm) / len(aucm):.3f}" if aucm else "?")
+        mac("TgtAUCMin", f"{min(auc):.3f}")
+        mac("TgtEF", f"{sum(ef) / len(ef):.0f}")
+        mac("TgtEFMax", f"{max(ef):.0f}")
+        mac("TgtDecoyFrac", f"{100 * sum(dec) / len(dec):.0f}")
+        # The largest well-supported targets, then the thinnest ones - the instructive end of
+        # the list, where the measured-only score stops meaning much.
+        n_mol = sorted(well, key=lambda s: -s["dataset"]["n_molecules"])[:8]
+
+        def gap(s):  # how much the presumed inactives were flattering this model
+            return s["metrics"]["ROC-AUC"] - s["metrics_measured_only"]["ROC-AUC"]
+
+        # the thin rows worth printing: the biggest decoy gaps, plus the smallest denominators
+        pick = {id(s): s for s in sorted(thin, key=lambda s: -gap(s))[:4]}
+        pick |= {id(s): s for s in
+                 sorted(thin, key=lambda s: s["metrics_measured_only"]["n_measured_minority"])[:2]}
+        order = n_mol + sorted(pick.values(),
+                               key=lambda s: -s["metrics_measured_only"]["n_measured_minority"])
+        rows = []
+        for s in order:
+            mo = s["metrics_measured_only"]
+            minority = mo.get("n_measured_minority")
+            dagger = "" if mo.get("well_supported") else "$^{\\dagger}$"
+            rows.append(
+                f"{esc(s['symbol'])}{dagger} & {s['dataset']['n_molecules']:,} & "
+                f"{100 * s['dataset']['decoy_fraction']:.0f}\\% & "
+                + (f"{minority:,}" if minority is not None else "--")
+                + f" & {s['metrics']['ROC-AUC']:.3f} & "
+                + (f"{mo['ROC-AUC']:.3f}" if mo.get("ROC-AUC") is not None else "withheld")
+                + f" & {100 * s['metrics']['Balanced_Accuracy']:.1f}\\% & "
+                f"{s['enrichment_factor_top1pct']:.0f}$\\times$ \\\\")
+            if s is order[len(n_mol) - 1]:
+                rows.append("\\midrule")
+        rows.append("\\midrule")
+        rows.append(f"\\textbf{{All {len(tsum)} models}} & "
+                    f"{sum(s['dataset']['n_molecules'] for s in tsum):,} & "
+                    f"{100 * sum(dec) / len(dec):.0f}\\% & -- & "
+                    f"\\textbf{{{sum(auc) / len(auc):.3f}}} & "
+                    f"\\textbf{{{sum(aucm) / len(aucm):.3f}}} & -- & "
+                    f"{sum(ef) / len(ef):.0f}$\\times$ \\\\")
+        rows.append(f"\\multicolumn{{8}}{{l}}{{\\footnotesize the measured column averages only "
+                    f"the {len(well)} well-supported models; {len(thin)} more are reported "
+                    f"individually and {len(tsum) - len(well) - len(thin)} are withheld}} \\\\")
+        (GEN / "targets_table.tex").write_text(
+            "\\begin{table}[H]\n\\centering\\small\n\\resizebox{\\textwidth}{!}{%\n"
+            "\\begin{tabular}{lrrrccrr}\n\\toprule\n"
+            "Protein & Molecules & Decoys & Measured & ROC-AUC & ROC-AUC & Balanced & EF\\\\\n"
+            " & & & minority & (all) & (measured) & accuracy & (top 1\\%)\\\\\n\\midrule\n"
+            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}}\n\\caption{Protein-activity "
+            "models on scaffold-grouped held-out molecules: the eight largest "
+            "well-supported ones, then the thinly supported rows worth looking at, then the "
+            "averages over all of them. ROC-AUC is given twice: over all test molecules, and over measured molecules "
+            "only. \\emph{Measured minority} is the number of measured molecules of the rarer "
+            "class the second figure rests on --- the denominator that decides whether it means "
+            f"anything. Rows marked $\\dagger$ have fewer than {wsmin} of them, "
+            "so their measured-only score is reported but excluded from any average. Enrichment "
+            "is measured against 20{,}000 random ZINC molecules.}"
+            "\\label{tab:targets}\n\\end{table}\n", encoding="utf-8")
+    vf = T / "validation.json"
+    if tsum and not vf.exists():  # validation still to run: keep the report compilable
+        for k in ("ValDrugs", "ValTop1", "ValTop3", "ValTop5", "ValRandom", "ValMedian",
+                  "CtrlMax", "CtrlFlags"):
+            mac(f"Tgt{k}", "?")
+    if vf.exists():
+        v = json.loads(vf.read_text(encoding="utf-8"))
+        mac("TgtValDrugs", f"{v['n_drugs_tested']:,}")
+        for k in ("top1", "top3", "top5"):
+            mac(f"TgtVal{k.capitalize()}", f"{100 * v[k]:.0f}" if v.get(k) is not None else "?")
+        mac("TgtValRandom", f"{100 * v['random_baseline_top1']:.1f}")
+        mac("TgtValMedian", f"{v['median_rank']:.1f}" if v.get("median_rank") else "?")
+        ctrl = v.get("negative_controls", [])
+        if ctrl:
+            mac("TgtCtrlMax", f"{100 * max(c['max_score'] for c in ctrl):.0f}")
+            mac("TgtCtrlFlags", f"{sum(c['n_worth_testing'] for c in ctrl):,}")
+        nd = v["n_diseases"]
+        rows = [f"{esc(d['illness'])} & {d['n_drugs']} & {d['median_rank']:.1f} / {nd} & "
+                f"{100 * d['top3']:.0f}\\% \\\\" for d in v.get("per_disease", [])]
+        rows.append("\\midrule")
+        rows.append(f"\\textbf{{All}} & \\textbf{{{v['n_drugs_tested']}}} & "
+                    f"\\textbf{{{v['median_rank']:.1f} / {nd}}} & "
+                    f"\\textbf{{{100 * v['top3']:.0f}\\%}} \\\\")
+        rows.append(f"Random ranking & -- & {(nd + 1) / 2:.1f} / {nd} & "
+                    f"{100 * 3 / nd:.0f}\\% \\\\")
+        (GEN / "targets_validation.tex").write_text(
+            "\\begin{table}[H]\n\\centering\\small\n\\begin{tabular}{lrcc}\n\\toprule\n"
+            "Illness & Approved drugs & Median rank of its own illness & Top-3\\\\\n\\midrule\n"
+            + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\caption{Repurposing "
+            "retrieval. Each illness's already-approved drugs are run through the complete "
+            "pipeline; the table records where that drug's own illness lands in the ranking of "
+            f"all {nd} illnesses. Random ranking is given for comparison."
+            "}\\label{tab:targets-validation}\n\\end{table}\n", encoding="utf-8")
+    sf = T / "ssl_comparison.json"
+    if tsum and not sf.exists():
+        for k in ("SSLNTargets", "SSLBudget", "SSLMin", "SSLMax", "SSLMean"):
+            mac(f"Tgt{k}", "?")
+    if sf.exists():
+        sc = json.loads(sf.read_text(encoding="utf-8"))
+        rs = sc.get("targets", [])
+        if rs:
+            g = [r["improvement_pct"] for r in rs]
+            mac("TgtSSLNTargets", f"{len(rs):,}")
+            mac("TgtSSLBudget", f"{sc['setup']['budget']:,}")
+            mac("TgtSSLMin", f"{min(g):+.2f}")
+            mac("TgtSSLMax", f"{max(g):+.2f}")
+            mac("TgtSSLMean", f"{sum(g) / len(g):+.2f}")
+            rows = [f"{esc(r['symbol'])} & {r['n_measured']:,} & {r['n_labels']:,} & "
+                    f"{esc(r['best_method'])} & {r['baseline_composite']:.4f} & "
+                    f"{r['improvement_pct']:+.2f}\\% \\\\" for r in rs]
+            (GEN / "targets_ssl.tex").write_text(
+                "\\begin{table}[H]\n\\centering\\small\n\\begin{tabular}{lrrlcr}\n\\toprule\n"
+                "Protein & Measured & Labels & Best SSL method & Baseline & Gain\\\\\n\\midrule\n"
+                + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\caption{The "
+                "semi-supervised comparison repeated on the protein targets with the fewest "
+                "measured molecules, with the unlabelled ZINC pool. Same protocol as the "
+                "materials and toxicity tracks.}\\label{tab:targets-ssl}\n\\end{table}\n",
+                encoding="utf-8")
+
     (GEN / "macros.tex").write_text("\n".join(macros) + "\n", encoding="utf-8")
     (GEN / "values.json").write_text(json.dumps(values, indent=1), encoding="utf-8")
     print(f"wrote {len(macros)} macros and tables to {GEN}")

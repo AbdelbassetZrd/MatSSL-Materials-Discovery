@@ -54,6 +54,12 @@ TARGETS = PROC / "targets"
 OUT = ROOT / "data" / "predictions" / "targets"
 MODELS = ROOT / "app" / "models"
 SIM_BINS = [0.0, 0.3, 0.4, 0.5, 0.7, 1.01]
+# A measured-only score is only as good as the number of measured molecules of the rarer class it
+# was computed against, so that count travels with the score everywhere instead of being averaged
+# away. Both rules are stated over the whole dataset rather than over the test split, so they do
+# not depend on how the split happened to fall and can be recomputed from the data alone.
+MIN_MEASURED_MINORITY = 15       # below this, a ROC-AUC is noise - withhold it entirely
+WELL_SUPPORTED_MINORITY = 60     # at or above this, the score enters the project-wide average
 T0 = time.time()
 
 
@@ -151,16 +157,35 @@ def train_one(cid: str, meta: dict, args, background: np.ndarray | None = None) 
 
     # ZINC decoys are assumed inactive, not measured, and they are easy to separate from
     # screened compounds. The honest headline number ignores them.
+    # A ranking metric is only as good as its rarer class. Some targets have almost no measured
+    # inactives at all (ChEMBL publishes what binds), and on those an AUC over measured molecules
+    # is computed against a handful of negatives - it comes out at 1.000 and means nothing. So the
+    # class counts are recorded and the score is withheld when the minority class is too small.
     is_decoy = feat["decoy"].to_numpy()[te]
     measured = ~is_decoy
-    res_measured = None
-    if measured.sum() >= 50 and len(set(yte[measured].tolist())) > 1:
-        res_measured = {
-            "n": int(measured.sum()),
+    n_dpos = int(((~feat["decoy"]) & (feat["label"] == 1)).sum())
+    n_dneg = int(((~feat["decoy"]) & (feat["label"] == 0)).sum())
+    minority = min(n_dpos, n_dneg)
+    res_measured = {"n": int(measured.sum()),
+                    "n_active": int((yte[measured] == 1).sum()),
+                    "n_inactive": int((yte[measured] == 0).sum()),
+                    "n_measured_minority": minority,
+                    "well_supported_threshold": WELL_SUPPORTED_MINORITY,
+                    "ROC-AUC": None, "PR-AUC": None, "Balanced_Accuracy": None,
+                    "reportable": False, "well_supported": False}
+    if (measured.sum() >= 50 and minority >= MIN_MEASURED_MINORITY
+            and len(set(yte[measured].tolist())) > 1):
+        res_measured.update({
             "ROC-AUC": float(roc_auc_score(yte[measured], p[measured])),
             "PR-AUC": float(average_precision_score(yte[measured], p[measured])),
             "Balanced_Accuracy": float(balanced_accuracy_score(yte[measured], pred[measured])),
-        }
+            "reportable": True,
+            "well_supported": minority >= WELL_SUPPORTED_MINORITY,
+        })
+    else:
+        res_measured["withheld_because"] = (
+            f"this target has only {minority} measured molecules of its minority class; at least "
+            f"{MIN_MEASURED_MINORITY} are needed before a ROC-AUC is anything but noise")
 
     # reliability against similarity to the nearest training active
     fp_all = X[:, len(DESC_NAMES):]
@@ -178,16 +203,19 @@ def train_one(cid: str, meta: dict, args, background: np.ndarray | None = None) 
     if background is not None:
         bg = stack.predict_proba(transform(background))[:, 1]
         ef = enrichment_factor(p[(yte == 1) & measured], bg)
-    auc_m = res_measured["ROC-AUC"] if res_measured else float("nan")
+    auc_m = res_measured["ROC-AUC"]
+    shown = (f"{auc_m:.3f} on {minority} minority" if auc_m is not None
+             else f"withheld, only {minority} minority")
     log(f"{meta['symbol']:<9} {len(feat):>6,} mols  AUC={res['ROC-AUC']:.3f} "
-        f"(measured only {auc_m:.3f})  bal={res['Balanced_Accuracy']:.3f}  "
+        f"(measured only {shown})  bal={res['Balanced_Accuracy']:.3f}  "
         f"EF1%={ef:.0f}x  decoys={feat['decoy'].mean():.0%}")
 
     summary = {
         "chembl_id": cid, "symbol": meta["symbol"], "name": meta.get("name"),
         "dataset": {"n_molecules": int(len(feat)), "n_scaffolds": int(feat["scaffold"].nunique()),
                     "positive_rate": float(y.mean()), "decoy_fraction": float(feat["decoy"].mean()),
-                    "n_train": int(len(tr)), "n_test": int(len(te))},
+                    "n_train": int(len(tr)), "n_test": int(len(te)),
+                    "n_measured_active": n_dpos, "n_measured_inactive": n_dneg},
         "metrics": res, "metrics_measured_only": res_measured,
         "enrichment_factor_top1pct": ef, "reliability_vs_similarity": reliability,
         "base_models": base_names, "threshold": thr,
@@ -237,9 +265,12 @@ def main() -> None:
             done.append(r)
     if done:
         a = [d["metrics"]["ROC-AUC"] for d in done]
-        m = [d["metrics_measured_only"]["ROC-AUC"] for d in done if d["metrics_measured_only"]]
+        m = [d["metrics_measured_only"]["ROC-AUC"] for d in done
+             if (d["metrics_measured_only"] or {}).get("well_supported")]
         log(f"DONE {len(done)} targets | mean ROC-AUC {np.mean(a):.3f} "
-            f"| measured molecules only {np.mean(m):.3f}")
+            + (f"| measured molecules only {np.mean(m):.3f}, averaged over the {len(m)} targets "
+               f"with at least {WELL_SUPPORTED_MINORITY} measured minority-class molecules"
+               if m else "| no target has enough measured inactives for a reliable average"))
 
 
 if __name__ == "__main__":

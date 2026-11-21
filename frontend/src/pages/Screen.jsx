@@ -25,7 +25,7 @@ function TargetTable({ targets }) {
       <thead>
         <tr className="text-left text-ink-mute border-b border-line">
           <th className="py-1">Protein</th><th>Evidence</th><th>P(active)</th>
-          <th>Nearest known active</th><th>Reliability</th>
+          <th>Nearest known active</th><th>Reliability</th><th>Model AUC</th>
         </tr>
       </thead>
       <tbody>
@@ -51,6 +51,25 @@ function TargetTable({ targets }) {
             </td>
             <td className={CONF[t.confidence] || "text-ink-mute"}>
               {t.modelled ? t.confidence : "–"}
+            </td>
+            {/* the AUC over measured molecules, with the count of rarer-class molecules it
+                rests on — a high AUC on a handful of them is not evidence */}
+            <td className="font-mono text-[10px]">
+              {t.modelled && (t.roc_auc_measured ?? t.test_roc_auc) != null ? (
+                <span
+                  className={t.roc_auc_measured != null && !t.well_supported ? "text-amber-700" : ""}
+                  title={
+                    t.roc_auc_measured != null
+                      ? `measured molecules only, on ${t.n_measured_minority} of the rarer class`
+                      : "all held-out molecules, including presumed-inactive ZINC decoys"
+                  }
+                >
+                  {fmt(t.roc_auc_measured ?? t.test_roc_auc, 2)}
+                  {t.n_measured_minority != null && (
+                    <span className="text-ink-mute"> ·{t.n_measured_minority}</span>
+                  )}
+                </span>
+              ) : "–"}
             </td>
           </tr>
         ))}

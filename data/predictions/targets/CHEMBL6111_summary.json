@@ -1,0 +1,58 @@
+{
+ "chembl_id": "CHEMBL6111",
+ "symbol": "PADI4",
+ "name": "peptidyl arginine deiminase 4",
+ "dataset": {
+  "n_molecules": 1462,
+  "n_scaffolds": 741,
+  "positive_rate": 0.7004103967168263,
+  "decoy_fraction": 0.20041039671682626,
+  "n_train": 1169,
+  "n_test": 293,
+  "n_measured_active": 1024,
+  "n_measured_inactive": 145
+ },
+ "metrics": {
+  "Model": "PADI4",
+  "Accuracy": 1.0,
+  "Precision": 1.0,
+  "Recall": 1.0,
+  "F1-Score": 1.0,
+  "ROC-AUC": 1.0,
+  "PR-AUC": 1.0,
+  "Composite_Score": 1.0,
+  "Balanced_Accuracy": 1.0,
+  "Threshold": 0.155
+ },
+ "metrics_measured_only": {
+  "n": 231,
+  "ROC-AUC": 1.0,
+  "PR-AUC": 1.0,
+  "Balanced_Accuracy": 1.0,
+  "n_measured_minority": 145,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 98.5609756097561,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 86,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 205,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.155
+}

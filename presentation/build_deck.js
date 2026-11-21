@@ -415,6 +415,102 @@ shotPair("Research Lab: every experiment, interactive",
   "Deployed models with test confusion matrices and ROC curves",
   "The Research Lab reads a static JSON export of all result files, so it also works offline during the presentation.");
 
+// ================================================================== 20-21. illnesses
+if (V.TgtNModels) {
+  s = newSlide("CONTENT", "Screening a molecule against illnesses", "Application");
+  // the chain, as four boxes: this is the whole idea of the module
+  const chain = [
+    ["your molecule", "drawn, built or SMILES", "accent2"],
+    [`${V.TgtNModels} protein models`, "one QSAR model per protein", "accent1"],
+    ["activity profile", "P(active) for each protein", "accent1"],
+    [`${V.TgtNDiseases} illnesses ranked`, "weighted by public evidence", "accent4"],
+  ];
+  chain.forEach(([head, sub, col], i) => {
+    const x = 0.6 + i * 3.1;
+    s.addShape(pres.shapes.ROUNDED_RECTANGLE, { x, y: 1.3, w: 2.8, h: 1.1, rectRadius: 0.1,
+      fill: { color: C.background2 }, line: { color: C[col], width: 1.5 },
+      objectName: "chain box " + i });
+    s.addText(head, { x: x + 0.12, y: 1.42, w: 2.56, h: 0.42, fontSize: 14, bold: true,
+      color: C.text2, margin: 0, align: "center", isTextBox: true, objectName: "chain head " + i });
+    s.addText(sub, { x: x + 0.12, y: 1.84, w: 2.56, h: 0.46, fontSize: 11, color: C.text1,
+      margin: 0, align: "center", valign: "top", isTextBox: true, objectName: "chain sub " + i });
+    if (i < 3) {
+      s.addText("→", { x: x + 2.8, y: 1.3, w: 0.3, h: 1.1, fontSize: 20, bold: true,
+        color: C.accent5, margin: 0, align: "center", valign: "middle", isTextBox: true,
+        objectName: "chain arrow " + i });
+    }
+  });
+  stat(s, 0.6, 2.65, 3.0, V.TgtNDiseases, "illnesses, from Open Targets evidence", "accent2", "ill n");
+  stat(s, 4.3, 2.65, 3.0, V.TgtNModels, `protein models (of ${V.TgtNProteins} associated proteins)`,
+    "accent1", "ill m");
+  stat(s, 8.0, 2.65, 4.3, V.TgtNMols, "measured molecule-protein activities from ChEMBL",
+    "accent4", "ill d");
+  card(s, 0.6, 4.4, 5.95, 2.4, "Why one model per protein",
+    "No dataset of “molecules that cure diabetes” exists — but tens of thousands of measured "
+    + "molecule-protein affinities do. So a molecule is scored once, and every illness is a "
+    + "weighted sum over that same profile.\n\nAsking about a second and third illness is free, and "
+    + "adding a new illness costs no training at all.", "accent1", "ill why");
+  card(s, 6.75, 4.4, 5.95, 2.4, "What it does not claim",
+    "The prediction is activity against a protein, plus the public evidence linking that protein "
+    + "to an illness. It says nothing about absorption, dose, selectivity or safety in a person."
+    + "\n\nA molecule unlike anything in the training data is reported as unclear, never as a "
+    + "confident finding.", "accent3", "ill limit");
+  s.addNotes("This is the third domain the same protocol is applied to. The key design decision is "
+    + "to train per protein and not per illness: the label exists for proteins and does not exist "
+    + "for illnesses. One pass over the protein models gives a reusable activity profile, and the "
+    + "illness score is then arithmetic over that profile, which is what makes the "
+    + "and-what-about-this-illness interaction instant. Everything in the interface says the same "
+    + "thing: in-silico screening for research and teaching, not medical advice.");
+
+  s = newSlide("CONTENT", "Read the denominator, not the score", "Application");
+  s.addText("ChEMBL publishes what binds far more often than what does not. Where a protein had "
+    + "too few measured inactives we added property-matched ZINC molecules as presumed inactives "
+    + "— easy to separate, so they flatter the model. So we report the score over measured "
+    + "molecules too, and next to it the number of molecules of the rarer class it rests on.",
+    { x: 0.6, y: 1.3, w: 12.1, h: 0.75, fontSize: 14, color: C.text1, margin: 0, valign: "top",
+      isTextBox: true, objectName: "decoy intro" });
+  const red = { bold: true, color: HEX.accent6 };
+  s.addTable([
+    [{ text: "Protein", options: { bold: true } },
+      { text: "AUC (all)", options: { bold: true } },
+      { text: "AUC (measured)", options: { bold: true } },
+      { text: "measured minority", options: { bold: true } }],
+    ["ATM", "0.981", { text: "0.981", options: { bold: true, color: HEX.accent4 } }, "532"],
+    ["ACHE (Alzheimer's)", "0.919", "0.914", "417"],
+    ["EGFR", "0.994", "0.987", "216"],
+    ["DRD2", "0.989", { text: "0.792", options: red }, { text: "55", options: red }],
+    ["TYK2", "0.991", { text: "0.836", options: red }, { text: "22", options: red }],
+    ["NR3C1", "1.000", { text: "1.000", options: red }, { text: "15", options: red }],
+  ], { x: 0.6, y: 2.2, w: 7.3, colW: [2.3, 1.5, 1.9, 1.6], fontSize: 12, color: HEX.dk1,
+    border: { type: "solid", color: "E2E8F0", pt: 1 }, align: "center", valign: "middle",
+    rowH: 0.34, objectName: "decoy table" });
+  s.addText("NR3C1 has 1,112 measured molecules — fifteen of them inactive. Its perfect "
+    + "1.000 is not a perfect model, it is the absence of a measurement. ATM is the trustworthy "
+    + `row: no presumed inactives, 532 real ones, 0.981 either way. Only the ${V.TgtNWellSupported} `
+    + `targets with ${V.TgtMinMinority}+ enter our average (${V.TgtAUCMeasured} measured, `
+    + `${V.TgtAUC} overall).`,
+    { x: 0.6, y: 4.55, w: 7.3, h: 1.1, fontSize: 13, italic: true, color: C.text1,
+      margin: 0, valign: "top", isTextBox: true, objectName: "decoy note" });
+  card(s, 8.2, 2.2, 4.5, 2.1, "The bug no metric could catch",
+    "FLG (filaggrin) was silently resolved to CHEMBL3650 — which is FGFR1, a different "
+    + "protein. ChEMBL returned 6,592 real activities, the model trained fine and scored 1.000 "
+    + "under the wrong name.\n\nFound only because 1.000 was implausible. All 52 resolutions were "
+    + "then audited; one was wrong.", "accent6", "flg");
+  bullets(s, [
+    "The resolver now demands an exact gene-symbol match and drops a target rather than guessing",
+    `Enrichment moved off the test set (ceiling 1.43×) onto 20,000 random ZINC molecules: ${V.TgtEF}× average, up to ${V.TgtEFMax}×`,
+    "Scaffold-grouped splits; applicability domain calibrated on our own data, not a fixed 0.4",
+  ], 8.2, 4.5, 4.5, 2.3, 13);
+  s.addNotes("These corrections are the actual contribution of this module. Each started as a "
+    + "result that looked good and was wrong: decoy-inflated AUC, a measured-only AUC computed "
+    + "against fifteen negatives, an enrichment factor with an arithmetic ceiling of 1.43, "
+    + "scaffold leakage, an arbitrary applicability-domain cutoff, and a gene symbol resolved to "
+    + "the wrong protein. If asked whether the scores can be trusted, point at the measured "
+    + "minority column: the honest answer is that it depends on the target, and the table says "
+    + "which. The FLG story is the one to tell: a silent identifier error is invisible to every "
+    + "validation metric, because the metrics never see the name.");
+}
+
 // ================================================================== 19. discussion
 s = newSlide("CONTENT", "Discussion and limitations", "Conclusion");
 bullets(s, [

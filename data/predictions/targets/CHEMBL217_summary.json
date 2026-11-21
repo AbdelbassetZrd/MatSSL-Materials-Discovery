@@ -8,7 +8,9 @@
   "positive_rate": 0.7002275312855518,
   "decoy_fraction": 0.2684869169510808,
   "n_train": 1406,
-  "n_test": 352
+  "n_test": 352,
+  "n_measured_active": 1231,
+  "n_measured_inactive": 55
  },
  "metrics": {
   "Model": "DRD2",
@@ -26,7 +28,11 @@
   "n": 251,
   "ROC-AUC": 0.791869918699187,
   "PR-AUC": 0.9930216687415926,
-  "Balanced_Accuracy": 0.5857723577235773
+  "Balanced_Accuracy": 0.5857723577235773,
+  "n_measured_minority": 55,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": false
  },
  "enrichment_factor_top1pct": 78.63394510182725,
  "reliability_vs_similarity": [

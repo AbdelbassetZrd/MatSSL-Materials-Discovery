@@ -1,0 +1,248 @@
+\section{Screening molecules against illnesses}
+\label{sec:illness}
+
+The materials track answers "what properties does this composition have?". The same protocol,
+applied to molecules, lets us ask a question that sounds very different but is structurally
+identical: \emph{given a molecule, which illnesses is it worth testing against?} This section
+explains why that question can be answered at all, what is actually being predicted, and the four
+places where an honest measurement differs sharply from a flattering one.
+
+\subsection{What is predicted, stated precisely}
+
+No model in this project predicts that a molecule cures a disease. Such a model cannot be trained,
+because the label does not exist: there is no dataset of \emph{molecules that cure diabetes}. What
+\emph{does} exist, in enormous quantity, is measured affinity between a molecule and a
+\textbf{single protein} --- the classical QSAR label, and the same kind of label used by
+established tools such as SwissTargetPrediction.
+
+Illnesses enter only as \emph{context}. Public biomedical databases record, for a given illness,
+which proteins the evidence associates with it and how strongly. Combining the two gives the
+chain actually implemented:
+
+\begin{center}
+\fbox{\parbox{0.93\textwidth}{\centering
+molecule $\longrightarrow$ \textbf{one QSAR model per protein} $\longrightarrow$ activity profile
+over \TgtNModels{} proteins $\longrightarrow$ \textbf{weighted by association evidence}
+$\longrightarrow$ a score for every illness}}
+\end{center}
+
+Everything the interface reports is a predicted interaction with a protein, together with the
+public evidence linking that protein to an illness. It is in-silico screening for research and
+teaching --- a hypothesis about what is worth measuring next, never a claim about treating anyone.
+
+\subsection{Why one model per protein, not one per illness}
+
+This is the single design decision the whole module rests on, and it is worth stating separately
+because three useful properties follow from it.
+
+\begin{enumerate}
+  \item \textbf{Asking about a second and third illness is free.} A molecule is featurised once
+    and passed through the \TgtNModels{} protein models once. Each illness is then a different
+    weighted sum over the \emph{same} activity profile --- arithmetic, not another model. The
+    complete ranking over all \TgtNDiseases{} illnesses is returned by a single request, which is
+    exactly the interaction the application needs: \emph{and what about this illness? and this
+    one?}
+  \item \textbf{Adding an illness costs no training at all.} A new illness requires one database
+    query for its protein list. If those proteins already have models, the illness becomes
+    screenable immediately.
+  \item \textbf{The intermediate quantity is the interpretable one.} "Predicted active against
+    ACHE and BCHE" is a chemically checkable statement that a domain expert can accept or reject.
+    "Might help Alzheimer's disease" is not.
+\end{enumerate}
+
+\subsection{Data}
+
+The knowledge base is built from the Open Targets GraphQL API for \TgtNDiseases{} well-studied
+illnesses: their most strongly associated proteins with an association score, and the
+small-molecule drugs already approved for each. Of \TgtNProteins{} associated proteins,
+\TgtNModels{} have enough measured activity in ChEMBL to model, giving \TgtNMols{}
+molecule--protein measurements in total.
+
+Activity labels come from pChEMBL (the negative logarithm of the measured potency):
+\textbf{$\geq 6.5$ active, $< 5$ inactive, and the uncertain band between the two discarded.}
+Published benchmarks of ChEMBL show there is no standard cutoff and that the resulting
+active/inactive ratio swings strongly with the choice, so the cutoff is recorded in every
+per-protein summary rather than left implicit. Duplicate molecule--protein pairs are collapsed to
+their median value, and all SMILES pass through the same canonicalisation used elsewhere in the
+molecular track. Features and splits are unchanged from the toxicity models: RDKit descriptors
+plus a Morgan fingerprint, and splits grouped by Bemis--Murcko scaffold.
+
+\subsection{Six ways to get a flattering number, and what was done instead}
+
+Each of the following produced a result that looked good before it was corrected. They are
+reported here because the corrections, not the headline scores, are the actual contribution of
+this module. The last one was not a measurement problem at all but a silent data error, found
+only because a metric came out implausibly high.
+
+\paragraph{1. Assumed inactives inflate the score.} The published literature reports what
+\emph{binds} far more often than what does not, so for many proteins ChEMBL supplies plenty of
+actives and too few measured inactives. Where that happened, property-matched molecules from the
+unlabelled ZINC pool were added as presumed inactives (matched on molecular weight and
+lipophilicity), averaging \TgtDecoyFrac\% of rows. But a ZINC molecule is \emph{assumed} inactive,
+not measured inactive, and it is easy to separate from a potent drug-like active --- so it
+flatters the model.
+
+The response is not to hide those rows but to declare them. Every model reports its decoy
+fraction, and ROC-AUC is reported \textbf{twice}: over all held-out molecules, and over
+\textbf{measured molecules only}. The difference is the honest cost of the assumption, and for
+individual proteins it is severe: in Table~\ref{tab:targets} DRD2 falls from $0.989$ to $0.792$
+and SLC6A4 from $0.993$ to $0.845$. Reporting only the first column would have produced a table
+of near-perfect scores that mean very little.
+
+\paragraph{2. A measured-only score is only as good as its denominator.} Correcting for presumed
+inactives immediately raises a second question that is easy to skip past: how many measured
+molecules is that second number computed against? For NR3C1 the answer is \textbf{fifteen}. Of
+$1{,}112$ measured molecules, fifteen are inactive --- so its measured-only ROC-AUC has almost
+nothing to rank against, and it duly comes out at $1.000$. That is not a perfect model; it is the
+absence of a measurement wearing the costume of a perfect result.
+
+Rather than quietly drop such targets, which would hide information a reader can weigh perfectly
+well, the denominator was made part of the claim. Every measured-only score now travels with the
+number of measured molecules of its rarer class --- the \emph{measured minority} column of
+Table~\ref{tab:targets}. Below fifteen the score is withheld outright as noise, which happens for
+\TgtNWithheld{} of the \TgtNModels{} targets --- EIF2AK4 is the extreme case, with
+\textbf{no measured inactives whatsoever}, so its entire negative class is presumed. At or above
+\TgtMinMinority{} the target is called \emph{well supported}, and only those
+(\TgtNWellSupported{} of \TgtNModels) enter the project-wide average: \TgtAUCMeasured{} on
+measured molecules against \TgtAUC{} over all of them. The \TgtNThin{} targets in between are
+reported and marked with a dagger, so that DRD2's $0.792$ is not quoted as though it had been
+measured on thousands of molecules when it rests on $55$.
+
+Table~\ref{tab:targets} should be read with that column first. ATM is its most trustworthy row:
+no presumed inactives at all, $532$ measured molecules of the rarer class, and the same $0.981$
+whichever way it is computed. The rows that still reach $1.000$ --- MC4R and NR3C1 --- are the
+ones to distrust, not the ones to celebrate. The pattern across the table is consistent: the
+larger the measured minority, the smaller the gap between the two ROC-AUC columns, which is
+exactly what one expects if the gap is caused by the presumed inactives rather than by the
+models.
+
+\maybeinput{targets_table}
+
+\paragraph{3. Enrichment measured against the test set is arithmetically meaningless.} The first
+version of the enrichment factor asked whether known actives rank above the \emph{other test
+molecules}. With roughly 70\% actives in a test set, the top 1\% can be at most $1/0.7 = 1.43$
+times as active as the base rate, so the metric is incapable of distinguishing a good model from a
+mediocre one. Enrichment is now measured the way a real virtual screen works: known actives
+against a background of \textbf{20{,}000 random ZINC molecules}, which is what the top of a screen
+actually competes against. Values of $\TgtEFMin\times$ to $\TgtEFMax\times$ (mean
+$\TgtEF\times$) now carry information --- and the low end carries it too: GBA1, the weakest model
+in the set at a measured ROC-AUC of $0.843$, enriches only $\TgtEFMin\times$, which is the
+pipeline correctly declining to promise much from $451$ molecules.
+
+\paragraph{4. Scaffold leakage.} A protein's known actives are frequently analogues of one
+another, published as a series around one chemical core. A random split therefore puts near-copies
+on both sides of it and measures memory rather than generalisation. Splits are grouped by
+Bemis--Murcko scaffold, as in the toxicity models, so an entire chemical series falls on one side.
+
+\paragraph{5. A fixed applicability-domain cutoff is arbitrary.} The usual practice is a hard
+Tanimoto threshold of $0.4$ to the nearest training molecule. Rather than adopt that number,
+held-out molecules are binned by similarity to their nearest known active and accuracy is measured
+within each bin, so the unreliable region is placed where accuracy actually degrades. A molecule
+that falls outside the domain is reported as \textbf{unclear}, not as a confident low score ---
+extrapolation is not a finding, and the interface is explicit about the difference.
+
+\paragraph{6. The model was right; the protein was wrong.} The knowledge base names proteins by
+gene symbol, and those symbols have to be resolved to ChEMBL target identifiers before any
+activity can be downloaded. The first version of that resolver searched ChEMBL by name and, if no
+target carried the gene symbol, fell back to the best-scoring human single protein. For one gene
+out of \TgtNProteins{} that fallback fired: \textbf{FLG} (filaggrin, a structural skin protein
+associated with asthma) was resolved to \textbf{CHEMBL3650, which is FGFR1} --- a receptor
+tyrosine kinase, an entirely different protein. ChEMBL duly returned $6{,}592$ real activities,
+the pipeline trained a perfectly good model on them, and it was reported under the name
+\emph{filaggrin} with a ROC-AUC of $1.000$.
+
+Nothing in the training or evaluation code could have caught this: every number was correct for
+the data it was given. It surfaced only because a ROC-AUC of exactly $1.000$ on a protein with no
+known small-molecule chemistry was implausible enough to check, after which all
+\TgtNProteins{} resolutions were audited against the gene symbols ChEMBL itself records
+--- one was wrong, the other \TgtNProteins{} were correct. The resolver now requires an exact
+gene-symbol match and \textbf{drops a target rather than guessing}, the mis-resolved target and
+its model were deleted, and asthma retains its three correctly resolved proteins (ADORA1, PDE4D
+and NR3C1, the glucocorticoid receptor that inhaled corticosteroids act on).
+
+The lesson is the one worth carrying out of this project: a silent identifier error is invisible
+to every validation metric, because the metrics never see the name. An implausibly good score is
+a reason to audit the inputs, not to celebrate.
+
+\subsection{Composing protein predictions into an illness score}
+
+With an activity profile in hand, the score for illness $d$ is the evidence-weighted mean of the
+predicted activities over its associated proteins:
+
+\begin{equation}
+  S(m, d) \;=\; \frac{\sum_{t \in T_d} w_{dt} \cdot P(\text{active} \mid m, t)}
+                     {\sum_{t \in T_d} w_{dt}}
+  \label{eq:illness-score}
+\end{equation}
+
+where $w_{dt}$ is the association score between illness $d$ and protein $t$, and $T_d$ is the set
+of its proteins \emph{that have a model}. The last clause matters: a protein without a model is
+\textbf{excluded from the sum rather than counted as zero}, because a missing model is missing
+information, not evidence of inactivity. Instead, each illness reports its \emph{coverage} --- the
+fraction of its associated proteins that are modelled --- so a low score for a poorly covered
+illness cannot be mistaken for a prediction of inactivity.
+
+The score never appears alone. It is returned with the per-protein probability, the association
+weight, the nearest known active and its similarity, and a confidence flag from the calibrated
+applicability domain. Toxicity flags from the Tox21 models then downgrade an otherwise promising
+result, and the verdict is reported in three bands: \textbf{worth testing}, \textbf{unclear} and
+\textbf{unlikely}. The scoring is implemented as pure functions so that the web application and
+the offline validation share one code path, which is what makes the validation below meaningful.
+
+\subsection{Validation}
+
+Per-protein ROC-AUC on scaffold-grouped held-out molecules (Table~\ref{tab:targets}) measures the
+individual models. It does not measure the composition in Equation~\ref{eq:illness-score}, so two
+further checks exercise the whole chain.
+
+\paragraph{Repurposing retrieval.} Every illness in the knowledge base carries the small-molecule
+drugs already approved for it. Those drugs are pushed through the complete pipeline --- featurise,
+run every protein model, weight by association score --- and we record where their own indication
+lands in the resulting ranking of all \TgtNDiseases{} illnesses. If the composition carries
+signal, a drug's own illness should rank near the top; random ranking would place it first
+\TgtValRandom\% of the time.
+
+\maybeinput{targets_validation}
+
+This is a deliberately permissive test: the same drugs appear in ChEMBL, so a model may partly be
+recalling them, and the scaffold-grouped per-protein figures remain the strict measurement. It is
+reported because it is the one check that exercises the composition end to end --- a pipeline that
+\emph{fails} it is broken regardless of its per-protein scores.
+
+\paragraph{Negative controls.} Molecules nobody would mistake for drugs --- water, ethanol,
+methane, glucose, acetic acid, benzene --- are run through the same chain. If they light up every
+illness, the models are reading drug-likeness rather than protein activity. The highest illness
+score reached by any control is \TgtCtrlMax\%, with \TgtCtrlFlags{} verdicts of "worth testing"
+across all controls and illnesses.
+
+\subsection{Semi-supervised learning on a third domain}
+
+Proteins with few measured molecules are precisely the case semi-supervised learning is supposed
+to address, which makes this module a third independent test of the project's central protocol.
+The five methods compared in Section~\ref{sec:methods} are rerun on the proteins with the fewest
+measured molecules, with \TgtSSLBudget{} labels and the unlabelled ZINC pool --- the same
+experimental design used for materials with GNoME and for toxicity with ZINC. Assumed inactives
+are excluded from the labelled pool here, since mixing them in would make the task artificially
+easy.
+
+\maybeinput{targets_ssl}
+
+\subsection{What this module cannot do}
+
+These limits are stated on every page of the application as well as here, and they are not
+formalities --- each one marks a real boundary of the method.
+
+\begin{itemize}
+  \item A protein-level prediction says nothing about absorption, dose, selectivity, metabolism or
+    safety in a person. Those are the reasons most candidate molecules fail, and none of them is
+    modelled.
+  \item Binding a protein associated with an illness is a \emph{hypothesis} about where to look
+    next, not an effect. An association score records that researchers have linked a protein to an
+    illness, not that acting on it helps.
+  \item ChEMBL is biased toward published actives, and the presumed inactives used to compensate
+    are an assumption. This is why the decoy fraction and the measured-only score are reported per
+    model rather than averaged away.
+  \item Many illnesses have no well-characterised druggable protein, so a low score may mean "no
+    useful protein model exists for this illness" rather than "this molecule does nothing". That
+    is exactly what the coverage figure is for.
+\end{itemize}

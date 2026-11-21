@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL2189121",
+ "symbol": "KRAS",
+ "name": "KRas proto-oncogene, GTPase",
+ "dataset": {
+  "n_molecules": 1214,
+  "n_scaffolds": 561,
+  "positive_rate": 0.700164744645799,
+  "decoy_fraction": 0.15650741350906094,
+  "n_train": 972,
+  "n_test": 242,
+  "n_measured_active": 850,
+  "n_measured_inactive": 174
+ },
+ "metrics": {
+  "Model": "KRAS",
+  "Accuracy": 0.9545454545454546,
+  "Precision": 0.9491525423728814,
+  "Recall": 0.9882352941176471,
+  "F1-Score": 0.968299711815562,
+  "ROC-AUC": 0.9797385620915032,
+  "PR-AUC": 0.9893986085601822,
+  "Composite_Score": 0.9740191369535326,
+  "Balanced_Accuracy": 0.9316176470588236,
+  "Threshold": 0.54
+ },
+ "metrics_measured_only": {
+  "n": 203,
+  "ROC-AUC": 0.9557932263814617,
+  "PR-AUC": 0.9893986085601822,
+  "Balanced_Accuracy": 0.8577540106951872,
+  "n_measured_minority": 174,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 100.34825870646767,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 48,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 27,
+   "accuracy": 0.7777777777777778,
+   "roc_auc": 0.8289473684210527
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 153,
+   "accuracy": 0.9803921568627451,
+   "roc_auc": 0.7880794701986755
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.54
+}

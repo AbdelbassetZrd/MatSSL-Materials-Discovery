@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL2034",
+ "symbol": "NR3C1",
+ "name": "nuclear receptor subfamily 3 group C member 1",
+ "dataset": {
+  "n_molecules": 1567,
+  "n_scaffolds": 782,
+  "positive_rate": 0.7000638162093171,
+  "decoy_fraction": 0.29036375239310785,
+  "n_train": 1254,
+  "n_test": 313,
+  "n_measured_active": 1097,
+  "n_measured_inactive": 15
+ },
+ "metrics": {
+  "Model": "NR3C1",
+  "Accuracy": 1.0,
+  "Precision": 1.0,
+  "Recall": 1.0,
+  "F1-Score": 1.0,
+  "ROC-AUC": 1.0,
+  "PR-AUC": 1.0,
+  "Composite_Score": 1.0,
+  "Balanced_Accuracy": 1.0,
+  "Threshold": 0.825
+ },
+ "metrics_measured_only": {
+  "n": 220,
+  "ROC-AUC": 1.0,
+  "PR-AUC": 0.9999999999999999,
+  "Balanced_Accuracy": 1.0,
+  "n_measured_minority": 15,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": false
+ },
+ "enrichment_factor_top1pct": 90.49599891496,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 80,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 73,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 139,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.825
+}

@@ -1,0 +1,53 @@
+{
+ "chembl_id": "CHEMBL3385",
+ "symbol": "MAPK3",
+ "name": "mitogen-activated protein kinase 3",
+ "dataset": {
+  "n_molecules": 318,
+  "n_scaffolds": 169,
+  "positive_rate": 0.7012578616352201,
+  "decoy_fraction": 0.24213836477987422,
+  "n_train": 254,
+  "n_test": 64,
+  "n_measured_active": 223,
+  "n_measured_inactive": 18
+ },
+ "metrics": {
+  "Model": "MAPK3",
+  "Accuracy": 0.953125,
+  "Precision": 0.9565217391304348,
+  "Recall": 0.9777777777777777,
+  "F1-Score": 0.967032967032967,
+  "ROC-AUC": 0.9789473684210526,
+  "PR-AUC": 0.991021375115618,
+  "Composite_Score": 0.9729901677270099,
+  "Balanced_Accuracy": 0.9362573099415205,
+  "Threshold": 0.78
+ },
+ "metrics_measured_only": {
+  "n": 241,
+  "n_measured_minority": 18,
+  "well_supported_threshold": 60,
+  "ROC-AUC": null,
+  "PR-AUC": null,
+  "Balanced_Accuracy": null,
+  "reportable": false,
+  "well_supported": false,
+  "withheld_because": "this target has only 18 measured molecules of its minority class; at least 15 are needed before a ROC-AUC is anything but noise"
+ },
+ "enrichment_factor_top1pct": 95.77055555555555,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.5,
+   "n": 33,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.78
+}

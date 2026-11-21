@@ -1,0 +1,59 @@
+{
+ "chembl_id": "CHEMBL1784",
+ "symbol": "GLP1R",
+ "name": "glucagon like peptide 1 receptor",
+ "dataset": {
+  "n_molecules": 1837,
+  "n_scaffolds": 1003,
+  "positive_rate": 0.7000544365813827,
+  "decoy_fraction": 0.2923244420250408,
+  "n_train": 1468,
+  "n_test": 369,
+  "n_measured_active": 1286,
+  "n_measured_inactive": 14
+ },
+ "metrics": {
+  "Model": "GLP1R",
+  "Accuracy": 0.983739837398374,
+  "Precision": 0.9921875,
+  "Recall": 0.9844961240310077,
+  "F1-Score": 0.9883268482490273,
+  "ROC-AUC": 0.9953209022976465,
+  "PR-AUC": 0.9979974562489097,
+  "Composite_Score": 0.9918238752733368,
+  "Balanced_Accuracy": 0.9832390530064948,
+  "Threshold": 0.635
+ },
+ "metrics_measured_only": {
+  "n": 266,
+  "ROC-AUC": null,
+  "PR-AUC": null,
+  "Balanced_Accuracy": null,
+  "n_measured_minority": 14,
+  "well_supported_threshold": 60,
+  "reportable": false,
+  "well_supported": false,
+  "withheld_because": "this target has only 14 measured molecules of its minority class; at least 15 are needed before a ROC-AUC is anything but noise"
+ },
+ "enrichment_factor_top1pct": 78.51937984496125,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 115,
+   "accuracy": 0.9565217391304348,
+   "roc_auc": 0.8545454545454545
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 250,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.635
+}

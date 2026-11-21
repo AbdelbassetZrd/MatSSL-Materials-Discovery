@@ -1,0 +1,70 @@
+{
+ "chembl_id": "CHEMBL288",
+ "symbol": "PDE4D",
+ "name": "phosphodiesterase 4D",
+ "dataset": {
+  "n_molecules": 1060,
+  "n_scaffolds": 547,
+  "positive_rate": 0.6556603773584906,
+  "decoy_fraction": 0.0,
+  "n_train": 849,
+  "n_test": 211,
+  "n_measured_active": 695,
+  "n_measured_inactive": 365
+ },
+ "metrics": {
+  "Model": "PDE4D",
+  "Accuracy": 0.919431279620853,
+  "Precision": 0.9618320610687023,
+  "Recall": 0.9130434782608695,
+  "F1-Score": 0.9368029739776952,
+  "ROC-AUC": 0.97736748064324,
+  "PR-AUC": 0.988771436513519,
+  "Composite_Score": 0.9570852273104675,
+  "Balanced_Accuracy": 0.9222751637879689,
+  "Threshold": 0.705
+ },
+ "metrics_measured_only": {
+  "n": 211,
+  "ROC-AUC": 0.97736748064324,
+  "PR-AUC": 0.988771436513519,
+  "Balanced_Accuracy": 0.9222751637879689,
+  "n_measured_minority": 365,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 79.13483308097196,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 52,
+   "accuracy": 0.9230769230769231,
+   "roc_auc": 0.890625
+  },
+  {
+   "min_similarity": 0.3,
+   "n": 25,
+   "accuracy": 0.76,
+   "roc_auc": 0.888888888888889
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 54,
+   "accuracy": 0.9074074074074074,
+   "roc_auc": 0.99
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 76,
+   "accuracy": 0.9868421052631579,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.705
+}

@@ -105,15 +105,35 @@ uv run python pipeline/build_structure_cache.py                  # offline struc
 The web app uses these models when the lowest-energy structure of the formula is known
 (Alexandria), and the SSL composition models otherwise.
 
-## Molecules and Design Lab
+## Molecules, illnesses and Design Lab
 
-Two extensions on top of the materials core. Full write-up:
+Three extensions on top of the materials core. Full write-up:
 [`docs/ROADMAP_extensions.md`](docs/ROADMAP_extensions.md).
 
 **Molecule Studio + toxicity.** Draw a molecule, build it from fragments, or paste a SMILES, and
 get a predicted toxicity profile (12 Tox21 assays + clinical toxicity). Same protocol as the
 materials track, with Bemis-Murcko **scaffold-grouped** splits and 249k unlabeled ZINC molecules
 as the pool. Mean ROC-AUC **0.772** over the 12 Tox21 assays (0.895 mitochondrial toxicity, 0.916 clinical toxicity).
+
+**Screen a molecule against illnesses.** Build a molecule, then ask the same question of every
+illness in turn: is it likely to be active against the proteins that public evidence links to
+this illness? One model per **protein** (not per illness), so a molecule is scored once and all
+15 illnesses are a weighted sum over that one profile - which is what makes "and what about
+illness C?" instant, and what makes adding an illness cost no training at all.
+
+```
+molecule --(45 protein models)--> activity profile --(Open Targets evidence)--> illness ranking
+```
+
+15 illnesses and 52 associated proteins, 45 with enough measured ChEMBL activity to model.
+Scaffold-grouped splits, enrichment measured against 20,000 random ZINC molecules, and **ROC-AUC
+reported twice** - over everything and over measured molecules only, because property-matched ZINC
+decoys are an assumption and flatter the score (DRD2: 0.989 against 0.792 once they are removed).
+Each measured-only score carries **the number of measured molecules of the rarer class it rests
+on**, after NR3C1's apparently perfect 1.000 turned out to be computed against fifteen inactives.
+A molecule unlike anything in the training set is reported as *unclear*, never as a confident
+finding. This is in-silico screening for research
+and teaching - a predicted protein interaction is a hypothesis, not a treatment.
 
 **Design Lab.** Pick an application and get candidate materials, ranked from the 554k unlabeled
 GNoME compositions:
@@ -131,6 +151,9 @@ for "above liquid nitrogen".
 ```bash
 uv run python pipeline/molecules/get_data.py && uv run python pipeline/molecules/featurize_mol.py
 uv run python pipeline/molecules/train_toxicity.py
+uv run python pipeline/molecules/build_disease_graph.py && uv run python pipeline/molecules/get_chembl.py
+uv run python pipeline/molecules/train_targets.py && uv run python pipeline/molecules/guard_target_metrics.py
+uv run python pipeline/molecules/validate_indications.py
 uv run python pipeline/industries/train_superconductor.py
 uv run python pipeline/industries/rank_candidates.py
 ```
@@ -146,14 +169,17 @@ uv run python pipeline/industries/rank_candidates.py
 | Compare | up to four compositions side by side |
 | Molecule Studio | Ketcher drawing canvas, fragment builder, SMILES box, RDKit 2D depiction, drug-likeness |
 | Toxicity | 12 Tox21 gauges, risk badge, SHAP explanations that name the substructure behind each bit |
+| Illnesses | the 15 illnesses, their associated proteins with evidence bars and model scores, and the drugs already approved for each |
+| Screen | every illness ranked for your molecule, expandable to the per-protein breakdown; or all your saved molecules as a heat map |
 | Design Lab | application scores for your composition + ranked candidates from the GNoME pool |
 | Demo tour | scripted walk-through for the presentation (keyboard ← / →) |
 
 API endpoints (FastAPI, documentation at `/docs`): `POST /materials/predict`,
 `POST /materials/batch-predict`, `POST /materials/analyze`, `GET /materials/similar`,
 `GET /materials/structure`, `GET /materials/experiments`, `GET /materials/models-info`,
-`POST /molecules/predict`, `POST /molecules/properties`, `GET /design/applications`,
-`POST /design/score`, `GET /design/candidates`.
+`POST /molecules/predict`, `POST /molecules/properties`, `GET /indications/diseases`,
+`GET /indications/diseases/{id}`, `POST /indications/screen`, `POST /indications/matrix`,
+`GET /design/applications`, `POST /design/score`, `GET /design/candidates`.
 
 ## Run the application
 

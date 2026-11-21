@@ -1,0 +1,59 @@
+{
+ "chembl_id": "CHEMBL1962",
+ "symbol": "GABRA1",
+ "name": "gamma-aminobutyric acid type A receptor subunit alpha1",
+ "dataset": {
+  "n_molecules": 454,
+  "n_scaffolds": 260,
+  "positive_rate": 0.7004405286343612,
+  "decoy_fraction": 0.2907488986784141,
+  "n_train": 363,
+  "n_test": 91,
+  "n_measured_active": 318,
+  "n_measured_inactive": 4
+ },
+ "metrics": {
+  "Model": "GABRA1",
+  "Accuracy": 0.978021978021978,
+  "Precision": 1.0,
+  "Recall": 0.96875,
+  "F1-Score": 0.9841269841269841,
+  "ROC-AUC": 1.0,
+  "PR-AUC": 1.0,
+  "Composite_Score": 0.9920634920634921,
+  "Balanced_Accuracy": 0.984375,
+  "Threshold": 0.69
+ },
+ "metrics_measured_only": {
+  "n": 322,
+  "n_measured_minority": 4,
+  "well_supported_threshold": 60,
+  "ROC-AUC": null,
+  "PR-AUC": null,
+  "Balanced_Accuracy": null,
+  "reportable": false,
+  "well_supported": false,
+  "withheld_because": "this target has only 4 measured molecules of its minority class; at least 15 are needed before a ROC-AUC is anything but noise"
+ },
+ "enrichment_factor_top1pct": 94.05,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 30,
+   "accuracy": 0.9333333333333333,
+   "roc_auc": 1.0
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 47,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.69
+}

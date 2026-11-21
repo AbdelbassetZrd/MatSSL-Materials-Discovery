@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL4247",
+ "symbol": "ALK",
+ "name": "ALK receptor tyrosine kinase",
+ "dataset": {
+  "n_molecules": 1875,
+  "n_scaffolds": 1092,
+  "positive_rate": 0.7002666666666667,
+  "decoy_fraction": 0.26613333333333333,
+  "n_train": 1501,
+  "n_test": 374,
+  "n_measured_active": 1313,
+  "n_measured_inactive": 63
+ },
+ "metrics": {
+  "Model": "ALK",
+  "Accuracy": 0.9812834224598931,
+  "Precision": 0.9885057471264368,
+  "Recall": 0.9847328244274809,
+  "F1-Score": 0.9866156787762906,
+  "ROC-AUC": 0.9990117230098146,
+  "PR-AUC": 0.9995788048709731,
+  "Composite_Score": 0.9928137008930527,
+  "Balanced_Accuracy": 0.9789735550708834,
+  "Threshold": 0.74
+ },
+ "metrics_measured_only": {
+  "n": 268,
+  "ROC-AUC": 0.9980916030534351,
+  "PR-AUC": 0.9999565169791265,
+  "Balanced_Accuracy": 0.9923664122137404,
+  "n_measured_minority": 63,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 76.95302698208752,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 111,
+   "accuracy": 0.963963963963964,
+   "roc_auc": 0.9943396226415094
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 108,
+   "accuracy": 0.9907407407407407,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 130,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.74
+}

@@ -8,7 +8,9 @@
   "positive_rate": 0.7,
   "decoy_fraction": 0.15306122448979592,
   "n_train": 1176,
-  "n_test": 294
+  "n_test": 294,
+  "n_measured_active": 1029,
+  "n_measured_inactive": 216
  },
  "metrics": {
   "Model": "EGFR",
@@ -26,7 +28,11 @@
   "n": 246,
   "ROC-AUC": 0.9866504854368933,
   "PR-AUC": 0.9972620883134621,
-  "Balanced_Accuracy": 0.8975728155339806
+  "Balanced_Accuracy": 0.8975728155339806,
+  "n_measured_minority": 216,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
  },
  "enrichment_factor_top1pct": 97.60179755839663,
  "reliability_vs_similarity": [

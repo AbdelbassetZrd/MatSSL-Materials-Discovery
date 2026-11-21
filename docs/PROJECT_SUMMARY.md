@@ -68,7 +68,7 @@ The project asks whether we can still predict well from only **1,000 labels** by
 
 ---
 
-## Beyond materials: molecules and a Design Lab
+## Beyond materials: molecules, illnesses and a Design Lab
 
 The platform now covers a second scientific domain and a discovery workflow. Details and results:
 [ROADMAP_extensions.md](ROADMAP_extensions.md).
@@ -90,9 +90,35 @@ for "above liquid nitrogen"). Left to its own devices, the ranking returns **cup
 superconductors and **vanadium fluorophosphates** for cathodes - the families real high-Tc
 superconductors and sodium-ion cathodes belong to.
 
-**Protein-target activity (next).** Test your molecules against the protein targets that public
-databases associate with an illness, using activity models trained on measured ChEMBL data.
-In-silico screening for research and teaching, not medical advice.
+**Screening against illnesses (built).** Build a molecule and ask the same question of every
+illness in turn - is it likely to be active against the proteins public evidence links to this
+illness? The design decision that makes this work is to train one model per **protein**, not per
+illness: no labelled dataset of "molecules that cure diabetes" exists, but tens of thousands of
+measured molecule-protein affinities do. A molecule is featurised once, run through all 45 protein
+models once, and every illness is then a weighted sum over that same profile - so "and what about
+illness C?" costs nothing, and adding an illness costs no training at all.
+
+15 illnesses from Open Targets and 52 associated proteins, 45 with enough measured ChEMBL
+activity. Scaffold-grouped splits as in the toxicity track, and three measurement decisions worth
+defending. Enrichment is measured against a background of **20,000 random ZINC molecules** rather
+than the test set, where a 70 %-active test set caps it at 1.43x and the metric says nothing.
+ROC-AUC is reported **twice** - over everything and over measured molecules only - because the
+property-matched ZINC decoys used where ChEMBL had too few inactives are an assumption, not a
+measurement, and they flatter the score (DRD2: 0.989 overall, 0.792 once they are removed). And
+each measured-only score carries **the number of measured molecules of the rarer class it rests
+on**, after NR3C1's apparently perfect 1.000 turned out to be computed against fifteen inactives -
+not a perfect model but the absence of a measurement. Only targets with 60 or more enter any
+average. A molecule unlike anything in the training set is reported as *unclear*, not as a
+confident low score.
+
+The error worth recounting is the one no metric could catch. Gene symbols are resolved to ChEMBL
+target ids, and the first resolver guessed when no target carried the symbol: **FLG** (filaggrin)
+resolved to **FGFR1**, a different protein, which then trained perfectly well and scored 1.000
+under the wrong name. It surfaced only because that score was implausible; all 52 resolutions were
+then audited, exactly one was wrong, and the resolver now drops a target rather than guessing.
+
+In-silico screening for research and teaching. A predicted protein interaction is a hypothesis;
+it says nothing about absorption, dose, selectivity or safety in a person, and every page says so.
 
 ## Ready-to-paste CV lines
 
@@ -103,7 +129,8 @@ In-silico screening for research and teaching, not medical advice.
 - Added unsupervised (Apriori rules, K-Means) and self-supervised (masked autoencoder on 554k samples) learning, plus genetic-algorithm feature selection (142 → 52) and an applicability domain.
 - Trained stacked ensembles with leakage-free grouped splits: **91–95 % accuracy** and **ROC-AUC 0.96–0.98** on metallicity, magnetism and stability.
 - Extended the same protocol to **molecules**: RDKit descriptors + Morgan fingerprints, scaffold-grouped splits, 12 Tox21 toxicity endpoints (mean ROC-AUC 0.77), and a superconductor Tc model (MAE 2.9 K, R² 0.93) that ranks 554k unlabeled compositions and recovers the cuprate and vanadium-fluorophosphate families unaided.
+- Built an **illness-screening module**: 45 protein-activity models from ChEMBL, composed into illness scores through Open Targets evidence, so one molecule is scored against 15 illnesses in a single pass; enrichment measured against a 20k-molecule ZINC background and accuracy reported separately on measured molecules to expose decoy inflation.
 - Deployed everything as **MatSSL Studio** (FastAPI + React + Docker), with SHAP explanations, a molecule editor, a 3D crystal viewer and an interactive results dashboard; CI with pytest and GitHub Actions.
 
 **Short version (LinkedIn / portfolio):**
-*Built MatSSL, an end-to-end ML platform that predicts properties of inorganic materials and molecules from scarce labels. It covers 1.2 M compositions and 260 k molecules, semi-supervised, unsupervised and self-supervised learning, about 2,700 benchmarked models, stacked ensembles up to 94.6 % accuracy, molecular toxicity models and a Design Lab that screens 554 k unmeasured compositions for batteries and superconductors - deployed as a FastAPI + React web app with explanations, a molecule editor and a 3D crystal viewer.*
+*Built MatSSL, an end-to-end ML platform that predicts properties of inorganic materials and molecules from scarce labels. It covers 1.2 M compositions and 260 k molecules, semi-supervised, unsupervised and self-supervised learning, about 2,700 benchmarked models, stacked ensembles up to 94.6 % accuracy, molecular toxicity models, an illness-screening module built on 45 protein-activity models, and a Design Lab that screens 554 k unmeasured compositions for batteries and superconductors - deployed as a FastAPI + React web app with explanations, a molecule editor and a 3D crystal viewer.*

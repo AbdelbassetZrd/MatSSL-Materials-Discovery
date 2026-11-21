@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL259",
+ "symbol": "MC4R",
+ "name": "melanocortin 4 receptor",
+ "dataset": {
+  "n_molecules": 1851,
+  "n_scaffolds": 1006,
+  "positive_rate": 0.700162074554295,
+  "decoy_fraction": 0.25499729875742844,
+  "n_train": 1481,
+  "n_test": 370,
+  "n_measured_active": 1296,
+  "n_measured_inactive": 83
+ },
+ "metrics": {
+  "Model": "MC4R",
+  "Accuracy": 0.9891891891891892,
+  "Precision": 0.9922779922779923,
+  "Recall": 0.9922779922779923,
+  "F1-Score": 0.9922779922779923,
+  "ROC-AUC": 0.9995825941771888,
+  "PR-AUC": 0.9998193363864789,
+  "Composite_Score": 0.9959302932275905,
+  "Balanced_Accuracy": 0.9871299871299871,
+  "Threshold": 0.56
+ },
+ "metrics_measured_only": {
+  "n": 276,
+  "ROC-AUC": 0.9995457642516465,
+  "PR-AUC": 0.9999702426343353,
+  "Balanced_Accuracy": 0.9667272314331138,
+  "n_measured_minority": 83,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 78.22007722007721,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 92,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 33,
+   "accuracy": 0.9090909090909091,
+   "roc_auc": 0.967741935483871
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 224,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.56
+}

@@ -69,8 +69,23 @@ def graphql(client: httpx.Client, variables: dict) -> dict | None:
     return body["data"]["disease"]
 
 
+def gene_symbols(target: dict) -> set[str]:
+    """The gene symbols ChEMBL itself records for a target, upper-cased."""
+    return {s.get("component_synonym", "").upper()
+            for c in target.get("target_components", [])
+            for s in c.get("target_component_synonyms", [])
+            if s.get("syn_type") == "GENE_SYMBOL"}
+
+
 def chembl_target(client: httpx.Client, symbol: str, cache: dict) -> dict | None:
-    """Gene symbol -> single human protein in ChEMBL, with its number of measured activities."""
+    """Gene symbol -> single human protein in ChEMBL, with its number of measured activities.
+
+    The match must be on a gene symbol ChEMBL records for the target, and there is deliberately
+    **no fallback** to the best free-text hit. An earlier version fell back, and resolved FLG
+    (filaggrin) to FGFR1 - a different protein entirely, which then trained happily and reported
+    a ROC-AUC of 1.000 under the wrong name. Dropping a target is recoverable; silently
+    substituting the wrong protein is not.
+    """
     if symbol in cache:
         return cache[symbol]
     cache[symbol] = None
@@ -80,16 +95,10 @@ def chembl_target(client: httpx.Client, symbol: str, cache: dict) -> dict | None
         hits = [t for t in r.json().get("targets", [])
                 if t.get("organism") == "Homo sapiens"
                 and t.get("target_type") == "SINGLE PROTEIN"
-                and symbol.upper() in {c.get("component_description", "").upper()
-                                       for c in t.get("target_components", [])}
-                | {s.get("component_synonym", "").upper()
-                   for c in t.get("target_components", [])
-                   for s in c.get("target_component_synonyms", [])}]
-        if not hits:  # fall back to the best-scoring human single protein
-            hits = [t for t in r.json().get("targets", [])
-                    if t.get("organism") == "Homo sapiens"
-                    and t.get("target_type") == "SINGLE PROTEIN"]
+                and symbol.upper() in gene_symbols(t)]
         if not hits:
+            print(f"   {symbol}: no human single protein in ChEMBL carries this gene symbol "
+                  f"- dropped rather than guessed")
             return None
         tid = hits[0]["target_chembl_id"]
         r = client.get(f"{CHEMBL}/activity.json", params={

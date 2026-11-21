@@ -186,6 +186,11 @@ data/processed/*
 
 # Processed data
 !data/processed/.gitkeep
+# The illness knowledge base is 79 KB of curated metadata, not a dataset: 15 illnesses, their
+# associated proteins with evidence scores, and the drugs already approved for each. The app
+# cannot list a single illness without it and it takes an Open Targets crawl to rebuild, so it
+# is kept in the repository.
+!data/processed/diseases.json
 
 # Predictions
 data/predictions/*.csv

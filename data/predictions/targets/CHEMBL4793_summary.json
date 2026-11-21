@@ -1,0 +1,52 @@
+{
+ "chembl_id": "CHEMBL4793",
+ "symbol": "DPP9",
+ "name": "dipeptidyl peptidase 9",
+ "dataset": {
+  "n_molecules": 460,
+  "n_scaffolds": 231,
+  "positive_rate": 0.41956521739130437,
+  "decoy_fraction": 0.0,
+  "n_train": 368,
+  "n_test": 92,
+  "n_measured_active": 193,
+  "n_measured_inactive": 267
+ },
+ "metrics": {
+  "Model": "DPP9",
+  "Accuracy": 0.8804347826086957,
+  "Precision": 0.85,
+  "Recall": 0.8717948717948718,
+  "F1-Score": 0.8607594936708861,
+  "ROC-AUC": 0.9477503628447025,
+  "PR-AUC": 0.9343861395349812,
+  "Composite_Score": 0.9042549282577943,
+  "Balanced_Accuracy": 0.8792936623125303,
+  "Threshold": 0.30000000000000004
+ },
+ "metrics_measured_only": {
+  "n": 92,
+  "ROC-AUC": 0.9477503628447025,
+  "PR-AUC": 0.9343861395349812,
+  "Balanced_Accuracy": 0.8792936623125303,
+  "n_measured_minority": 193,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 56.52025641025641,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.5,
+   "n": 22,
+   "accuracy": 0.9090909090909091,
+   "roc_auc": 0.9166666666666666
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.30000000000000004
+}

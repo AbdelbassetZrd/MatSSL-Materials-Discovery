@@ -1,0 +1,70 @@
+{
+ "chembl_id": "CHEMBL1824",
+ "symbol": "ERBB2",
+ "name": "erb-b2 receptor tyrosine kinase 2",
+ "dataset": {
+  "n_molecules": 1927,
+  "n_scaffolds": 1031,
+  "positive_rate": 0.7000518941359626,
+  "decoy_fraction": 0.1883757135443695,
+  "n_train": 1538,
+  "n_test": 389,
+  "n_measured_active": 1349,
+  "n_measured_inactive": 215
+ },
+ "metrics": {
+  "Model": "ERBB2",
+  "Accuracy": 0.884318766066838,
+  "Precision": 0.9315589353612167,
+  "Recall": 0.9007352941176471,
+  "F1-Score": 0.9158878504672897,
+  "ROC-AUC": 0.9601558572146807,
+  "PR-AUC": 0.9816684681509035,
+  "Composite_Score": 0.9380218538409852,
+  "Balanced_Accuracy": 0.8734445701357466,
+  "Threshold": 0.79
+ },
+ "metrics_measured_only": {
+  "n": 331,
+  "ROC-AUC": 0.9239780658025922,
+  "PR-AUC": 0.9821609493534275,
+  "Balanced_Accuracy": 0.7978252741774676,
+  "n_measured_minority": 215,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 73.42253931275481,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 96,
+   "accuracy": 0.8958333333333334,
+   "roc_auc": 0.927906976744186
+  },
+  {
+   "min_similarity": 0.4,
+   "n": 20,
+   "accuracy": 0.6,
+   "roc_auc": 0.484375
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 102,
+   "accuracy": 0.8235294117647058,
+   "roc_auc": 0.8565254969749352
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 158,
+   "accuracy": 0.9493670886075949,
+   "roc_auc": 0.9267973856209151
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.79
+}

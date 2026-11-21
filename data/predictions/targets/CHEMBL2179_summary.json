@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL2179",
+ "symbol": "GBA1",
+ "name": "glucosylceramidase beta 1",
+ "dataset": {
+  "n_molecules": 451,
+  "n_scaffolds": 217,
+  "positive_rate": 0.4190687361419069,
+  "decoy_fraction": 0.0,
+  "n_train": 362,
+  "n_test": 89,
+  "n_measured_active": 189,
+  "n_measured_inactive": 262
+ },
+ "metrics": {
+  "Model": "GBA1",
+  "Accuracy": 0.7415730337078652,
+  "Precision": 0.696969696969697,
+  "Recall": 0.6388888888888888,
+  "F1-Score": 0.6666666666666666,
+  "ROC-AUC": 0.8425052410901468,
+  "PR-AUC": 0.7495407667646127,
+  "Composite_Score": 0.7545859538784068,
+  "Balanced_Accuracy": 0.725104821802935,
+  "Threshold": 0.485
+ },
+ "metrics_measured_only": {
+  "n": 89,
+  "ROC-AUC": 0.8425052410901468,
+  "PR-AUC": 0.7495407667646127,
+  "Balanced_Accuracy": 0.725104821802935,
+  "n_measured_minority": 189,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 11.131111111111112,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.3,
+   "n": 23,
+   "accuracy": 0.43478260869565216,
+   "roc_auc": 0.8026315789473684
+  },
+  {
+   "min_similarity": 0.4,
+   "n": 20,
+   "accuracy": 0.9,
+   "roc_auc": 0.9375
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 23,
+   "accuracy": 0.8260869565217391,
+   "roc_auc": 0.9222222222222223
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.485
+}

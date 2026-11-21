@@ -1,0 +1,65 @@
+{
+ "chembl_id": "CHEMBL5358",
+ "symbol": "EIF2AK4",
+ "name": "eukaryotic translation initiation factor 2 alpha kinase 4",
+ "dataset": {
+  "n_molecules": 432,
+  "n_scaffolds": 242,
+  "positive_rate": 0.7013888888888888,
+  "decoy_fraction": 0.2986111111111111,
+  "n_train": 345,
+  "n_test": 87,
+  "n_measured_active": 303,
+  "n_measured_inactive": 0
+ },
+ "metrics": {
+  "Model": "EIF2AK4",
+  "Accuracy": 0.9770114942528736,
+  "Precision": 0.9836065573770492,
+  "Recall": 0.9836065573770492,
+  "F1-Score": 0.9836065573770492,
+  "ROC-AUC": 0.9987389659520808,
+  "PR-AUC": 0.9994795732500652,
+  "Composite_Score": 0.9911727616645649,
+  "Balanced_Accuracy": 0.9725725094577553,
+  "Threshold": 0.67
+ },
+ "metrics_measured_only": {
+  "n": 303,
+  "n_measured_minority": 0,
+  "well_supported_threshold": 60,
+  "ROC-AUC": null,
+  "PR-AUC": null,
+  "Balanced_Accuracy": null,
+  "reportable": false,
+  "well_supported": false,
+  "withheld_because": "this target has only 0 measured molecules of its minority class; at least 15 are needed before a ROC-AUC is anything but noise"
+ },
+ "enrichment_factor_top1pct": 98.66065573770491,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 26,
+   "accuracy": 0.9615384615384616,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 30,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 30,
+   "accuracy": 0.9666666666666667,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.67
+}

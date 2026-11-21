@@ -1,0 +1,58 @@
+{
+ "chembl_id": "CHEMBL5804",
+ "symbol": "TLR9",
+ "name": "toll like receptor 9",
+ "dataset": {
+  "n_molecules": 496,
+  "n_scaffolds": 252,
+  "positive_rate": 0.34274193548387094,
+  "decoy_fraction": 0.0,
+  "n_train": 367,
+  "n_test": 129,
+  "n_measured_active": 170,
+  "n_measured_inactive": 326
+ },
+ "metrics": {
+  "Model": "TLR9",
+  "Accuracy": 0.9612403100775194,
+  "Precision": 0.9666666666666667,
+  "Recall": 0.8787878787878788,
+  "F1-Score": 0.9206349206349206,
+  "ROC-AUC": 0.9760101010101011,
+  "PR-AUC": 0.9647180190801257,
+  "Composite_Score": 0.9483225108225108,
+  "Balanced_Accuracy": 0.9341856060606061,
+  "Threshold": 0.375
+ },
+ "metrics_measured_only": {
+  "n": 129,
+  "ROC-AUC": 0.9760101010101011,
+  "PR-AUC": 0.9647180190801257,
+  "Balanced_Accuracy": 0.9341856060606061,
+  "n_measured_minority": 170,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 78.91787878787879,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.5,
+   "n": 98,
+   "accuracy": 0.9795918367346939,
+   "roc_auc": 0.9525593008739075
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 26,
+   "accuracy": 0.9230769230769231,
+   "roc_auc": 0.975
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.375
+}

@@ -1,0 +1,64 @@
+{
+ "chembl_id": "CHEMBL213",
+ "symbol": "ADRB1",
+ "name": "adrenoceptor beta 1",
+ "dataset": {
+  "n_molecules": 1151,
+  "n_scaffolds": 627,
+  "positive_rate": 0.7002606429192006,
+  "decoy_fraction": 0.17115551694178974,
+  "n_train": 923,
+  "n_test": 228,
+  "n_measured_active": 806,
+  "n_measured_inactive": 148
+ },
+ "metrics": {
+  "Model": "ADRB1",
+  "Accuracy": 0.9605263157894737,
+  "Precision": 0.9748427672955975,
+  "Recall": 0.96875,
+  "F1-Score": 0.9717868338557993,
+  "ROC-AUC": 0.9929227941176471,
+  "PR-AUC": 0.9973446068207943,
+  "Composite_Score": 0.9823548139867232,
+  "Balanced_Accuracy": 0.9549632352941176,
+  "Threshold": 0.65
+ },
+ "metrics_measured_only": {
+  "n": 185,
+  "ROC-AUC": 0.98675,
+  "PR-AUC": 0.9980161241810267,
+  "Balanced_Accuracy": 0.9043749999999999,
+  "n_measured_minority": 148,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 96.53731343283582,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 52,
+   "accuracy": 0.9807692307692307,
+   "roc_auc": 0.9803921568627451
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 55,
+   "accuracy": 0.9454545454545454,
+   "roc_auc": 0.9945054945054944
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 104,
+   "accuracy": 0.9903846153846154,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.65
+}

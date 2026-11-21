@@ -30,18 +30,54 @@ def has_models(client):
 
 
 # --------------------------------------------------------------------------- scoring logic
-def test_score_is_the_evidence_weighted_mean():
+def test_score_is_the_best_evidence_weighted_target():
     profile = {"T1": {"probability": 0.9, "similarity": 0.7},
                "T2": {"probability": 0.2, "similarity": 0.6}}
     r = score_disease(DISEASE, profile)
-    assert r["score"] == pytest.approx((0.9 * 0.9 + 0.4 * 0.2) / (0.9 + 0.4), abs=1e-4)
+    assert r["score"] == pytest.approx(max(0.9 * 0.9, 0.4 * 0.2), abs=1e-4)
+    assert r["panel_mean"] == pytest.approx((0.9 * 0.9 + 0.4 * 0.2) / (0.9 + 0.4), abs=1e-4)
     assert r["coverage"] == pytest.approx(2 / 3, abs=0.01)
     assert r["best_target"] == "AAA"
 
 
+def test_a_selective_molecule_is_not_punished_for_missing_the_other_targets():
+    """The donepezil case: active on one well-evidenced protein, inactive on the rest.
+
+    Under an evidence-weighted mean this scored 0.25 and was called "unlikely", which ranked
+    Alzheimer's below depression for the standard Alzheimer's drug. Selectivity is how most
+    drugs work, so the aggregation must not average it away.
+    """
+    # the real Alzheimer's panel: four proteins of comparable evidence, only one of them hit
+    alzheimers = {
+        "id": "MONDO_0004975", "label": "Alzheimer's disease",
+        "targets": [{"chembl_id": "ACHE", "symbol": "ACHE", "name": "", "association_score": 0.75},
+                    {"chembl_id": "ACE", "symbol": "ACE", "name": "", "association_score": 0.70},
+                    {"chembl_id": "APP", "symbol": "APP", "name": "", "association_score": 0.68},
+                    {"chembl_id": "CDK5", "symbol": "CDK5", "name": "", "association_score": 0.60}],
+    }
+    donepezil = {"ACHE": {"probability": 0.99, "similarity": 1.0},
+                 "ACE": {"probability": 0.06, "similarity": 0.31},
+                 "APP": {"probability": 0.01, "similarity": 0.28},
+                 "CDK5": {"probability": 0.04, "similarity": 0.25}}
+    r = score_disease(alzheimers, donepezil)
+    assert r["score"] == pytest.approx(0.75 * 0.99, abs=1e-4)
+    assert r["verdict"] == "worth testing"
+    assert r["best_target"] == "ACHE"
+    assert r["confidence"] == "high"      # the driving target is an exact match, so trust it
+    assert r["panel_mean"] < 0.3          # what the old mean reported: "unlikely"
+    assert r["score"] > 2 * r["panel_mean"]
+
+
+def test_a_molecule_active_on_nothing_still_scores_low():
+    r = score_disease(DISEASE, {"T1": {"probability": 0.05, "similarity": 0.9},
+                                "T2": {"probability": 0.10, "similarity": 0.9}})
+    assert r["score"] < 0.1
+    assert r["verdict"] == "unlikely"
+
+
 def test_targets_without_a_model_are_excluded_not_counted_as_zero():
     one = score_disease(DISEASE, {"T1": {"probability": 0.8, "similarity": 0.9}})
-    assert one["score"] == pytest.approx(0.8, abs=1e-6)  # not 0.8*0.9/1.5
+    assert one["score"] == pytest.approx(0.9 * 0.8, abs=1e-6)  # the one model, not averaged
     assert one["coverage"] == pytest.approx(1 / 3, abs=0.01)
 
 

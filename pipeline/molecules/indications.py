@@ -10,7 +10,13 @@ Illnesses enter only as *context*. Open Targets records how strongly the public 
 each protein to each illness, and those association scores are used to weight the per-target
 predictions:
 
-    score(molecule, illness) = sum_t  w_t * P(active | molecule, target t)  /  sum_t  w_t
+    score(molecule, illness) = max_t  w_t * P(active | molecule, target t)
+
+that is, the single most promising protein: how likely the molecule is to be active against it,
+discounted by how strongly the evidence links it to the illness. The maximum rather than a mean,
+because a drug does not have to hit every protein associated with an illness - a selective
+inhibitor of one of them is the normal case, and averaging punishes exactly the molecules that
+work. See `score_disease` for why a noisy-OR was rejected too.
 
 The result is a **screening score**: a way to rank which illnesses are worth a closer look for
 a given molecule, in the same spirit as a reverse-screening tool. It is a hypothesis, not a
@@ -74,7 +80,12 @@ def score_disease(disease: dict, profile: dict) -> dict:
                     "nearest_active": pred.get("nearest_active"),
                     "confidence": level, "confidence_note": why,
                     "decoy_fraction": pred.get("decoy_fraction"),
-                    "test_roc_auc": pred.get("test_roc_auc")}
+                    "test_roc_auc": pred.get("test_roc_auc"),
+                    # the honest score and the denominator it rests on, so the interface can
+                    # show how well measured this particular protein model really is
+                    "roc_auc_measured": pred.get("roc_auc_measured"),
+                    "n_measured_minority": pred.get("n_measured_minority"),
+                    "well_supported": pred.get("well_supported")}
             num += w * p
             den += w
         rows.append(row)
@@ -86,19 +97,45 @@ def score_disease(disease: dict, profile: dict) -> dict:
                 "verdict": "no model", "coverage": 0.0, "targets": rows,
                 "note": "none of the proteins linked to this illness has enough measured "
                         "activity data to train a model"}
-    order = {"low": 0, "medium": 1, "high": 2, "unknown": 0}
-    worst = min((r["confidence"] for r in modelled), key=lambda c: order[c])
-    score = num / den
+
+    # The score is the best evidence-weighted target, not the mean over all of them.
+    #
+    #     score = max_t  w_t * p_t
+    #
+    # Why the mean was wrong: a drug does not have to hit every protein linked to an illness, it
+    # has to hit one that matters. Donepezil is a selective acetylcholinesterase inhibitor, and
+    # that is exactly how it treats Alzheimer's - but averaging its 99 % on ACHE against its 1 %
+    # on APP and 4 % on CDK5 gave Alzheimer's 25, ranking it below depression and labelling it
+    # "unlikely". Selectivity is the normal case for a drug, and the mean penalises it.
+    #
+    # Why not a noisy-OR, 1 - prod(1 - w_t p_t), which is the other obvious choice: it assumes
+    # the per-target predictions are independent. They are not - they are all computed from the
+    # same descriptors and fingerprint of the same molecule, so they are strongly correlated, and
+    # a noisy-OR turns four mediocre correlated predictions into one confident-looking score. The
+    # maximum makes the weaker claim, and it is the claim the data supports.
+    #
+    # The evidence-weighted mean is still reported as `panel_mean`: "engages the whole panel" is
+    # a real question, just not the one being asked here.
+    driver = max(modelled, key=lambda r: r["association_score"] * r["probability"])
+    score = driver["association_score"] * driver["probability"]
+    panel_mean = num / den
+
+    # Confidence follows the target that drives the score, not the least relevant one. Under the
+    # mean every target contributed, so the weakest applicability domain mattered; now the claim
+    # rests on one target, so that is the one whose domain decides whether to trust it.
     return {
         "disease_id": disease["id"], "label": disease["label"],
         "score": round(score, 4),
-        "verdict": band(score, worst),
+        "panel_mean": round(panel_mean, 4),
+        "verdict": band(score, driver["confidence"]),
         "coverage": round(len(modelled) / len(rows), 2),
-        "confidence": worst,
-        "best_target": modelled[0]["symbol"],
+        "confidence": driver["confidence"],
+        "best_target": driver["symbol"],
         "targets": rows,
-        "note": (f"{len(modelled)} of {len(rows)} associated proteins have a model; "
-                 f"strongest predicted activity on {modelled[0]['symbol']}"),
+        "note": (f"{len(modelled)} of {len(rows)} associated proteins have a model; the score is "
+                 f"driven by {driver['symbol']} "
+                 f"(predicted {100 * driver['probability']:.0f}% active, evidence "
+                 f"{driver['association_score']:.2f})"),
     }
 
 

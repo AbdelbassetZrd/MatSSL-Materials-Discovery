@@ -1,0 +1,76 @@
+{
+ "chembl_id": "CHEMBL224",
+ "symbol": "HTR2A",
+ "name": "5-hydroxytryptamine receptor 2A",
+ "dataset": {
+  "n_molecules": 2330,
+  "n_scaffolds": 1219,
+  "positive_rate": 0.7,
+  "decoy_fraction": 0.2935622317596567,
+  "n_train": 1865,
+  "n_test": 465,
+  "n_measured_active": 1631,
+  "n_measured_inactive": 15
+ },
+ "metrics": {
+  "Model": "HTR2A",
+  "Accuracy": 0.9741935483870968,
+  "Precision": 0.9845679012345679,
+  "Recall": 0.9785276073619632,
+  "F1-Score": 0.9815384615384616,
+  "ROC-AUC": 0.9961159906430683,
+  "PR-AUC": 0.9983946695437448,
+  "Composite_Score": 0.9888272260907649,
+  "Balanced_Accuracy": 0.9712781921701903,
+  "Threshold": 0.49
+ },
+ "metrics_measured_only": {
+  "n": 329,
+  "ROC-AUC": 0.9877300613496933,
+  "PR-AUC": 0.9998873419095642,
+  "Balanced_Accuracy": 0.9892638036809815,
+  "n_measured_minority": 15,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": false
+ },
+ "enrichment_factor_top1pct": 62.04255190546708,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 136,
+   "accuracy": 0.9485294117647058,
+   "roc_auc": 0.9859213250517599
+  },
+  {
+   "min_similarity": 0.3,
+   "n": 49,
+   "accuracy": 0.9183673469387755,
+   "roc_auc": 0.9732441471571907
+  },
+  {
+   "min_similarity": 0.4,
+   "n": 24,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 116,
+   "accuracy": 0.9913793103448276,
+   "roc_auc": 1.0
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 140,
+   "accuracy": 1.0,
+   "roc_auc": null
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.49
+}

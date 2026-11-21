@@ -1,0 +1,58 @@
+{
+ "chembl_id": "CHEMBL1949",
+ "symbol": "PPIA",
+ "name": "peptidylprolyl isomerase A",
+ "dataset": {
+  "n_molecules": 402,
+  "n_scaffolds": 239,
+  "positive_rate": 0.7014925373134329,
+  "decoy_fraction": 0.25870646766169153,
+  "n_train": 320,
+  "n_test": 82,
+  "n_measured_active": 282,
+  "n_measured_inactive": 16
+ },
+ "metrics": {
+  "Model": "PPIA",
+  "Accuracy": 0.975609756097561,
+  "Precision": 0.9827586206896551,
+  "Recall": 0.9827586206896551,
+  "F1-Score": 0.9827586206896551,
+  "ROC-AUC": 0.9985632183908046,
+  "PR-AUC": 0.999410508071505,
+  "Composite_Score": 0.9906609195402298,
+  "Balanced_Accuracy": 0.9705459770114943,
+  "Threshold": 0.835
+ },
+ "metrics_measured_only": {
+  "n": 59,
+  "ROC-AUC": 0.9655172413793104,
+  "PR-AUC": 0.999410508071505,
+  "Balanced_Accuracy": 0.49137931034482757,
+  "n_measured_minority": 16,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": false
+ },
+ "enrichment_factor_top1pct": 100.28999999999999,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 22,
+   "accuracy": 1.0,
+   "roc_auc": null
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 58,
+   "accuracy": 0.9827586206896551,
+   "roc_auc": 0.9824561403508771
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.835
+}

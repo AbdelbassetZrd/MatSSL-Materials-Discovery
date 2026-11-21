@@ -7,6 +7,33 @@ import { depict, loadRDKit } from "../lib/rdkit.js";
 import { api } from "../api.js";
 import { fmt } from "../lib/theme.js";
 
+// The AUC worth showing is the one over *measured* molecules, not the one inflated by the
+// presumed-inactive ZINC decoys — and it only means something if enough measured molecules of
+// the rarer class stand behind it, so that count is shown with it.
+function ModelQuality({ t }) {
+  if (!t.modelled) return <span className="text-ink-mute">no model</span>;
+  const auc = t.roc_auc_measured ?? t.test_roc_auc;
+  const measured = t.roc_auc_measured != null;
+  const n = t.n_measured_minority;
+  const thin = measured && !t.well_supported;
+  return (
+    <span
+      className={thin ? "text-amber-700" : "text-good"}
+      title={
+        measured
+          ? `ROC-AUC ${fmt(auc, 3)} over measured molecules only${
+              n != null ? `, resting on ${n} measured molecules of the rarer class` : ""
+            }${thin ? " — too few for this number to carry much weight" : ""}`
+          : "ROC-AUC over all held-out molecules, including presumed-inactive ZINC decoys"
+      }
+    >
+      AUC {fmt(auc, 2)}
+      {measured && n != null && <span className="text-ink-mute"> · n={n}</span>}
+      {thin && " ⚠"}
+    </span>
+  );
+}
+
 function TargetRow({ t }) {
   return (
     <div className="grid grid-cols-[88px_1fr_auto] items-center gap-2 text-xs">
@@ -14,9 +41,7 @@ function TargetRow({ t }) {
       <div className="h-2 rounded bg-surface overflow-hidden" title="evidence linking this protein to the illness">
         <div className="h-2 rounded bg-brand" style={{ width: `${100 * t.association_score}%` }} />
       </div>
-      <span className={t.modelled ? "text-good" : "text-ink-mute"}>
-        {t.modelled ? `model AUC ${fmt(t.test_roc_auc, 2)}` : "no model"}
-      </span>
+      <ModelQuality t={t} />
     </div>
   );
 }
@@ -41,6 +66,11 @@ function Detail({ id, rdkit }) {
         <div className="space-y-1.5">
           {data.targets.map((t) => <TargetRow key={t.chembl_id} t={t} />)}
         </div>
+        <p className="mt-2 text-[11px] text-ink-mute">
+          AUC is measured on held-out molecules whose activity was actually measured, and
+          <span className="font-mono"> n</span> is how many of the rarer class stand behind it.
+          A low <span className="font-mono">n</span> (⚠) means that number carries little weight.
+        </p>
       </div>
       {data.known_drugs?.length > 0 && (
         <div>

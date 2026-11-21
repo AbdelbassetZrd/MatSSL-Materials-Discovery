@@ -1,0 +1,70 @@
+{
+ "chembl_id": "CHEMBL226",
+ "symbol": "ADORA1",
+ "name": "adenosine A1 receptor",
+ "dataset": {
+  "n_molecules": 1927,
+  "n_scaffolds": 1039,
+  "positive_rate": 0.7000518941359626,
+  "decoy_fraction": 0.2610275038920602,
+  "n_train": 1541,
+  "n_test": 386,
+  "n_measured_active": 1349,
+  "n_measured_inactive": 75
+ },
+ "metrics": {
+  "Model": "ADORA1",
+  "Accuracy": 0.9689119170984456,
+  "Precision": 0.967391304347826,
+  "Recall": 0.9888888888888889,
+  "F1-Score": 0.978021978021978,
+  "ROC-AUC": 0.9899584929757343,
+  "PR-AUC": 0.9952174920338022,
+  "Composite_Score": 0.9839902354988561,
+  "Balanced_Accuracy": 0.9556513409961687,
+  "Threshold": 0.635
+ },
+ "metrics_measured_only": {
+  "n": 287,
+  "ROC-AUC": 0.9425925925925926,
+  "PR-AUC": 0.9959241614343128,
+  "Balanced_Accuracy": 0.7885620915032681,
+  "n_measured_minority": 75,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
+ },
+ "enrichment_factor_top1pct": 69.499266593326,
+ "reliability_vs_similarity": [
+  {
+   "min_similarity": 0.0,
+   "n": 94,
+   "accuracy": 0.9893617021276596,
+   "roc_auc": 0.9926739926739926
+  },
+  {
+   "min_similarity": 0.3,
+   "n": 23,
+   "accuracy": 0.8260869565217391,
+   "roc_auc": 0.9083333333333334
+  },
+  {
+   "min_similarity": 0.5,
+   "n": 127,
+   "accuracy": 0.9763779527559056,
+   "roc_auc": 0.8821138211382114
+  },
+  {
+   "min_similarity": 0.7,
+   "n": 133,
+   "accuracy": 0.9774436090225563,
+   "roc_auc": 0.8987179487179487
+  }
+ ],
+ "base_models": [
+  "LightGBM",
+  "XGBoost",
+  "HistGB"
+ ],
+ "threshold": 0.635
+}

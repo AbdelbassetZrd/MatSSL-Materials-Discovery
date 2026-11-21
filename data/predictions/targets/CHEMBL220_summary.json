@@ -8,7 +8,9 @@
   "positive_rate": 0.7002743484224966,
   "decoy_fraction": 0.013717421124828532,
   "n_train": 1173,
-  "n_test": 285
+  "n_test": 285,
+  "n_measured_active": 1021,
+  "n_measured_inactive": 417
  },
  "metrics": {
   "Model": "ACHE",
@@ -26,9 +28,13 @@
   "n": 279,
   "ROC-AUC": 0.9142109963005485,
   "PR-AUC": 0.9531289919327933,
-  "Balanced_Accuracy": 0.8530424799081515
+  "Balanced_Accuracy": 0.8530424799081515,
+  "n_measured_minority": 417,
+  "well_supported_threshold": 60,
+  "reportable": true,
+  "well_supported": true
  },
- "enrichment_factor_top1pct": 49.258560140474096,
+ "enrichment_factor_top1pct": 69.65518939953697,
  "reliability_vs_similarity": [
   {
    "min_similarity": 0.0,
