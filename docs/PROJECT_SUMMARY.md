@@ -111,6 +111,22 @@ not a perfect model but the absence of a measurement. Only targets with 60 or mo
 average. A molecule unlike anything in the training set is reported as *unclear*, not as a
 confident low score.
 
+The scoring itself had to be rethought. It began as an evidence-weighted mean over an illness's
+proteins, which gave **donepezil** - the standard Alzheimer's drug - an Alzheimer's verdict of
+*unlikely*, even though the model identified its real target ACHE at 99 % with an exact structural
+match, because its correctly-predicted 1 % on APP and 4 % on CDK5 dragged the average down. A drug
+does not have to hit every protein linked to an illness, it has to hit one that matters, so the
+score is now the best evidence-weighted target. Donepezil's Alzheimer's: 0.74, *worth testing*, via
+ACHE. A noisy-OR was rejected because it assumes independence between predictions all computed
+from the same molecule's fingerprint.
+
+Validated on **163 approved drugs** by checking where each drug's own illness ranks: 41 % top-three
+for the 11 illnesses with human protein targets (20 % baseline; depression and Alzheimer's both
+83 %), and 0 % across all 37 drugs for the 4 infectious diseases - because an antiretroviral or an
+antimalarial acts on a protein of the pathogen, which a knowledge base of human proteins cannot
+express. The method's domain is therefore measured rather than assumed. Inert control molecules
+are never reported as worth testing.
+
 The error worth recounting is the one no metric could catch. Gene symbols are resolved to ChEMBL
 target ids, and the first resolver guessed when no target carried the symbol: **FLG** (filaggrin)
 resolved to **FGFR1**, a different protein, which then trained perfectly well and scored 1.000

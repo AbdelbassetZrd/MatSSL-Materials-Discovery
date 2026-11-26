@@ -1,0 +1,33 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrcc}
+\toprule
+Illness & Approved drugs & Median rank of its own illness & Top-3\\
+\midrule
+\multicolumn{4}{l}{\emph{Illnesses whose drugs act on human proteins}} \\
+\quad Depression & 12 & 1.0 / 15 & 83\% \\
+\quad Alzheimer's disease & 12 & 3.0 / 15 & 83\% \\
+\quad Parkinson's disease & 12 & 4.0 / 15 & 42\% \\
+\quad Lung cancer & 6 & 4.0 / 15 & 50\% \\
+\quad Asthma & 12 & 4.0 / 15 & 42\% \\
+\quad Epilepsy & 12 & 4.0 / 15 & 42\% \\
+\quad Type 2 diabetes & 12 & 6.0 / 15 & 42\% \\
+\quad Hypertension & 12 & 7.0 / 15 & 33\% \\
+\quad Obesity & 12 & 8.5 / 15 & 8\% \\
+\quad Breast cancer & 12 & 11.0 / 15 & 17\% \\
+\quad Rheumatoid arthritis & 12 & 11.5 / 15 & 17\% \\
+\quad \textit{group total} & \textit{126} & \textit{5.9} & \textit{41\%} \\
+\midrule
+\multicolumn{4}{l}{\emph{Infectious disease: the drug's target is in the pathogen}} \\
+\quad HIV infection & 12 & 11.0 / 15 & 0\% \\
+\quad COVID-19 & 1 & 11.0 / 15 & 0\% \\
+\quad Tuberculosis & 12 & 11.5 / 15 & 0\% \\
+\quad Malaria & 12 & 14.0 / 15 & 0\% \\
+\quad \textit{group total} & \textit{37} & \textit{12.1} & \textit{0\%} \\
+\midrule
+\textbf{All} & \textbf{163} & \textbf{7.0 / 15} & \textbf{32\%} \\
+Random ranking & -- & 8.0 / 15 & 20\% \\
+\bottomrule
+\end{tabular}
+\caption{Repurposing retrieval. Each illness's already-approved drugs are run through the complete pipeline; the table records where that drug's own illness lands in the ranking of all 15 illnesses. Random ranking is given for comparison.}\label{tab:targets-validation}
+\end{table}

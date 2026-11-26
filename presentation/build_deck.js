@@ -511,6 +511,59 @@ if (V.TgtNModels) {
     + "validation metric, because the metrics never see the name.");
 }
 
+// ======================================================= 22. does the screening work?
+if (V.TgtValApplicableTopThree && V.TgtValApplicableTopThree !== "?") {
+  s = newSlide("CONTENT", "Does it work? Ask the drugs that already exist", "Application");
+  s.addText(`All ${V.TgtValDrugs} drugs already approved for these illnesses go through the whole `
+    + "chain, and we check where each drug's own illness lands in its predicted ranking. "
+    + "The aggregate is above chance — and it hides the real finding.",
+    { x: 0.6, y: 1.3, w: 12.1, h: 0.7, fontSize: 14, color: C.text1, margin: 0, valign: "top",
+      isTextBox: true, objectName: "val intro" });
+  s.addTable([
+    [{ text: "", options: { bold: true } },
+      { text: "drugs", options: { bold: true } },
+      { text: "median rank", options: { bold: true } },
+      { text: "top-3", options: { bold: true } }],
+    [{ text: "Drugs acting on human proteins", options: { bold: true, color: HEX.accent4 } },
+      V.TgtValApplicableDrugs, `${V.TgtValApplicableMedian} / 15`,
+      { text: `${V.TgtValApplicableTopThree} %`, options: { bold: true, color: HEX.accent4 } }],
+    ["   Depression", "12", "1.0 / 15", "83 %"],
+    ["   Alzheimer's disease", "12", "3.0 / 15", "83 %"],
+    [{ text: "Infectious disease", options: { bold: true, color: HEX.accent6 } },
+      V.TgtValInfectiousDrugs, `${V.TgtValInfectiousMedian} / 15`,
+      { text: `${V.TgtValInfectiousTopThree} %`, options: { bold: true, color: HEX.accent6 } }],
+    ["   HIV · tuberculosis · malaria", "37", "worse than random", "0 %"],
+    [{ text: "Random ranking", options: { italic: true } },
+      { text: "–", options: { italic: true } },
+      { text: "8.0 / 15", options: { italic: true } },
+      { text: "20 %", options: { italic: true } }],
+  ], { x: 0.6, y: 2.15, w: 7.5, colW: [3.1, 1.0, 2.0, 1.4], fontSize: 12, color: HEX.dk1,
+    border: { type: "solid", color: "E2E8F0", pt: 1 }, valign: "middle", rowH: 0.34,
+    objectName: "val table" });
+  card(s, 8.3, 2.15, 4.4, 2.5, "Why infectious disease fails",
+    "Open Targets links an illness to its *human* proteins. But an antiretroviral inhibits HIV "
+    + "protease, an antimalarial acts on the parasite, a TB drug on mycobacterial enzymes.\n\n"
+    + "None of those is human, so none can be in the panel. The models are asked whether these "
+    + "drugs bind human proteins they were never meant to — and correctly answer no.",
+    "accent6", "val why");
+  bullets(s, [
+    "So the domain is measured, not assumed: human protein targets yes, infectious disease no",
+    "A limit found by measurement beats one asserted in advance — which is why every illness was tested, not a favourable subset",
+    `Inert controls (water, glucose, benzene): ${V.TgtCtrlFlags} ever reported "worth testing"`,
+  ], 8.3, 4.8, 4.4, 2.0, 12);
+  s.addText("This is the only test that exercises the whole chain end to end. It is permissive — "
+    + "these drugs are in ChEMBL, so a model may partly be recalling them — but a pipeline that "
+    + "fails it is broken whatever its per-protein scores say.",
+    { x: 0.6, y: 5.0, w: 7.5, h: 1.0, fontSize: 12, italic: true, color: C.text1, margin: 0,
+      valign: "top", isTextBox: true, objectName: "val caveat" });
+  s.addNotes("The headline is 32 % top-three against a 20 % baseline, which is unremarkable. The "
+    + "split is the result: 41 % where the drug acts on a human protein, and zero across all 37 "
+    + "drugs for HIV, tuberculosis, malaria and COVID-19. That is not the models failing - it is "
+    + "the knowledge base being unable to express where those drugs act, because it holds human "
+    + "proteins and those drugs target the pathogen. If asked what the module cannot do, this is "
+    + "the answer, and it is measured rather than guessed.");
+}
+
 // ================================================================== 19. discussion
 s = newSlide("CONTENT", "Discussion and limitations", "Conclusion");
 bullets(s, [

@@ -1,0 +1,230 @@
+{
+ "setup": {
+  "budget": 400,
+  "unlabeled": 5000,
+  "seeds": 3,
+  "pool": "ZINC"
+ },
+ "targets": [
+  {
+   "chembl_id": "CHEMBL1977",
+   "symbol": "VDR",
+   "n_measured": 409,
+   "n_labels": 241,
+   "n_unlabeled": 5000,
+   "seeds": 3,
+   "best_method": "SelfTraining-LightGBM (tau=0.9, n=5000)",
+   "baseline_composite": 0.9864,
+   "improvement_pct": 0.2737226277372186,
+   "per_method": [
+    {
+     "method": "Baseline LightGBM (241 labeled)",
+     "composite_mean": 0.9864,
+     "composite_std": 0.0066,
+     "f1_mean": 0.9728,
+     "auc_mean": 1.0
+    },
+    {
+     "method": "ClusterThenLabel-LightGBM (k=50, purity=0.8, n=5000)",
+     "composite_mean": 0.9856,
+     "composite_std": 0.0122,
+     "f1_mean": 0.9712,
+     "auc_mean": 1.0
+    },
+    {
+     "method": "CoTraining-LightGBM (tau=0.85, n=5000)",
+     "composite_mean": 0.8771,
+     "composite_std": 0.021,
+     "f1_mean": 0.9432,
+     "auc_mean": 0.8109
+    },
+    {
+     "method": "LabelPropagation (knn, k=10, n=5000)",
+     "composite_mean": 0.9533,
+     "composite_std": 0.0069,
+     "f1_mean": 0.9275,
+     "auc_mean": 0.9792
+    },
+    {
+     "method": "LabelSpreading (knn, k=10, alpha=0.2, n=5000)",
+     "composite_mean": 0.9456,
+     "composite_std": 0.0104,
+     "f1_mean": 0.9121,
+     "auc_mean": 0.9792
+    },
+    {
+     "method": "SelfTraining-LightGBM (tau=0.9, n=5000)",
+     "composite_mean": 0.9891,
+     "composite_std": 0.0063,
+     "f1_mean": 0.9785,
+     "auc_mean": 0.9997
+    }
+   ]
+  },
+  {
+   "chembl_id": "CHEMBL1981",
+   "symbol": "INSR",
+   "n_measured": 433,
+   "n_labels": 259,
+   "n_unlabeled": 5000,
+   "seeds": 3,
+   "best_method": "Baseline LightGBM (259 labeled)",
+   "baseline_composite": 0.9286,
+   "improvement_pct": 0.0,
+   "per_method": [
+    {
+     "method": "Baseline LightGBM (259 labeled)",
+     "composite_mean": 0.9286,
+     "composite_std": 0.0201,
+     "f1_mean": 0.9664,
+     "auc_mean": 0.8908
+    },
+    {
+     "method": "ClusterThenLabel-LightGBM (k=50, purity=0.8, n=5000)",
+     "composite_mean": 0.8671,
+     "composite_std": 0.0591,
+     "f1_mean": 0.9393,
+     "auc_mean": 0.7949
+    },
+    {
+     "method": "CoTraining-LightGBM (tau=0.85, n=5000)",
+     "composite_mean": 0.867,
+     "composite_std": 0.0474,
+     "f1_mean": 0.9384,
+     "auc_mean": 0.7957
+    },
+    {
+     "method": "LabelPropagation (knn, k=10, n=5000)",
+     "composite_mean": 0.876,
+     "composite_std": 0.009,
+     "f1_mean": 0.9192,
+     "auc_mean": 0.8329
+    },
+    {
+     "method": "LabelSpreading (knn, k=10, alpha=0.2, n=5000)",
+     "composite_mean": 0.8722,
+     "composite_std": 0.0138,
+     "f1_mean": 0.9269,
+     "auc_mean": 0.8174
+    },
+    {
+     "method": "SelfTraining-LightGBM (tau=0.9, n=5000)",
+     "composite_mean": 0.8486,
+     "composite_std": 0.0477,
+     "f1_mean": 0.935,
+     "auc_mean": 0.7623
+    }
+   ]
+  },
+  {
+   "chembl_id": "CHEMBL2179",
+   "symbol": "GBA1",
+   "n_measured": 451,
+   "n_labels": 272,
+   "n_unlabeled": 5000,
+   "seeds": 3,
+   "best_method": "Baseline LightGBM (272 labeled)",
+   "baseline_composite": 0.9336,
+   "improvement_pct": 0.0,
+   "per_method": [
+    {
+     "method": "Baseline LightGBM (272 labeled)",
+     "composite_mean": 0.9336,
+     "composite_std": 0.0157,
+     "f1_mean": 0.9021,
+     "auc_mean": 0.965
+    },
+    {
+     "method": "ClusterThenLabel-LightGBM (k=50, purity=0.8, n=5000)",
+     "composite_mean": 0.8941,
+     "composite_std": 0.0361,
+     "f1_mean": 0.8471,
+     "auc_mean": 0.941
+    },
+    {
+     "method": "CoTraining-LightGBM (tau=0.85, n=5000)",
+     "composite_mean": 0.8921,
+     "composite_std": 0.0123,
+     "f1_mean": 0.8525,
+     "auc_mean": 0.9317
+    },
+    {
+     "method": "LabelPropagation (knn, k=10, n=5000)",
+     "composite_mean": 0.7622,
+     "composite_std": 0.0423,
+     "f1_mean": 0.6915,
+     "auc_mean": 0.8329
+    },
+    {
+     "method": "LabelSpreading (knn, k=10, alpha=0.2, n=5000)",
+     "composite_mean": 0.7318,
+     "composite_std": 0.0726,
+     "f1_mean": 0.6863,
+     "auc_mean": 0.7772
+    },
+    {
+     "method": "SelfTraining-LightGBM (tau=0.9, n=5000)",
+     "composite_mean": 0.9223,
+     "composite_std": 0.0282,
+     "f1_mean": 0.8745,
+     "auc_mean": 0.9701
+    }
+   ]
+  },
+  {
+   "chembl_id": "CHEMBL4793",
+   "symbol": "DPP9",
+   "n_measured": 460,
+   "n_labels": 276,
+   "n_unlabeled": 5000,
+   "seeds": 3,
+   "best_method": "CoTraining-LightGBM (tau=0.85, n=5000)",
+   "baseline_composite": 0.9057,
+   "improvement_pct": 0.43060616098045873,
+   "per_method": [
+    {
+     "method": "Baseline LightGBM (276 labeled)",
+     "composite_mean": 0.9057,
+     "composite_std": 0.012,
+     "f1_mean": 0.8638,
+     "auc_mean": 0.9476
+    },
+    {
+     "method": "ClusterThenLabel-LightGBM (k=50, purity=0.8, n=5000)",
+     "composite_mean": 0.8632,
+     "composite_std": 0.0124,
+     "f1_mean": 0.8202,
+     "auc_mean": 0.9062
+    },
+    {
+     "method": "CoTraining-LightGBM (tau=0.85, n=5000)",
+     "composite_mean": 0.9096,
+     "composite_std": 0.0072,
+     "f1_mean": 0.8784,
+     "auc_mean": 0.9407
+    },
+    {
+     "method": "LabelPropagation (knn, k=10, n=5000)",
+     "composite_mean": 0.8758,
+     "composite_std": 0.0027,
+     "f1_mean": 0.8396,
+     "auc_mean": 0.912
+    },
+    {
+     "method": "LabelSpreading (knn, k=10, alpha=0.2, n=5000)",
+     "composite_mean": 0.8757,
+     "composite_std": 0.0032,
+     "f1_mean": 0.8472,
+     "auc_mean": 0.9043
+    },
+    {
+     "method": "SelfTraining-LightGBM (tau=0.9, n=5000)",
+     "composite_mean": 0.8776,
+     "composite_std": 0.0211,
+     "f1_mean": 0.8448,
+     "auc_mean": 0.9104
+    }
+   ]
+  }
+ ]
+}

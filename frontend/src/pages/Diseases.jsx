@@ -12,24 +12,27 @@ import { fmt } from "../lib/theme.js";
 // the rarer class stand behind it, so that count is shown with it.
 function ModelQuality({ t }) {
   if (!t.modelled) return <span className="text-ink-mute">no model</span>;
-  const auc = t.roc_auc_measured ?? t.test_roc_auc;
   const measured = t.roc_auc_measured != null;
+  const auc = measured ? t.roc_auc_measured : t.test_roc_auc;
   const n = t.n_measured_minority;
-  const thin = measured && !t.well_supported;
+  // Three states, and the worst one must not look like the best. When the measured-only score
+  // was withheld there were too few measured molecules of the rarer class to compute it, so what
+  // is left is the figure inflated by presumed-inactive ZINC decoys — often a flattering 1.00.
+  // Showing that unmarked would make the least verified protein look like the strongest.
+  const state = !measured ? "unverified" : t.well_supported ? "good" : "thin";
+  const tone = { good: "text-good", thin: "text-amber-700", unverified: "text-red-600" }[state];
+  const title = {
+    good: `ROC-AUC ${fmt(auc, 3)} over measured molecules only, resting on ${n} of the rarer class`,
+    thin: `ROC-AUC ${fmt(auc, 3)} over measured molecules only, but resting on just ${n} of the `
+      + "rarer class — too few for this number to carry much weight",
+    unverified: `only ${n ?? 0} measured molecules of the rarer class, too few to score honestly. `
+      + "This figure includes presumed-inactive molecules and is almost certainly optimistic.",
+  }[state];
   return (
-    <span
-      className={thin ? "text-amber-700" : "text-good"}
-      title={
-        measured
-          ? `ROC-AUC ${fmt(auc, 3)} over measured molecules only${
-              n != null ? `, resting on ${n} measured molecules of the rarer class` : ""
-            }${thin ? " — too few for this number to carry much weight" : ""}`
-          : "ROC-AUC over all held-out molecules, including presumed-inactive ZINC decoys"
-      }
-    >
+    <span className={tone} title={title}>
       AUC {fmt(auc, 2)}
-      {measured && n != null && <span className="text-ink-mute"> · n={n}</span>}
-      {thin && " ⚠"}
+      {n != null && <span className="text-ink-mute"> · n={n}</span>}
+      {state !== "good" && " ⚠"}
     </span>
   );
 }
@@ -67,9 +70,11 @@ function Detail({ id, rdkit }) {
           {data.targets.map((t) => <TargetRow key={t.chembl_id} t={t} />)}
         </div>
         <p className="mt-2 text-[11px] text-ink-mute">
-          AUC is measured on held-out molecules whose activity was actually measured, and
-          <span className="font-mono"> n</span> is how many of the rarer class stand behind it.
-          A low <span className="font-mono">n</span> (⚠) means that number carries little weight.
+          AUC is measured on held-out molecules whose activity was actually measured, and{" "}
+          <span className="font-mono">n</span> is how many of the rarer class stand behind it.
+          Amber (⚠) means <span className="font-mono">n</span> is small, so the number carries
+          little weight; red means it was too small to score honestly at all, and what is shown
+          includes presumed-inactive molecules.
         </p>
       </div>
       {data.known_drugs?.length > 0 && (

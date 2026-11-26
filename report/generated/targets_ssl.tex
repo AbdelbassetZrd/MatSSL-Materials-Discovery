@@ -1,0 +1,14 @@
+\begin{table}[H]
+\centering\small
+\begin{tabular}{lrrlcr}
+\toprule
+Protein & Measured & Labels & Best method & Baseline & Gain\\
+\midrule
+VDR & 409 & 241 & SelfTraining-LightGBM (tau=0.9, n=5000) & 0.9864 & +0.27\% \\
+INSR & 433 & 259 & Baseline LightGBM (259 labeled) & 0.9286 & +0.00\% \\
+GBA1 & 451 & 272 & Baseline LightGBM (272 labeled) & 0.9336 & +0.00\% \\
+DPP9 & 460 & 276 & CoTraining-LightGBM (tau=0.85, n=5000) & 0.9057 & +0.43\% \\
+\bottomrule
+\end{tabular}
+\caption{The semi-supervised comparison repeated on the protein targets with the fewest measured molecules, with the unlabelled ZINC pool. Same protocol as the materials and toxicity tracks. Where the best method is the baseline, no semi-supervised variant beat supervised learning on that protein. }\label{tab:targets-ssl}
+\end{table}

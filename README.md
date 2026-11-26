@@ -123,7 +123,14 @@ illness C?" instant, and what makes adding an illness cost no training at all.
 
 ```
 molecule --(45 protein models)--> activity profile --(Open Targets evidence)--> illness ranking
+
+illness score = max over the illness's proteins of  evidence(protein) x P(active | molecule)
 ```
+
+The score is a **maximum, not a mean**: a drug does not have to hit every protein linked to an
+illness, it has to hit one that matters. Averaging gave donepezil - the standard Alzheimer's drug,
+whose real target ACHE the model predicts at 99 % - an Alzheimer's verdict of *unlikely*, because
+its correct 1 % on APP and 4 % on CDK5 diluted the signal. Selectivity is how drugs work.
 
 15 illnesses and 52 associated proteins, 45 with enough measured ChEMBL activity to model.
 Scaffold-grouped splits, enrichment measured against 20,000 random ZINC molecules, and **ROC-AUC
@@ -132,7 +139,14 @@ decoys are an assumption and flatter the score (DRD2: 0.989 against 0.792 once t
 Each measured-only score carries **the number of measured molecules of the rarer class it rests
 on**, after NR3C1's apparently perfect 1.000 turned out to be computed against fifteen inactives.
 A molecule unlike anything in the training set is reported as *unclear*, never as a confident
-finding. This is in-silico screening for research
+finding.
+
+**Validated on 163 approved drugs** by checking where each drug's own illness lands in its
+predicted ranking. For the 11 illnesses treated by modulating a human protein it works - 41 %
+top-three against a 20 % baseline, and depression and Alzheimer's at 83 %. For the 4 infectious
+diseases it fails on all 37 drugs, because an antiretroviral or an antimalarial acts on a protein
+of the pathogen and the knowledge base only holds human proteins. That bounds the method: it
+applies to illnesses with a human protein target, and not to infectious disease. This is in-silico screening for research
 and teaching - a predicted protein interaction is a hypothesis, not a treatment.
 
 **Design Lab.** Pick an application and get candidate materials, ranked from the 554k unlabeled

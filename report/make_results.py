@@ -475,14 +475,17 @@ def main() -> None:
             "\\label{tab:targets}\n\\end{table}\n", encoding="utf-8")
     vf = T / "validation.json"
     if tsum and not vf.exists():  # validation still to run: keep the report compilable
-        for k in ("ValDrugs", "ValTop1", "ValTop3", "ValTop5", "ValRandom", "ValMedian",
-                  "CtrlMax", "CtrlFlags"):
+        for k in ("ValDrugs", "ValTopOne", "ValTopThree", "ValTopFive", "ValRandom", "ValMedian",
+                  "CtrlMax", "CtrlFlags", "ValApplicableIllnesses", "ValApplicableDrugs",
+                  "ValApplicableTopThree", "ValApplicableMedian", "ValInfectiousIllnesses",
+                  "ValInfectiousDrugs", "ValInfectiousTopThree", "ValInfectiousMedian"):
             mac(f"Tgt{k}", "?")
     if vf.exists():
         v = json.loads(vf.read_text(encoding="utf-8"))
         mac("TgtValDrugs", f"{v['n_drugs_tested']:,}")
-        for k in ("top1", "top3", "top5"):
-            mac(f"TgtVal{k.capitalize()}", f"{100 * v[k]:.0f}" if v.get(k) is not None else "?")
+        # a LaTeX command name cannot contain a digit, so top1 becomes TopOne, not Top1
+        for k, word in (("top1", "TopOne"), ("top3", "TopThree"), ("top5", "TopFive")):
+            mac(f"TgtVal{word}", f"{100 * v[k]:.0f}" if v.get(k) is not None else "?")
         mac("TgtValRandom", f"{100 * v['random_baseline_top1']:.1f}")
         mac("TgtValMedian", f"{v['median_rank']:.1f}" if v.get("median_rank") else "?")
         ctrl = v.get("negative_controls", [])
@@ -490,9 +493,40 @@ def main() -> None:
             mac("TgtCtrlMax", f"{100 * max(c['max_score'] for c in ctrl):.0f}")
             mac("TgtCtrlFlags", f"{sum(c['n_worth_testing'] for c in ctrl):,}")
         nd = v["n_diseases"]
-        rows = [f"{esc(d['illness'])} & {d['n_drugs']} & {d['median_rank']:.1f} / {nd} & "
-                f"{100 * d['top3']:.0f}\\% \\\\" for d in v.get("per_disease", [])]
-        rows.append("\\midrule")
+        # Open Targets links an illness to *human* proteins. For an infectious disease the drug
+        # acts on a protein of the pathogen - the parasite, the bacterium, the virus - which
+        # cannot be in the panel, so retrieval fails there by construction rather than because
+        # the models are poor. The two groups are therefore reported separately.
+        infectious = {"Tuberculosis", "Malaria", "HIV infection", "COVID-19"}
+
+        def group_stats(rows_):
+            n = sum(d["n_drugs"] for d in rows_) or 1
+            return (len(rows_), n,
+                    sum(d["top3"] * d["n_drugs"] for d in rows_) / n,
+                    sum(d["median_rank"] * d["n_drugs"] for d in rows_) / n)
+
+        human = [d for d in v.get("per_disease", []) if d["illness"] not in infectious]
+        patho = [d for d in v.get("per_disease", []) if d["illness"] in infectious]
+        for tag, grp in (("Applicable", human), ("Infectious", patho)):
+            n_ill, n_drug, t3, mr = group_stats(grp)
+            mac(f"TgtVal{tag}Illnesses", f"{n_ill:,}")
+            mac(f"TgtVal{tag}Drugs", f"{n_drug:,}")
+            mac(f"TgtVal{tag}TopThree", f"{100 * t3:.0f}")
+            mac(f"TgtVal{tag}Median", f"{mr:.1f}")
+
+        rows = []
+        for grp, head in ((human, "Illnesses whose drugs act on human proteins"),
+                          (patho, "Infectious disease: the drug's target is in the pathogen")):
+            if not grp:
+                continue
+            rows.append(f"\\multicolumn{{4}}{{l}}{{\\emph{{{head}}}}} \\\\")
+            rows += [f"\\quad {esc(d['illness'])} & {d['n_drugs']} & "
+                     f"{d['median_rank']:.1f} / {nd} & {100 * d['top3']:.0f}\\% \\\\"
+                     for d in sorted(grp, key=lambda d: d["median_rank"])]
+            n_ill, n_drug, t3, mr = group_stats(grp)
+            rows.append(f"\\quad \\textit{{group total}} & \\textit{{{n_drug}}} & "
+                        f"\\textit{{{mr:.1f}}} & \\textit{{{100 * t3:.0f}\\%}} \\\\")
+            rows.append("\\midrule")
         rows.append(f"\\textbf{{All}} & \\textbf{{{v['n_drugs_tested']}}} & "
                     f"\\textbf{{{v['median_rank']:.1f} / {nd}}} & "
                     f"\\textbf{{{100 * v['top3']:.0f}\\%}} \\\\")
@@ -517,6 +551,10 @@ def main() -> None:
             g = [r["improvement_pct"] for r in rs]
             mac("TgtSSLNTargets", f"{len(rs):,}")
             mac("TgtSSLBudget", f"{sc['setup']['budget']:,}")
+            # the nominal budget is a cap; these proteins have too little data to reach it
+            mac("TgtSSLLabelsMin", f"{min(r['n_labels'] for r in rs):,}")
+            mac("TgtSSLLabelsMax", f"{max(r['n_labels'] for r in rs):,}")
+            mac("TgtSSLNoGain", f"{sum(1 for r in rs if r['improvement_pct'] < 0.01):,}")
             mac("TgtSSLMin", f"{min(g):+.2f}")
             mac("TgtSSLMax", f"{max(g):+.2f}")
             mac("TgtSSLMean", f"{sum(g) / len(g):+.2f}")
@@ -525,11 +563,13 @@ def main() -> None:
                     f"{r['improvement_pct']:+.2f}\\% \\\\" for r in rs]
             (GEN / "targets_ssl.tex").write_text(
                 "\\begin{table}[H]\n\\centering\\small\n\\begin{tabular}{lrrlcr}\n\\toprule\n"
-                "Protein & Measured & Labels & Best SSL method & Baseline & Gain\\\\\n\\midrule\n"
+                "Protein & Measured & Labels & Best method & Baseline & Gain\\\\\n\\midrule\n"
                 + "\n".join(rows) + "\n\\bottomrule\n\\end{tabular}\n\\caption{The "
                 "semi-supervised comparison repeated on the protein targets with the fewest "
                 "measured molecules, with the unlabelled ZINC pool. Same protocol as the "
-                "materials and toxicity tracks.}\\label{tab:targets-ssl}\n\\end{table}\n",
+                "materials and toxicity tracks. Where the best method is the baseline, no "
+                "semi-supervised variant beat supervised learning on that protein. "
+                "}\\label{tab:targets-ssl}\n\\end{table}\n",
                 encoding="utf-8")
 
     (GEN / "macros.tex").write_text("\n".join(macros) + "\n", encoding="utf-8")

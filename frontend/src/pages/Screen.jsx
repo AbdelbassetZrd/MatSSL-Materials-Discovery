@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { AlertTriangle, ChevronDown, ChevronRight, Info, Beaker } from "lucide-react";
 import { ErrorBox, Loading, SectionHeader, Tabs } from "../components/ui.jsx";
@@ -209,22 +209,32 @@ function Matrix({ molecules }) {
 
 export default function Screen() {
   const ctx = useMolecule();
+  // ?smiles=... makes a screening result a shareable link, as it already is on the toxicity
+  // page. Without it this page could only ever show whatever molecule the session happened to
+  // be holding.
+  const [params] = useSearchParams();
+  const linked = params.get("smiles");
   const [rdkit, setRdkit] = useState(null);
   const [tab, setTab] = useState("one");
-  const [smiles, setSmiles] = useState(ctx.smiles);
+  const [smiles, setSmiles] = useState(linked || ctx.smiles);
   useEffect(() => {
     loadRDKit().then(setRdkit).catch(() => {});
   }, []);
-  useEffect(() => setSmiles(ctx.smiles), [ctx.smiles]);
+  useEffect(() => {
+    if (!linked) setSmiles(ctx.smiles);
+  }, [ctx.smiles, linked]);
 
   const choices = useMemo(() => {
     const seen = new Set();
-    return [{ smiles: ctx.smiles, name: "current molecule" }, ...ctx.saved].filter((m) => {
+    const head = [];
+    if (linked && linked !== ctx.smiles) head.push({ smiles: linked, name: "from link" });
+    head.push({ smiles: ctx.smiles, name: "current molecule" });
+    return [...head, ...ctx.saved].filter((m) => {
       if (!m.smiles || seen.has(m.smiles)) return false;
       seen.add(m.smiles);
       return true;
     });
-  }, [ctx.smiles, ctx.saved]);
+  }, [ctx.smiles, ctx.saved, linked]);
   const svg = useMemo(() => depict(rdkit, smiles, { width: 240, height: 150 }), [rdkit, smiles]);
 
   return (

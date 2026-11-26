@@ -38,7 +38,8 @@ because three useful properties follow from it.
 \begin{enumerate}
   \item \textbf{Asking about a second and third illness is free.} A molecule is featurised once
     and passed through the \TgtNModels{} protein models once. Each illness is then a different
-    weighted sum over the \emph{same} activity profile --- arithmetic, not another model. The
+    weighted lookup over the \emph{same} activity profile (Equation~\ref{eq:illness-score})
+    --- arithmetic, not another model. The
     complete ranking over all \TgtNDiseases{} illnesses is returned by a single request, which is
     exactly the interaction the application needs: \emph{and what about this illness? and this
     one?}
@@ -165,26 +166,89 @@ to every validation metric, because the metrics never see the name. An implausib
 a reason to audit the inputs, not to celebrate.
 
 \subsection{Composing protein predictions into an illness score}
+\label{sec:illness-score}
 
-With an activity profile in hand, the score for illness $d$ is the evidence-weighted mean of the
-predicted activities over its associated proteins:
+An activity profile gives one probability per protein. Turning that into a score for an illness
+means choosing how to combine the proteins associated with it, and that choice turned out to
+matter more than any modelling decision in this module.
+
+\paragraph{The first attempt, and the molecule that refuted it.} The obvious choice is the
+evidence-weighted mean over the illness's proteins,
+$\sum_t w_{dt} p_t / \sum_t w_{dt}$. It was implemented, and it fails on the first drug anyone
+would test it with.
+
+\textbf{Donepezil} is the standard treatment for Alzheimer's disease and a selective
+acetylcholinesterase inhibitor. Screened against the \TgtNDiseases{} illnesses, the pipeline put
+its real target ACHE at $99\%$ with a Tanimoto of $1.00$ to a known active --- the chemistry was
+recognised perfectly. Alzheimer's is associated with four modelled proteins of comparable
+evidence, and donepezil is correctly predicted inactive on the other three:
+
+\begin{center}\small
+\begin{tabular}{lccc}
+\toprule
+Protein & evidence $w$ & $P(\text{active})$ & $w \cdot p$\\
+\midrule
+ACHE  & 0.75 & 99\,\% & \textbf{0.74}\\
+ACE   & 0.70 &  6\,\% & 0.04\\
+APP   & 0.68 &  1\,\% & 0.01\\
+CDK5  & 0.60 &  4\,\% & 0.02\\
+\midrule
+\multicolumn{3}{l}{evidence-weighted mean} & 0.25\\
+\multicolumn{3}{l}{best evidence-weighted target} & \textbf{0.74}\\
+\bottomrule
+\end{tabular}
+\end{center}
+
+The mean gave Alzheimer's \textbf{0.25} and the verdict \emph{unlikely}, ranking it below
+depression. The pipeline had identified the correct mechanism of the correct drug and then
+reported it as not worth testing, because three proteins that no drug hits dragged the average
+down.
+
+The error is conceptual, not numerical. A mean asks \emph{does this molecule engage the whole
+panel of proteins linked to this illness?} Almost no drug does, and the ones that come closest
+are promiscuous compounds that fail for that very reason. Selectivity is how a drug is supposed
+to work, and the mean penalises it hardest.
+
+\paragraph{What the score is now.} The question worth asking is whether \emph{any} well-evidenced
+protein is likely to be engaged, so the score is the best evidence-weighted target:
 
 \begin{equation}
-  S(m, d) \;=\; \frac{\sum_{t \in T_d} w_{dt} \cdot P(\text{active} \mid m, t)}
-                     {\sum_{t \in T_d} w_{dt}}
+  S(m, d) \;=\; \max_{t \in T_d} \; w_{dt} \cdot P(\text{active} \mid m, t)
   \label{eq:illness-score}
 \end{equation}
 
 where $w_{dt}$ is the association score between illness $d$ and protein $t$, and $T_d$ is the set
-of its proteins \emph{that have a model}. The last clause matters: a protein without a model is
-\textbf{excluded from the sum rather than counted as zero}, because a missing model is missing
-information, not evidence of inactivity. Instead, each illness reports its \emph{coverage} --- the
-fraction of its associated proteins that are modelled --- so a low score for a poorly covered
-illness cannot be mistaken for a prediction of inactivity.
+of its proteins \emph{that have a model}. Under this definition donepezil scores $0.74$ on
+Alzheimer's, \emph{worth testing}, attributed to ACHE. The evidence-weighted mean is still
+computed and returned alongside, as \texttt{panel\_mean}: ``engages the whole panel'' is a real
+question, it is simply not the one being asked.
+
+\paragraph{Why not a noisy-OR.} The other natural aggregation is
+$1 - \prod_t (1 - w_{dt} p_t)$, the probability that at least one target is engaged, which has the
+appeal of rewarding a molecule that hits several proteins. It was rejected, because it assumes the
+per-target predictions are \textbf{independent} --- and they are not. Every $p_t$ is computed from
+the same descriptors and the same fingerprint of the same molecule, so the predictions are
+strongly correlated by construction. A noisy-OR over four correlated mediocre predictions returns
+a confident-looking score that no single piece of evidence supports: four proteins at $p = 0.3$
+with $w = 0.7$ would yield $0.61$, enough for \emph{worth testing} on no good grounds. The maximum
+makes the weaker claim, and it is the claim the data supports.
+
+\paragraph{A missing model is not a zero.} $T_d$ ranges only over proteins that have a model. A
+protein without one is \textbf{excluded rather than counted as inactive}, because a missing model
+is missing information. Each illness instead reports its \emph{coverage}, the fraction of its
+associated proteins that are modelled, so a low score for a poorly covered illness cannot be
+mistaken for a prediction that the molecule does nothing.
+
+\paragraph{Confidence follows the driver.} Under a mean every protein contributed, so the least
+reliable applicability domain governed the whole result. Under Equation~\ref{eq:illness-score} the
+claim rests on one protein, so confidence is now read from \emph{that} protein's similarity to its
+nearest known active. This is why donepezil's Alzheimer's result is reported at \textbf{high}
+confidence --- the driving target is an exact structural match --- where the previous scheme
+reported \emph{low}, having been dragged down by the unrelated proteins it was averaging over.
 
 The score never appears alone. It is returned with the per-protein probability, the association
-weight, the nearest known active and its similarity, and a confidence flag from the calibrated
-applicability domain. Toxicity flags from the Tox21 models then downgrade an otherwise promising
+weight, the nearest known active and its similarity, the driving protein, the coverage and a
+confidence flag. Toxicity flags from the Tox21 models then downgrade an otherwise promising
 result, and the verdict is reported in three bands: \textbf{worth testing}, \textbf{unclear} and
 \textbf{unlikely}. The scoring is implemented as pure functions so that the web application and
 the offline validation share one code path, which is what makes the validation below meaningful.
@@ -202,30 +266,89 @@ lands in the resulting ranking of all \TgtNDiseases{} illnesses. If the composit
 signal, a drug's own illness should rank near the top; random ranking would place it first
 \TgtValRandom\% of the time.
 
+Over \TgtValDrugs{} approved drugs the pipeline puts the drug's own illness first \TgtValTopOne\%
+of the time against a random \TgtValRandom\%, in its top three \TgtValTopThree\% of the time
+against a random $20\%$, and at a median rank of \TgtValMedian{} of \TgtNDiseases{} where random
+ranking would give $8.0$. Better than chance, then, but not by the margin the per-protein
+ROC-AUCs might suggest --- and the aggregate is the least informative way to read this result.
+
 \maybeinput{targets_validation}
 
-This is a deliberately permissive test: the same drugs appear in ChEMBL, so a model may partly be
-recalling them, and the scaffold-grouped per-protein figures remain the strict measurement. It is
-reported because it is the one check that exercises the composition end to end --- a pipeline that
-\emph{fails} it is broken regardless of its per-protein scores.
+\paragraph{The aggregate hides the actual finding.} The per-illness rows split into two groups
+with nothing in between, and the dividing line is not model quality.
+
+For the \TgtValApplicableIllnesses{} illnesses whose drugs act on \emph{human} proteins, retrieval
+works: \TgtValApplicableTopThree\% top-three over \TgtValApplicableDrugs{} drugs at a median rank
+of \TgtValApplicableMedian{}, roughly twice the random baseline, and far better than that at the
+top --- every antidepressant but two puts depression in its own top three, and so does almost
+every Alzheimer's drug.
+
+For the \TgtValInfectiousIllnesses{} infectious diseases --- HIV infection, tuberculosis, malaria
+and COVID-19 --- retrieval is \textbf{\TgtValInfectiousTopThree\% across all
+\TgtValInfectiousDrugs{} drugs}, with a median rank of \TgtValInfectiousMedian{}, which is
+\emph{worse} than random. Not one drug recovers its own indication.
+
+That is not a modelling failure, and it is worth being precise about why. Open Targets associates
+an illness with the \textbf{human} proteins implicated in it. But an antiretroviral inhibits HIV
+protease or reverse transcriptase; an antimalarial acts on the parasite; a tuberculosis drug acts
+on mycobacterial enzymes. None of those proteins is human, so none of them can appear in the
+panel, and the models are being asked whether these drugs bind human proteins they were never
+designed to bind. They correctly answer no. The pipeline is right about the chemistry and wrong
+about the illness, because the knowledge base cannot express where those drugs act.
+
+This bounds the module honestly: the method applies to illnesses treated by modulating a human
+protein, and does not apply to infectious disease at all. A caveat discovered by measurement is
+worth more than one asserted in advance, and it is the reason this validation was run on every
+illness rather than on a favourable subset.
+
+\paragraph{A deliberately permissive test.} The same drugs appear in ChEMBL, so a model may partly
+be recalling them, and the scaffold-grouped per-protein figures in Table~\ref{tab:targets} remain
+the strict measurement. Retrieval is reported because it is the only check that exercises the
+composition end to end --- a pipeline that \emph{fails} it is broken regardless of its per-protein
+scores --- and because, as above, the shape of the failures is more informative than the headline.
 
 \paragraph{Negative controls.} Molecules nobody would mistake for drugs --- water, ethanol,
-methane, glucose, acetic acid, benzene --- are run through the same chain. If they light up every
-illness, the models are reading drug-likeness rather than protein activity. The highest illness
-score reached by any control is \TgtCtrlMax\%, with \TgtCtrlFlags{} verdicts of "worth testing"
-across all controls and illnesses.
+methane, glucose, acetic acid and benzene --- are run through the same chain. If they light up
+every illness, the models are reading drug-likeness rather than protein activity. \textbf{Not one
+of them is ever reported as \emph{worth testing}} --- \TgtCtrlFlags{} such verdicts across all six
+control molecules and all \TgtNDiseases{} illnesses.
+
+They are not dismissed outright either, and that is a real limitation of
+Equation~\ref{eq:illness-score}: because the score is a maximum, it cannot fall below the single
+most optimistic protein model, and these tiny molecules collect scores up to \TgtCtrlMax\% --- the
+\emph{unclear} band rather than \emph{unlikely}. What keeps them out of the promising band is the
+applicability-domain check: benzene resembles nothing in any training set of actives, confidence
+comes back low, and the verdict is capped. The maximum and the domain check are therefore not
+independent design choices --- the first is only safe because the second is there.
 
 \subsection{Semi-supervised learning on a third domain}
 
 Proteins with few measured molecules are precisely the case semi-supervised learning is supposed
 to address, which makes this module a third independent test of the project's central protocol.
-The five methods compared in Section~\ref{sec:methods} are rerun on the proteins with the fewest
-measured molecules, with \TgtSSLBudget{} labels and the unlabelled ZINC pool --- the same
-experimental design used for materials with GNoME and for toxicity with ZINC. Assumed inactives
-are excluded from the labelled pool here, since mixing them in would make the task artificially
-easy.
+The five methods compared in Section~\ref{sec:methods} are rerun on the \TgtSSLNTargets{} proteins
+with the fewest measured molecules, using the unlabelled ZINC pool --- the same experimental
+design used for materials with GNoME and for toxicity with ZINC. The label budget is capped at
+\TgtSSLBudget{}, but these proteins have so little measured data that only
+\TgtSSLLabelsMin{}--\TgtSSLLabelsMax{} labels are actually available, which is the regime of
+interest. Presumed inactives are excluded from the labelled pool here: they are assumed rather
+than measured, and mixing them in would make the task artificially easy.
 
 \maybeinput{targets_ssl}
+
+The gains run from \TgtSSLMin\% to \TgtSSLMax\%, a mean of \TgtSSLMean\%, and on
+\TgtSSLNoGain{} of the \TgtSSLNTargets{} proteins \textbf{no semi-supervised variant beat plain
+supervised learning at all} --- the best method was the baseline. Where something did help it was
+Self-Training on VDR and Co-Training on DPP9, the same two methods that won on materials and
+toxicity.
+
+This is a modest result, and it is the same modest result the other two domains gave: measured
+across materials, toxicity and now protein activity, the honest summary of this project's central
+experiment is that semi-supervised learning on an unlabelled pool buys a fraction of a percent
+when it works and nothing when it does not. Reporting that across three independent domains is
+worth more than reporting a larger number from one. It also agrees with the clearest negative
+result in the materials track, where the GNoME pool actively \emph{hurt} magnetism prediction: a
+large pool of unlabelled molecules is only useful when it is drawn from the same chemistry as the
+labelled set, and ZINC is not where measured kinase or receptor ligands come from.
 
 \subsection{What this module cannot do}
 

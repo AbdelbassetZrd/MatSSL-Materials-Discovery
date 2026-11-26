@@ -138,7 +138,7 @@ ratio swings strongly with it, so the cutoff is recorded in every per-target sum
 left implicit. Duplicate molecule-protein pairs are collapsed to their median pChEMBL, and SMILES
 are canonicalised with the same `canonical()` helper used everywhere else in the project.
 
-### Six honest-measurement problems, and what was done about each
+### Seven honest-measurement problems, and what was done about each
 
 These are the parts worth defending in a viva; each one was a real result that looked good and
 was wrong.
@@ -201,17 +201,58 @@ held-out molecules are binned by similarity to their nearest known active and ac
 per bin, so the "unreliable" line sits where accuracy actually collapses. A molecule outside the
 domain is reported as **unclear**, not as a confident low score - extrapolation is not a finding.
 
+**7. A selective drug was punished for being selective.** The illness score began as the
+evidence-weighted mean of the predicted activities over an illness's proteins. It fails on the
+first drug anyone would test it with. **Donepezil** is the standard Alzheimer's treatment and a
+selective acetylcholinesterase inhibitor; the pipeline put its real target ACHE at 99 % with a
+Tanimoto of 1.00 to a known active - the chemistry was recognised perfectly - and then gave
+Alzheimer's **0.25, "unlikely"**, ranking it below depression:
+
+| Protein | evidence w | P(active) | w x p |
+|---|---|---|---|
+| ACHE | 0.75 | 99 % | **0.74** |
+| ACE | 0.70 | 6 % | 0.04 |
+| APP | 0.68 | 1 % | 0.01 |
+| CDK5 | 0.60 | 4 % | 0.02 |
+| | | evidence-weighted mean | 0.25 |
+| | | best evidence-weighted target | **0.74** |
+
+The error is conceptual, not numerical. A mean asks *does this molecule engage the whole panel of
+proteins linked to this illness?* Almost no drug does, and the ones that come closest are
+promiscuous compounds that fail for exactly that reason. Selectivity is how a drug is supposed to
+work, and the mean penalises it hardest. The score is now the best evidence-weighted target,
+
+```
+score(molecule, illness) = max_t  w_t * P(active | molecule, protein t)
+```
+
+under which donepezil scores 0.74 on Alzheimer's, *worth testing*, attributed to ACHE. The mean is
+still reported alongside as `panel_mean`, because "engages the whole panel" is a real question -
+just not the one being asked.
+
+A noisy-OR, `1 - prod(1 - w_t p_t)`, was the other obvious candidate and was rejected: it assumes
+the per-target predictions are independent, and they are all computed from the same descriptors
+and fingerprint of the same molecule, so they are correlated by construction. Four proteins at
+p = 0.3 with w = 0.7 would combine to 0.61 - enough for "worth testing" on no good grounds. The
+maximum makes the weaker claim, and it is the claim the data supports.
+
+Confidence now follows the protein that drives the score rather than the least relevant one. Under
+a mean every protein contributed, so the worst applicability domain governed the result; under a
+maximum the claim rests on one protein, so that is the one whose domain decides whether to trust
+it. This is why donepezil's Alzheimer's result is reported at **high** confidence - the driving
+target is an exact structural match - where the old scheme said *low*.
+
 ### Scoring
 
 `pipeline/molecules/indications.py` is pure functions, so the API and the offline validation share
 one implementation (the pattern that worked for `pipeline/industries/applications.py`):
 
 ```
-illness_score = SUM_t  w_t * P(active | molecule, protein t)  /  SUM_t  w_t
-                                              w = Open Targets association score
+illness_score = max_t  w_t * P(active | molecule, protein t)
+                              w = Open Targets association score
 ```
 
-Proteins with no model are **excluded from the sum, not counted as zero** - a missing model is
+Proteins with no model are **excluded, not counted as zero** - a missing model is
 missing information, not evidence of inactivity - and the illness instead reports its *coverage*
 (how many of its proteins are modelled). The result carries its full breakdown: per-protein
 probability, the evidence weight, the nearest known active with its Tanimoto similarity, and a
@@ -230,6 +271,62 @@ exists, and the already-approved drugs depicted with RDKit. `pages/Screen.jsx` i
 page: one molecule against all 15 illnesses as an expandable ranking, or all saved molecules as a
 heat map. Both carry the same notice.
 
+### Does it work? The validation, and the limit it uncovered
+
+Every illness in the knowledge base carries the small-molecule drugs already approved for it.
+All 163 of them are pushed through the complete chain - featurise, run all 45 protein models,
+weight by association score - and we record where their own indication lands in the ranking of
+all 15 illnesses.
+
+Overall: the drug's own illness is ranked first 14 % of the time (random 6.7 %), in the top three
+32 % (random 20 %), at a median rank of 7.0 of 15 (random 8.0). Above chance, but the aggregate
+is the least interesting way to read it, because the per-illness results split cleanly in two.
+
+**Where the method works** - the 11 illnesses whose drugs act on *human* proteins:
+
+| Illness | median rank | top-3 |
+|---|---|---|
+| Depression | **1.0** / 15 | **83 %** |
+| Alzheimer's disease | 3.0 / 15 | **83 %** |
+| Parkinson's disease | 4.0 / 15 | 42 % |
+| Lung cancer | 4.0 / 15 | 50 % |
+| Asthma | 4.0 / 15 | 42 % |
+| Epilepsy | 4.0 / 15 | 42 % |
+| Type 2 diabetes | 6.0 / 15 | 42 % |
+| **group total (126 drugs)** | **5.9** | **41 %** |
+
+**Where it fails completely** - the 4 infectious diseases:
+
+| Illness | median rank | top-3 |
+|---|---|---|
+| HIV infection | 11.0 / 15 | 0 % |
+| Tuberculosis | 11.5 / 15 | 0 % |
+| Malaria | 14.0 / 15 | 0 % |
+| **group total (37 drugs)** | **12.1** | **0 %** |
+
+Not one of the 37 drugs recovers its own indication, and the median rank is *worse* than random.
+This is not a modelling failure, and the reason is worth stating exactly: Open Targets associates
+an illness with the **human** proteins implicated in it. But an antiretroviral inhibits HIV
+protease or reverse transcriptase, an antimalarial acts on the parasite, a tuberculosis drug acts
+on mycobacterial enzymes. None of those proteins is human, so none can appear in the panel. The
+models are asked whether these drugs bind human proteins they were never designed to bind, and
+they correctly answer no. The pipeline is right about the chemistry and wrong about the illness,
+because the knowledge base cannot express where those drugs act.
+
+So the module's domain is now known rather than assumed: **it applies to illnesses treated by
+modulating a human protein, and not to infectious disease at all.** A limit found by measurement
+is worth more than one asserted in advance, which is why the validation was run on every illness
+instead of a favourable subset.
+
+**Negative controls.** Water, ethanol, methane, glucose, acetic acid and benzene go through the
+same chain. **None is ever reported as "worth testing"** for any illness. They are not dismissed
+outright either, and that is a genuine limitation of using a maximum: the score cannot fall below
+the single most optimistic protein model, so these tiny molecules reach up to 55 % - the *unclear*
+band rather than *unlikely*. What keeps them out of the promising band is the applicability-domain
+check: benzene resembles nothing in any set of known actives, so confidence comes back low and the
+verdict is capped. The maximum and the domain check are not independent choices - the first is
+only safe because the second exists.
+
 ### Honest limits, stated in the UI as well as here
 
 - A target-level prediction says nothing about absorption, dose, selectivity or safety in a person.
@@ -238,6 +335,8 @@ heat map. Both carry the same notice.
   per model.
 - Many illnesses have no good druggable target, so a low score can mean "no useful protein model
   for this illness" rather than "this molecule does nothing". That is why coverage is reported.
+- **Infectious disease is outside the method entirely**, as the validation above shows: the drug's
+  target lives in the pathogen, and the knowledge base only holds human proteins.
 
 ---
 
@@ -329,3 +428,14 @@ uv run uvicorn app.main:app --host 127.0.0.1 --port 8000   # http://127.0.0.1:80
 | `app/services/design.py`, `app/api/routes/design.py` | Design Lab API |
 | `frontend/src/pages/MoleculeStudio.jsx`, `MoleculeResults.jsx`, `DesignLab.jsx` | the three new pages |
 | `tests/test_molecules.py`, `tests/test_design.py` | API and scoring tests |
+| `pipeline/molecules/build_disease_graph.py` | Open Targets to illness/protein knowledge base (exact gene-symbol match, no guessing) |
+| `pipeline/molecules/get_chembl.py` | measured activities per protein, pChEMBL labelling, property-matched decoys |
+| `pipeline/molecules/train_targets.py` | one stacked model per protein, with the measured-only metric and its denominator |
+| `pipeline/molecules/guard_target_metrics.py` | applies the measured-minority rule to every summary on disk |
+| `pipeline/molecules/indications.py` | the scoring (pure functions, shared by the API and the validation) |
+| `pipeline/molecules/validate_indications.py` | repurposing retrieval over 163 approved drugs + inert controls |
+| `pipeline/molecules/run_ssl_targets.py` | the semi-supervised comparison on the lowest-data proteins |
+| `app/services/indications.py`, `app/api/routes/indications.py` | illness screening API |
+| `frontend/src/pages/Diseases.jsx`, `Screen.jsx` | illness explorer and screening page |
+| `tests/test_indications.py` | scoring maths, the donepezil regression, and the API |
+| `data/processed/diseases.json` | the knowledge base: 15 illnesses, 52 proteins, 325 approved drugs |
